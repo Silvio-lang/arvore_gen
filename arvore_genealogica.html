@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Árvore Genealógica - Cadastro, Vinculação e Gerenciamento</title>
+    <link rel="stylesheet" href="arvore_style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Árvore Genealógica</h1>
+            <p>Um aplicativo para construir e gerenciar sua história familiar.</p>
+        </header>
+
+        <nav>
+            <button id="btnNovaPessoa" class="active">Nova Pessoa</button>
+            <button id="btnGerenciar">Gerenciar Registros</button>
+            <button id="btnVisualizarArvore">Visualizar Árvore</button>
+        </nav>
+
+        <main>
+            <!-- ===== SEÇÃO PARA CADASTRAR NOVA PESSOA ===== -->
+            <section id="secNovaPessoa" class="active">
+                <h3>Cadastrar Nova Pessoa</h3>
+                <form id="pessoaForm">
+                    <label for="nome">Nome completo:</label>
+                    <input type="text" id="nome" name="nome" required>
+                    
+                    <label for="sexo">Sexo:</label>
+                    <select id="sexo" name="sexo" required>
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                    </select>
+                    
+                    <label for="nascimento">Nascimento:</label>
+                    <input type="text" id="nascimento" name="nascimento" placeholder="DD/MM/AAAA">
+                    
+                    <label for="falecimento">Falecimento (opcional):</label>
+                    <input type="text" id="falecimento" name="falecimento" placeholder="DD/MM/AAAA ou apenas ano">
+                    
+                    <label for="profissao">Profissão (opcional):</label>
+                    <input type="text" id="profissao" name="profissao">
+                    
+                    <label for="cidade_pais_principal">Cidade/País principal (opcional):</label>
+                    <input type="text" id="cidade_pais_principal" name="cidade_pais_principal">
+                    
+                    <button type="submit">Salvar Registro</button>
+                </form>
+                
+                <div id="registroAtualContainer" style="margin-top: 20px; padding: 10px; background: #e7f3ff; border-radius: 4px; font-style: italic;">
+                    Nenhum registro criado nesta sessão.
+                </div>
+            </section>
+
+            <!-- ===== SEÇÃO PARA GERENCIAR REGISTROS ===== -->
+            <section id="secGerenciar">
+                <h3>Gerenciar Registros</h3>
+                <label for="filtroNome">Filtrar por Nome:</label>
+                <input type="text" id="filtroNome" placeholder="Digite um nome ou sobrenome...">
+                
+                <!-- ===== CABEÇALHO DA LISTA CORRIGIDO (USA CLASSES) ===== -->
+                <div class="cabecalho-lista">
+                    <div class="cabecalho-pessoa">Pessoa</div>
+                    <div class="indicadores-cabecalho">
+                        <span title="Cônjuge(s)">C</span>
+                        <span title="Filhos">F</span>
+                        <span title="Pais">P</span>
+                    </div>               
+                    <div class="cabecalho-acoes">Ações</div>
+                </div>
+                <!-- ======================================================= -->
+                
+                <div class="registros-lista" id="registrosLista"></div>
+
+                <!-- ===== FORMULÁRIO DE EDIÇÃO ===== -->
+                <div id="formGerenciar" style="display: none; margin-top: 30px; padding: 20px; background: #f0f8ff; border: 2px solid #007bff; border-radius: 6px;">
+                    <h3>Editar Registro</h3>
+                    <form id="editarForm">
+                        <input type="hidden" id="editarId">
+                        
+                        <label for="editarNome">Nome completo:</label>
+                        <input type="text" id="editarNome" name="editarNome" required>
+                        
+                        <label for="editarSexo">Sexo:</label>
+                        <select id="editarSexo" name="editarSexo">
+                            <option value="M">Masculino</option>
+                            <option value="F">Feminino</option>
+                        </select>
+                        
+                        <label for="editarNascimento">Nascimento:</label>
+                        <input type="text" id="editarNascimento" name="editarNascimento">
+                        
+                        <label for="editarFalecimento">Falecimento:</label>
+                        <input type="text" id="editarFalecimento" name="editarFalecimento">
+                        
+                        <label for="editarProfissao">Profissão:</label>
+                        <input type="text" id="editarProfissao" name="editarProfissao">
+                        
+                        <label for="editarCidade">Cidade/País principal:</label>
+                        <input type="text" id="editarCidade" name="editarCidade">
+                        
+                        <button type="submit">Salvar Alterações</button>
+                        <button type="button" id="btnCancelarEditar">Cancelar</button>
+                        <button type="button" id="btnExcluirRegistro" style="background-color: #dc3545;">Excluir Registro</button>
+                    </form>
+                    
+                    <hr style="margin: 20px 0;">
+                    
+                    <h4>Vínculos Atuais:</h4>
+                    <div id="vinculosLista"></div>
+                    
+                    <h4>Adicionar Novo Vínculo</h4>
+                       <p style="font-size: 11px; font-style: italic; color: #666; margin: 5px 0 10px 0;">
+    (Permite mais de um cônjuge e mais de 2 pais ou mães)
+</p>
+                    <div>
+                        <label>Relação da pessoa editada:</label><br>
+                        <input type="radio" id="radioPai" name="tipoVinculoNovo" value="pai">
+                        <label for="radioPai">é pai/mãe de...</label><br>
+                        <input type="radio" id="radioFilho" name="tipoVinculoNovo" value="filho">
+                        <label for="radioFilho">é filho(a) de...</label><br>
+                        <input type="radio" id="radioConjuge" name="tipoVinculoNovo" value="conjuge">
+                        <label for="radioConjuge">é cônjuge de...</label><br>
+                    </div>
+                    <label for="selectPessoaVinculo">Com quem:</label>
+                    <select id="selectPessoaVinculo">
+                        <option value="">Selecione na lista...</option>
+                    </select>
+                    <button id="btnAdicionarVinculo">Adicionar Vínculo</button>
+                </div>
+            </section>
+
+            <!-- ===== NOVA SEÇÃO: VISUALIZAR ÁRVORE ===== -->
+            <section id="secVisualizarArvore">
+                <h3>Visualizar Árvore Genealógica</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="selectPessoaCentral">Selecionar pessoa central:</label>
+                    <select id="selectPessoaCentral" style="width: 100%; max-width: 400px; padding: 8px;">
+                        <option value="">Escolha uma pessoa...</option>
+                    </select>
+                </div>
+
+                <div id="arvoreContainer"></div>
+            </section>
+        </main>
+
+        <footer style="margin-top: 40px; text-align: center; padding: 20px; border-top: 1px solid #ccc;">
+
+        <button id="btnExportarJSON" style="margin-right: 10px;">Salvar DADOS</button>
+        <label for="inputImportJSON" style="cursor: pointer; padding: 10px 20px; background: #28a745; color: white; border-radius: 5px;">
+              Carregar DADOS
+                <input type="file" id="inputImportJSON" accept=".json" style="display: none;">
+            </label>
+        </footer>
+    </div>
+
+    <script src="arvore_script.js"></script>
+</body>
+</html>
