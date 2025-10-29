@@ -1303,3 +1303,71 @@ footer button:focus-visible {
     font-size: 16px !important;
     font-weight: 600 !important;
 }
+/* =======================================================
+* ESTILOS CORRIGIDOS PARA O LAYOUT VERTICAL DE VÍNCULO
+* ======================================================= */
+.vinculo-container {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-border);
+}
+
+.vinculo-pessoa-nome {
+    margin: 0 0 10px 0; /* Espaço abaixo do nome */
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+    font-weight: var(--font-weight-semibold);
+}
+
+.vinculo-container select,
+.vinculo-container button {
+    width: 100%; /* Faz cada item ocupar a largura total */
+    margin-bottom: 10px; /* Adiciona espaço entre eles */
+    display: block; /* Garante que fiquem em linhas separadas */
+}
+
+/* Remove a margem do último elemento para não criar espaço extra */
+.vinculo-container button {
+    margin-bottom: 0;
+}
+/* =======================================================
+* TOOLTIP DE AVISO PARA O BOTÃO "SALVAR NA NUVEM"
+* ======================================================= */
+
+/* 1. Prepara o botão para posicionar o aviso sobre ele */
+#btnSalvarSupabase {
+    position: relative;
+}
+
+/* 2. Cria e estiliza o aviso, que fica escondido por padrão */
+#btnSalvarSupabase::after {
+    content: 'CAUTELA - arquivo coletivo';
+    position: absolute;
+    bottom: 120%; /* Posiciona o aviso acima do botão */
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* Estilo do aviso */
+    background-color: black;
+    color: red;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    
+    /* Lógica para esconder/mostrar */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+    
+    /* Garante que o texto não quebre e fique na frente de outros elementos */
+    white-space: nowrap;
+    z-index: 100;
+}
+
+/* 3. Mostra o aviso quando o mouse está sobre o botão */
+#btnSalvarSupabase:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
