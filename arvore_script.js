@@ -91,7 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
         "13. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois, os dados ficarão na memória do seu navegador, automaticamente. Se usar outro navegador (Chrome, Edge, etc.), precisará carregar da nuvem ou da pasta de Downloads novamente.",
         "14. As alterações feitas e salvas na nuvem são associados ao seu nome de usuário.",
         "15. Clique em + e - para navegar (avançar e retroceder) nestas instruções.",
-        "16. Quando usado no celular, muitas vezes o aparecimento do teclado sobrepõe o conteúdo da página. Neste caso, puxe a tela para cima para continuar visualizando."
+        "16. Quando usado no celular, muitas vezes o aparecimento do teclado sobrepõe o conteúdo da página. Neste caso, puxe a tela para cima para continuar visualizando.",
+        "17. O sistema é bem flexível para aceitar registros com dados faltantes para facilitar o trabalho colaborativo.",
+        "18. Procure utilizar o nome em letras MAIÚSCULAS por padrão.",
+        "19. Está previsto implementar a geração de lista de datas de aniversários."
     ];
 
     function mostrarDica(index) {
