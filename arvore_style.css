@@ -254,3 +254,28 @@ form button[type="submit"], form button[type="button"] {
         flex-grow: 0; /* Impede que os botões estiquem demais */
     }
 }
+/* ESTILOS PARA NAVEGAÇÃO DAS DICAS */
+.dicas-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 15px;
+}
+
+.dicas-nav button {
+    font-size: 20px;
+    font-weight: bold;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    cursor: pointer;
+}
+
+#dicaContador {
+    font-weight: bold;
+    font-size: 16px;
+    min-width: 50px;
+    text-align: center;
+}
