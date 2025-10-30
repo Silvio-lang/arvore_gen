@@ -82,16 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
         "04. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
         "05. Ao vincular duas pessoas, o vínculo contrário correspondente é criado automaticamente na outra pessoa.",
         "06. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
-        "07. Filhos e pai/mãe 'não-de-sangue' ou 'não registrados em cartório' podem ser lançados como filhos, sem nenhum impedimento, podendo também incluir  outros parentes e vinculá-los.",
-        "08 Para percorrer a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
-        "09. Na visualização da Árvore, centralizada em alguém, caso note alguma falta de vínculo ou um nome com erro, use o botão 'Editar' nesta tela para correção.",
-        "10 Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero de cônjuges, pais, e filhos cadastrados. Auxilia a detectar erros e vinculos não registrados.",
-        "11. Se você quiser criar uma árvore separada, nova, pode fazê-lo, mas *somente no seu computador ou celular* para não alterar os dados criados desde o início desta árvore familiar. Neste caso, não salve na nuvem!  Solicitamos cuidado",
-        "12. O criador deste aplicativo é Silvio Aurich Filho, participante desta árvore.",
-        "13. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois, os dados estarão na memória do seu navegador, automaticamente. Se trocar de navegador (Chrome, Edge, etc.), precisará carregar da nuvem ou da pasta de Downloads novamente.",
-        "14. As alterações feitas e salvas por você, na nuvem, serão associados ao seu nome de usuário.",
-        "15. Clique em (+) e (-) para navegar (avançar e retroceder) nestas instruções/dicas.",
-        "16. Quando utilizado o celular, muitas vezes o aparecimento do teclado cobre parte do conteúdo da página. Neste caso, puxe a tela para cima para continuar visualizando."
+        "07. Filhos e pai/mãe 'não-de-sangue' ou 'não registrados' podem ser lançados como filhos sem nenhum impedimento, podendo também vinculá-lo a outros parentes",
+        "08 Para visualizar a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
+        "09. Na visualização da Árvore, centralizada em alguém, ao ser notada alguma falta de vínculo ou nome com erro, use o botão 'Editar' nesta tela para correção.",
+        "10 Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero de cônjuges, pais, e filhos registrados na base de dados. Auxilia a detectar erros e vinculos não registrados.",
+        "11. Se você quiser, pode criar uma árvore separada, nova, pode fazer, mas *somente na seu computador/celular*, para não alterar os dados criados desde o início desta árvore familiar. Neste caso, não salve na nuvem. Solicitamos cuidado!",
+        "12. O criador deste aplicativo é Silvio Aurich Filho, participante da base de dados.",
+        "13. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois, os dados ficarão na memória do seu navegador, automaticamente. Se usar outro navegador (Chrome, Edge, etc.), precisará carregar da nuvem ou da pasta de Downloads novamente.",
+        "14. As alterações feitas e salvas na nuvem são associados ao seu nome de usuário.",
+        "15. Clique em + e - para navegar (avançar e retroceder) nestas instruções.",
+        "16. Quando usado no celular, muitas vezes o aparecimento do teclado sobrepõe o conteúdo da página. Neste caso, puxe a tela para cima para continuar visualizando."
     ];
 
     function mostrarDica(index) {
@@ -634,21 +634,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function carregarDoSupabase() {
-        if (!supabase) return alert('❌ Supabase não carregado!');
-        const userName = localStorage.getItem('arvoreUsuario');
-        if (!userName) {
-            return alert("ℹ️ Nenhum usuário foi definido. Por favor, salve os dados na nuvem uma vez para definir um usuário.");
+        if (!supabase) {
+            esconderLoading();
+            return alert('❌ Supabase não carregado!');
         }
-        
-        mostrarLoading(`Carregando dados de "${userName}"...`);
+
+        let userName = localStorage.getItem('arvoreUsuario');
+
+        if (!userName) {
+            userName = prompt("Parece ser seu primeiro acesso neste navegador.\n\nPor favor, digite seu nome de usuário para carregar os dados da nuvem:", "");
+        }
+
+        if (!userName || userName.trim().length < 3) {
+            esconderLoading();
+            return alert("❌ Carregamento cancelado. O nome de usuário é necessário.");
+        }
+
+        const userNameLimpo = userName.trim();
+        mostrarLoading(`Carregando dados de "${userNameLimpo}"...`);
         
         try {
-            const { data: nuvemData, error } = await supabase.from('app_genealogia').select('*').eq('user_id', userName);
+            const { data: nuvemData, error } = await supabase.from('app_genealogia').select('*').eq('user_id', userNameLimpo);
             if (error) throw error;
 
             if (!nuvemData || nuvemData.length === 0) {
                 esconderLoading();
-                return alert(`ℹ️ Nenhum dado encontrado na nuvem para o usuário: ${userName}`);
+                return alert(`ℹ️ Nenhum dado encontrado na nuvem para o usuário: ${userNameLimpo}`);
             }
             
             const bancoLocal = carregarBancoLocal();
@@ -666,7 +677,9 @@ document.addEventListener('DOMContentLoaded', () => {
             salvarBancoLocal(banco);
 
             esconderLoading();
-            alert(`✅ Dados de "${userName}" sincronizados! Total: ${banco.length} pessoas.`);
+            // Salva o nome de usuário no navegador para usos futuros
+            localStorage.setItem('arvoreUsuario', userNameLimpo);
+            alert(`✅ Dados de "${userNameLimpo}" sincronizados! Total: ${banco.length} pessoas.`);
             ativarSecao(secGerenciar, btnGerenciar);
         } catch (err) {
             esconderLoading();
