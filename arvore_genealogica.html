@@ -16,7 +16,7 @@
         <nav>
             <button id="btnNovaPessoa">Incluir Pessoa</button>
             <button id="btnGerenciar">Buscar Pessoas</button>
-            <button id="btnVisualizarArvore">Percorrer Árvore</button>
+            <!-- O botão "Percorrer Árvore" foi removido daqui -->
         </nav>
 
         <!-- SEÇÃO 1: NOVA PESSOA -->
@@ -50,43 +50,43 @@
             <div id="registroAtualContainer">Nenhum registro criado nesta sessão.</div>
         </section>
 
-        <!-- SEÇÃO 2: GERENCIAR REGISTROS -->
+        <!-- SEÇÃO 2: GERENCIAR REGISTROS (COM REATORAÇÃO) -->
         <section id="secGerenciar">
             <h2>Registros</h2>
             
             <label>Filtrar por Nome ou Sobrenome:</label>
             <input type="text" id="filtroNome">
 
-            <div id="registrosLista"></div>
+            <!-- NOVOS BOTÕES DE AÇÃO GLOBAIS -->
+            <div id="botoesAcaoGlobais">
+                <button id="btnEditarSelecionado">✏️ Editar Selecionado</button>
+                <button id="btnVisualizarSelecionado">🌳 Visualizar Árvore</button>
+            </div>
+
+            <div id="registrosLista"></div> <!-- A lista será populada com radio buttons via JS -->
 
             <div id="registroAtualContainer2" style="display:none; margin-top: 30px; padding-top: 30px; border-top: 1px solid #ddd;">
                 <h3>Editar Registro</h3>
                 <form id="editarForm" style="display:none;">
+                    <!-- Campos de edição permanecem os mesmos -->
                     <label>ID:</label>
                     <input type="text" id="edit-id" readonly>
-
                     <label>Nome completo:</label>
                     <input type="text" id="edit-nome">
-
                     <label>Sexo:</label>
                     <select id="edit-sexo">
                         <option value="">Selecione...</option>
                         <option value="M">Masculino</option>
                         <option value="F">Feminino</option>
                     </select>
-
                     <label>Nascimento:</label>
                     <input type="text" id="edit-nascimento">
-
                     <label>Falecimento:</label>
                     <input type="text" id="edit-falecimento">
-
                     <label>Profissão:</label>
                     <input type="text" id="edit-profissao">
-
                     <label>Cidade/País principal:</label>
                     <input type="text" id="edit-cidade_pais">
-
                     <button type="button" id="btnSalvarEdicao">Salvar Alterações</button>
                     <button type="button" id="btnExcluirRegistro">Excluir Registro</button>
                     <button type="button" id="btnCancelarEditar">Cancelar</button>
@@ -95,33 +95,29 @@
                 <div id="vinculosSection" style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #ddd;">
                     <h3>Vínculos Atuais:</h3>
                     <div id="vinculosLista"></div>
-
-                    <!-- SEÇÃO DE VÍNCULO MODIFICADA -->
-<div class="vinculo-container">
-    <h4 id="labelNomePessoaEditada" class="vinculo-pessoa-nome"></h4>
-    <select id="selectRelacao">
-        <option value="pai">é pai/mãe de...</option>
-        <option value="filho">é filho(a) de...</option>
-        <option value="conjuge">é (ou foi) cônjuge de...</option>
-    </select>
-    <select id="selectPessoaVinculo">
-        <option value="">Selecione uma pessoa...</option>
-    </select>
-    <button type="button" id="btnAdicionarVinculo">Adicionar Vínculo</button>
-</div>
+                    <div class="vinculo-container">
+                        <h4 id="labelNomePessoaEditada" class="vinculo-pessoa-nome"></h4>
+                        <select id="selectRelacao">
+                            <option value="pai">é pai/mãe de...</option>
+                            <option value="filho">é filho(a) de...</option>
+                            <option value="conjuge">é (ou foi) cônjuge de...</option>
+                        </select>
+                        <select id="selectPessoaVinculo">
+                            <option value="">Selecione uma pessoa...</option>
+                        </select>
+                        <button type="button" id="btnAdicionarVinculo">Adicionar Vínculo</button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- SEÇÃO 3: VISUALIZAR ÁRVORE -->
+        <!-- SEÇÃO 3: VISUALIZAR ÁRVORE (AGORA ACESSADA PELA BUSCA) -->
         <section id="secVisualizarArvore">
             <h2 style="text-align: center;">Árvore Genealógica - Visualização</h2>
-            
             <label>Selecionar pessoa central:</label>
             <select id="selectPessoaCentral">
                 <option value="">Escolha uma pessoa...</option>
             </select>
-
             <div id="arvoreContainer"></div>
         </section>
 
@@ -131,8 +127,18 @@
             <button id="btnImportarJSON">Carregar LOCAL</button>
             <button id="btnSalvarSupabase">☁️ Salvar na Nuvem</button>
             <button id="btnCarregarSupabase">⬇️ Carregar da Nuvem</button>
+            <button id="btnDicas" title="Ver Dicas de Uso">💡</button> <!-- NOVO BOTÃO DE DICAS -->
             <input type="file" id="inputImportJSON" accept=".json,.txt" style="display: none;">
         </footer>
+    </div>
+
+    <!-- MODAL DE DICAS (ESTRUTURA) -->
+    <div id="dicasModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Dica Rápida</h3>
+            <p id="dicaTexto"></p>
+        </div>
     </div>
 
     <!-- SCRIPTS -->
@@ -140,3 +146,4 @@
     <script src="arvore_script.js"></script>
 </body>
 </html>
+
