@@ -77,16 +77,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================================================================
     const dicas = [
         "01. Para criar um vínculo (paternidade/filiação ou de casal), edite uma pessoa e use a seção 'Vínculos Atuais'.",
-        "02. Você pode filtrar a lista de pessoas digitando qualquer parte do nome no campo de busca.",
+        "02. Você pode filtrar a lista de pessoas digitando qualquer parte do nome no campo de Busca de Pessoas.",
         "03. Use os botões 'Salvar na Nuvem' e 'Carregar da Nuvem' para manter seus dados seguros e sincronizados entre todos os usuários.",
         "04. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
         "05. Ao vincular duas pessoas, o vínculo contrário correspondente é criado automaticamente na outra pessoa.",
         "06. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
-        "07. Filhos e pai/mãe 'não-de-sangue' ou 'não registrados' podem ser lançados como filhos sem nenhum impedimento, podendo também vinculá-lo a outros parentes",
-        "08 Para visualizar a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
-        "09. Na visualização da Árvore, centralizada em alguém, ao ser notada alguma falta de vínculo ou nome com erro, use o botão 'Editar' nesta tela para correção.",
+        "07. Filhos e pai/mãe 'não-de-sangue' ou 'não registrados' podem ser lançados como filhos sem nenhum impedimento, podendo também vinculá-lo também aos outros parentes",
+        "08. Para visualizar a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
+        "09. Na visualização da Árvore, centralizada em alguém, se notar alguma falta de vínculo ou nome com erro, use o botão 'Editar' nesta tela para correção.",
         "10 Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero de cônjuges, pais, e filhos registrados na base de dados. Auxilia a detectar erros e vinculos não registrados.",
-        "11. Se você quiser, pode criar uma árvore separada, nova, pode fazer, mas *somente na seu computador/celular*, para não alterar os dados criados desde o início desta árvore familiar. Neste caso, não salve na nuvem. Solicitamos cuidado!",
+        "11. Se você quiser, pode criar uma árvore separada, nova, pode fazer! mas *somente no seu computador/celular*, para não alterar os dados criados desde o surgimento desta árvore familiar. Neste caso, não salve na nuvem. Solicitamos cuidado!",
         "12. O criador deste aplicativo é Silvio Aurich Filho, participante da base de dados.",
         "13. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois, os dados ficarão na memória do seu navegador, automaticamente. Se usar outro navegador (Chrome, Edge, etc.), precisará carregar da nuvem ou da pasta de Downloads novamente.",
         "14. As alterações feitas e salvas na nuvem são associados ao seu nome de usuário.",
@@ -698,4 +698,5 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     ativarSecao(secVisualizarArvore, null);
 });
+
 
