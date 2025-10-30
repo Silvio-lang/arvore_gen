@@ -92,9 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
         "14. As alterações feitas e salvas na nuvem são associados ao seu nome de usuário.",
         "15. Clique em + e - para navegar (avançar e retroceder) nestas instruções.",
         "16. Quando usado no celular, muitas vezes o aparecimento do teclado sobrepõe o conteúdo da página. Neste caso, puxe a tela para cima para continuar visualizando.",
-        "17. O sistema é bem flexível para aceitar registros com dados faltantes para facilitar o trabalho colaborativo.",
+        "17. O sistema é flexível em aceitar registros com dados faltantes para facilitar o trabalho colaborativo com introdução de nomes e vínculos.",
         "18. Procure utilizar o nome em letras MAIÚSCULAS por padrão.",
-        "19. Está previsto implementar a geração de lista de datas de aniversários."
+        "19. Em breve: geração de listas de datas de aniversários."
     ];
 
     function mostrarDica(index) {
@@ -698,3 +698,4 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     ativarSecao(secVisualizarArvore, null);
 });
+
