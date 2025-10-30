@@ -388,28 +388,39 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnAdicionarVinculo) {
         btnAdicionarVinculo.addEventListener('click', () => {
             if (!registroEditando || !selectRelacao || !selectPessoaVinculo) return;
+
             const relacao = selectRelacao.value;
             const pessoaId = selectPessoaVinculo.value;
             const pessoaVinculada = banco.find(p => p.id === pessoaId);
+
             if (!relacao || !pessoaId || !pessoaVinculada) {
                 alert('Selecione uma relação e uma pessoa.');
                 return;
             }
-            if (relacao === 'pai_mae') {
-                registroEditando.pais = garantirRelacaoUnica(registroEditando.pais, pessoaId);
-                pessoaVinculada.filhos = garantirRelacaoUnica(pessoaVinculada.filhos, registroEditando.id);
-            } else if (relacao === 'filho_a') {
+
+            // LÓGICA CORRIGIDA E FINAL
+            // A pessoa que está sendo editada (registroEditando) é o sujeito da ação.
+            if (relacao === 'pai_mae' || relacao === 'pai') { 
+                // [registroEditando] É PAI/MÃE DE [pessoaVinculada]
                 registroEditando.filhos = garantirRelacaoUnica(registroEditando.filhos, pessoaId);
                 pessoaVinculada.pais = garantirRelacaoUnica(pessoaVinculada.pais, registroEditando.id);
+            } else if (relacao === 'filho_a' || relacao === 'filho') {
+                // [registroEditando] É FILHO(A) DE [pessoaVinculada]
+                registroEditando.pais = garantirRelacaoUnica(registroEditando.pais, pessoaId);
+                pessoaVinculada.filhos = garantirRelacaoUnica(pessoaVinculada.filhos, registroEditando.id);
             } else if (relacao === 'conjuge') {
+                // [registroEditando] É CÔNJUGE DE [pessoaVinculada]
                 registroEditando.conjuge = garantirRelacaoUnica(registroEditando.conjuge, pessoaId);
                 pessoaVinculada.conjuge = garantirRelacaoUnica(pessoaVinculada.conjuge, registroEditando.id);
             }
+
             salvarBancoLocal(banco);
             atualizarVinculosList();
             selectPessoaVinculo.value = '';
         });
     }
+
+
 
     const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
     if (btnSalvarEdicao) {
@@ -616,16 +627,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const userNameLimpo = userName.trim();
         localStorage.setItem('arvoreUsuario', userNameLimpo);
         
-        mostrarLoading(`Salvando dados de "${userNameLimpo}" na nuvem...`);
+        mostrarLoading(`Salvando dados na nuvem...`);
         
         try {
+            // Futura melhoria: Implementar checagem de versão antes de salvar.
             const dadosParaSalvar = banco.map(p => ({ ...p, user_id: userNameLimpo, versão: Math.floor(Date.now() / 1000) }));
             const { error } = await supabase.from('app_genealogia').upsert(dadosParaSalvar, { onConflict: 'id' });
             
             if (error) throw error;
             
             esconderLoading();
-            alert(`✅ Dados salvos na nuvem com sucesso para o usuário: ${userNameLimpo}`);
+            alert(`✅ Dados salvos na nuvem com sucesso!`);
         } catch (err) {
             esconderLoading();
             console.error('❌ Erro ao salvar no Supabase:', err);
@@ -635,31 +647,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarDoSupabase() {
         if (!supabase) {
-            esconderLoading();
             return alert('❌ Supabase não carregado!');
         }
 
-        let userName = localStorage.getItem('arvoreUsuario');
-
-        if (!userName) {
-            userName = prompt("Parece ser seu primeiro acesso neste navegador.\n\nPor favor, digite seu nome de usuário para carregar os dados da nuvem:", "");
-        }
-
-        if (!userName || userName.trim().length < 3) {
-            esconderLoading();
-            return alert("❌ Carregamento cancelado. O nome de usuário é necessário.");
-        }
-
-        const userNameLimpo = userName.trim();
-        mostrarLoading(`Carregando dados de "${userNameLimpo}"...`);
+        mostrarLoading(`Carregando todos os dados da nuvem...`);
         
         try {
-            const { data: nuvemData, error } = await supabase.from('app_genealogia').select('*').eq('user_id', userNameLimpo);
+            // Carrega TODOS os dados, sem filtro de usuário
+            const { data: nuvemData, error } = await supabase.from('app_genealogia').select('*');
             if (error) throw error;
 
             if (!nuvemData || nuvemData.length === 0) {
                 esconderLoading();
-                return alert(`ℹ️ Nenhum dado encontrado na nuvem para o usuário: ${userNameLimpo}`);
+                return alert(`ℹ️ Nenhum dado encontrado na nuvem.`);
             }
             
             const bancoLocal = carregarBancoLocal();
@@ -677,9 +677,7 @@ document.addEventListener('DOMContentLoaded', () => {
             salvarBancoLocal(banco);
 
             esconderLoading();
-            // Salva o nome de usuário no navegador para usos futuros
-            localStorage.setItem('arvoreUsuario', userNameLimpo);
-            alert(`✅ Dados de "${userNameLimpo}" sincronizados! Total: ${banco.length} pessoas.`);
+            alert(`✅ Dados da nuvem sincronizados! Total: ${banco.length} pessoas.`);
             ativarSecao(secGerenciar, btnGerenciar);
         } catch (err) {
             esconderLoading();
