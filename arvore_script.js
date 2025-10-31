@@ -82,18 +82,19 @@ document.addEventListener('DOMContentLoaded', () => {
         "04. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
         "05. Ao vincular duas pessoas, o vínculo contrário correspondente é criado automaticamente na outra pessoa.",
         "06. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
-        "07. Filhos e pai/mãe 'não-de-sangue' ou 'não registrados' podem ser lançados como filhos sem nenhum impedimento, podendo também vinculá-lo também aos outros parentes",
+        "07. Não há restrição a filhos e pai/mãe 'não-biológicos', podendo ser lançados normalmente além de registrar e vincular outros parentes seus",
         "08. Para visualizar a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
         "09. Na visualização da Árvore, centralizada em alguém, se notar alguma falta de vínculo ou nome com erro, use o botão 'Editar' nesta tela para correção.",
         "10. Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero de cônjuges, pais, e filhos registrados na base de dados. Auxilia a detectar erros e vinculos não registrados.",
-        "11. Se você quiser, pode criar uma árvore separada, nova, pode fazer! mas *somente no seu computador/celular*, para não alterar os dados criados desde o surgimento desta árvore familiar. Neste caso, não salve na nuvem. Solicitamos cuidado!",
-        "12. Procure utilizar o nome em letras MAIÚSCULAS por padrão.",
-        "13. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois, os dados ficarão na memória do seu navegador, automaticamente. Se usar outro navegador (Chrome, Edge, etc.), precisará carregar da nuvem ou da pasta de Downloads novamente.",
-        "14. As alterações feitas e salvas na nuvem são associados ao seu nome de usuário.",
-        "15. Clique em + e - para navegar (avançar e retroceder) nestas instruções.",
-        "16. Quando usado no celular, muitas vezes o aparecimento do teclado sobrepõe o conteúdo da página. Neste caso, puxe a tela para cima para continuar visualizando.",
-        "17. O sistema é flexível em aceitar registros com dados faltantes para facilitar o trabalho colaborativo com introdução de nomes e vínculos.",
-        "18. Para criação de outra 'nuvem' com banco de dados novo/independente - leia: https://raw.githubusercontent.com/silvio-lang/arvore_gen/main/README.md "
+        "11. Se você quiser, pode criar uma árvore separada, nova, pode fazer! mas 'somente no seu computador ou celular' para não alterar os dados de longa data. Neste caso, não salve na nuvem. Solicitamos cautela!",
+        "12. Para criação de outra 'nuvem' com banco de dados novo/independente - leia: https://raw.githubusercontent.com/silvio-lang/arvore_gen/main/README.md"
+        "13. Procure utilizar o nome da pessoa e também cidade/país em letras MAIÚSCULAS para uniformização.",
+        "14. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois, os dados ficarão na memória do seu navegador. Cada navegador (Chrome, Edge, etc.), precisará carregar da nuvem ou do dispositivo uma vez.",
+        "15. As alterações feitas e salvas na nuvem são associados ao usuário que as fez.",
+        "16. Clique em + e - para navegar (avançar e retroceder) as instruções desta janela.",
+        "17. No celular, o aparecimento do teclado pode sobrepor parcialmente o conteúdo da página. Arraste a tela para cima para visualizar novamente.",
+        "18. O sistema aceita registros com dados mínimos (nome e vínculos) para facilitar o trabalho colaborativo com complementação posterior.",
+        
     ];
 
     function mostrarDica(index) {
@@ -701,5 +702,6 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     ativarSecao(secVisualizarArvore, null);
 });
+
 
 
