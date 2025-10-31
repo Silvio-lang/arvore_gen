@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
             banco.push(novaPessoa);
             ultimoRegistro = novaPessoa;
             salvarBancoLocal(banco);
-            alert(`✅ Pessoa "${novaPessoa.nome}" cadastrada!`);
+            alert(`Pessoa "${novaPessoa.nome}" cadastrada!`);
             exibirRegistroAtual();
             pessoaForm.reset();
             ativarSecao(secGerenciar, btnGerenciar);
@@ -312,12 +312,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const pais = parseArrayField(registroEditando.pais);
         pais.forEach(id => {
             const pai = banco.find(p => p.id === id);
-            if (pai) vinculos.push({ tipo: 'pai', pessoa: pai });
+            if (pai) vinculos.push({ tipo: 'filho', pessoa: pai });
         });
         const filhos = parseArrayField(registroEditando.filhos);
         filhos.forEach(id => {
             const filho = banco.find(p => p.id === id);
-            if (filho) vinculos.push({ tipo: 'filho', pessoa: filho });
+            if (filho) vinculos.push({ tipo: 'pai', pessoa: filho });
         });
         const conjuges = parseArrayField(registroEditando.conjuge);
         conjuges.forEach(id => {
@@ -331,9 +331,9 @@ document.addEventListener('DOMContentLoaded', () => {
         vinculos.forEach((vinc, idx) => {
             const item = document.createElement('div');
             let tipoLabel = vinc.tipo;
-            if (vinc.tipo === 'pai') tipoLabel = 'Pai/Mãe';
-            if (vinc.tipo === 'filho') tipoLabel = 'Filho(a)';
-            if (vinc.tipo === 'cônjuge') tipoLabel = 'Cônjuge';
+            if (vinc.tipo === 'pai') tipoLabel = 'É Pai/Mãe de';
+            if (vinc.tipo === 'filho') tipoLabel = 'É Filho(a) de';
+            if (vinc.tipo === 'cônjuge') tipoLabel = 'É Cônjuge de';
             
             item.innerHTML = `
                 <span>${tipoLabel}: ${vinc.pessoa.nome}</span>
@@ -364,20 +364,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function removerVinculo(idx) {
         if (!registroEditando) return;
         const vinculos = [];
-        parseArrayField(registroEditando.pais).forEach(id => vinculos.push({ tipo: 'pai', id }));
-        parseArrayField(registroEditando.filhos).forEach(id => vinculos.push({ tipo: 'filho', id }));
+        parseArrayField(registroEditando.pais).forEach(id => vinculos.push({ tipo: 'filho', id }));
+        parseArrayField(registroEditando.filhos).forEach(id => vinculos.push({ tipo: 'pai', id }));
         parseArrayField(registroEditando.conjuge).forEach(id => vinculos.push({ tipo: 'cônjuge', id }));
 
         if (idx >= 0 && idx < vinculos.length) {
             const vinc = vinculos[idx];
             const pessoaVinculada = banco.find(p => p.id === vinc.id);
             if (vinc.tipo === 'pai') {
-                registroEditando.pais = parseArrayField(registroEditando.pais).filter(id => id !== vinc.id);
-                if(pessoaVinculada) pessoaVinculada.filhos = parseArrayField(pessoaVinculada.filhos).filter(id => id !== registroEditando.id);
-            }
-            if (vinc.tipo === 'filho') {
                 registroEditando.filhos = parseArrayField(registroEditando.filhos).filter(id => id !== vinc.id);
                 if(pessoaVinculada) pessoaVinculada.pais = parseArrayField(pessoaVinculada.pais).filter(id => id !== registroEditando.id);
+            }
+            if (vinc.tipo === 'filho') {
+                registroEditando.pais = parseArrayField(registroEditando.pais).filter(id => id !== vinc.id);
+                if(pessoaVinculada) pessoaVinculada.filhos = parseArrayField(pessoaVinculada.filhos).filter(id => id !== registroEditando.id);
             }
             if (vinc.tipo === 'cônjuge') {
                 registroEditando.conjuge = parseArrayField(registroEditando.conjuge).filter(id => id !== vinc.id);
@@ -401,18 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // LÓGICA CORRIGIDA E FINAL
-            // A pessoa que está sendo editada (registroEditando) é o sujeito da ação.
             if (relacao === 'pai_mae' || relacao === 'pai') { 
-                // [registroEditando] É PAI/MÃE DE [pessoaVinculada]
                 registroEditando.filhos = garantirRelacaoUnica(registroEditando.filhos, pessoaId);
                 pessoaVinculada.pais = garantirRelacaoUnica(pessoaVinculada.pais, registroEditando.id);
             } else if (relacao === 'filho_a' || relacao === 'filho') {
-                // [registroEditando] É FILHO(A) DE [pessoaVinculada]
                 registroEditando.pais = garantirRelacaoUnica(registroEditando.pais, pessoaId);
                 pessoaVinculada.filhos = garantirRelacaoUnica(pessoaVinculada.filhos, registroEditando.id);
             } else if (relacao === 'conjuge') {
-                // [registroEditando] É CÔNJUGE DE [pessoaVinculada]
                 registroEditando.conjuge = garantirRelacaoUnica(registroEditando.conjuge, pessoaId);
                 pessoaVinculada.conjuge = garantirRelacaoUnica(pessoaVinculada.conjuge, registroEditando.id);
             }
@@ -423,20 +418,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-
     const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
     if (btnSalvarEdicao) {
         btnSalvarEdicao.addEventListener('click', () => {
             if (!registroEditando) return;
+
+            const userName = localStorage.getItem('arvoreUsuario');
+            if (!userName) {
+                alert("Para garantir a autoria das alterações, por favor, salve os dados na nuvem ao menos uma vez antes de editar.");
+                return;
+            }
+
             registroEditando.nome = (document.getElementById('edit-nome')?.value || '').toUpperCase();
             registroEditando.sexo = document.getElementById('edit-sexo')?.value || '';
             registroEditando.nascimento = document.getElementById('edit-nascimento')?.value || '';
             registroEditando.falecimento = document.getElementById('edit-falecimento')?.value || '';
             registroEditando.profissao = document.getElementById('edit-profissao')?.value || '';
             registroEditando.cidade_pais_principal = (document.getElementById('edit-cidade_pais')?.value || '').toUpperCase();
+            
+            registroEditando.user_id = userName; 
+            registroEditando.versão = Math.floor(Date.now() / 1000);
+
             salvarBancoLocal(banco);
-            alert('✅ Alterações salvas!');
+
+            alert('Alterações salvas localmente!');
             cancelarEdicao();
             atualizarListaRegistros();
         });
@@ -452,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnExcluirRegistro) {
         btnExcluirRegistro.addEventListener('click', () => {
-            if (!registroEditando || !confirm(`⚠️ Tem certeza que deseja excluir "${registroEditando.nome}"? Esta ação não pode ser desfeita.`)) return;
+            if (!registroEditando || !confirm(`Tem certeza que deseja excluir "${registroEditando.nome}"? Esta ação não pode ser desfeita.`)) return;
             banco = banco.filter(p => p.id !== registroEditando.id);
             banco.forEach(p => {
                 p.pais = parseArrayField(p.pais).filter(id => id !== registroEditando.id);
@@ -460,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 p.conjuge = parseArrayField(p.conjuge).filter(id => id !== registroEditando.id);
             });
             salvarBancoLocal(banco);
-            alert('✅ Registro excluído!');
+            alert('Registro excluído!');
             cancelarEdicao();
             atualizarListaRegistros();
         });
@@ -576,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================================================================
     if (btnExportarJSON) {
         btnExportarJSON.addEventListener('click', () => {
-            if (banco.length === 0) return alert('ℹ️ Não há dados para exportar.');
+            if (banco.length === 0) return alert('Não há dados para exportar.');
             const dataStr = JSON.stringify(banco, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -585,7 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
             a.download = `arvore_genealogica_${new Date().toISOString().slice(0, 10)}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            alert('✅ Dados exportados com sucesso!');
+            alert(`Dados exportados com sucesso! Total: ${banco.length} registros`);
         });
     }
 
@@ -602,13 +607,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (Array.isArray(dadosImportados)) {
                         banco = dadosImportados;
                         salvarBancoLocal(banco);
-                        alert(`✅ Dados importados! (${banco.length} pessoas)`);
+                        alert(`Dados importados do arquivo! Total: ${banco.length} pessoas`);
                         ativarSecao(secGerenciar, btnGerenciar);
                     } else {
-                        alert('❌ Formato de arquivo inválido.');
+                        alert('Formato de arquivo inválido.');
                     }
                 } catch (err) {
-                    alert('❌ Erro ao ler o arquivo: ' + err.message);
+                    alert('Erro ao ler o arquivo: ' + err.message);
                 }
             };
             reader.readAsText(file);
@@ -619,12 +624,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // FUNÇÕES DE SINCRONIZAÇÃO COM SUPABASE
     // ================================================================
     async function salvarNoSupabase() {
-        if (!supabase) return alert('❌ Supabase não carregado!');
-        if (banco.length === 0) return alert('ℹ️ Não há dados para salvar.');
+        if (!supabase) return alert('Supabase não carregado!');
+        if (banco.length === 0) return alert('Não há dados para salvar.');
         
         const userName = prompt("Por favor, digite seu nome de usuário para salvar os dados:", localStorage.getItem('arvoreUsuario') || "");
         if (!userName || userName.trim().length < 3) {
-            return alert("❌ Salvamento cancelado. É necessário um nome de usuário com pelo menos 3 caracteres.");
+            return alert("Salvamento cancelado. É necessário um nome de usuário com pelo menos 3 caracteres.");
         }
         
         const userNameLimpo = userName.trim();
@@ -640,29 +645,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error) throw error;
             
             esconderLoading();
-            alert(`✅ Dados salvos na nuvem com sucesso!`);
+            alert(`Dados salvos na nuvem com sucesso! Total de registros enviados: ${banco.length}`);
         } catch (err) {
             esconderLoading();
-            console.error('❌ Erro ao salvar no Supabase:', err);
-            alert('❌ Erro ao salvar: ' + err.message);
+            console.error('Erro ao salvar no Supabase:', err);
+            alert('Erro ao salvar: ' + err.message);
         }
     }
 
     async function carregarDoSupabase() {
         if (!supabase) {
-            return alert('❌ Supabase não carregado!');
+            return alert('Supabase não carregado!');
         }
 
         mostrarLoading(`Carregando todos os dados da nuvem...`);
         
         try {
-            // Carrega TODOS os dados, sem filtro de usuário
             const { data: nuvemData, error } = await supabase.from('app_genealogia').select('*');
             if (error) throw error;
 
             if (!nuvemData || nuvemData.length === 0) {
                 esconderLoading();
-                return alert(`ℹ️ Nenhum dado encontrado na nuvem.`);
+                return alert(`Nenhum dado encontrado na nuvem.`);
             }
             
             const bancoLocal = carregarBancoLocal();
@@ -680,12 +684,12 @@ document.addEventListener('DOMContentLoaded', () => {
             salvarBancoLocal(banco);
 
             esconderLoading();
-            alert(`✅ Dados da nuvem sincronizados! Total: ${banco.length} pessoas.`);
+            alert(`Dados da nuvem sincronizados! Total de registros na base: ${banco.length}`);
             ativarSecao(secGerenciar, btnGerenciar);
         } catch (err) {
             esconderLoading();
-            console.error('❌ Erro ao carregar do Supabase:', err);
-            alert('❌ Erro: ' + err.message);
+            console.error('Erro ao carregar do Supabase:', err);
+            alert('Erro: ' + err.message);
         }
     }
 
@@ -698,6 +702,3 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     ativarSecao(secVisualizarArvore, null);
 });
-
-
-
