@@ -279,3 +279,7 @@ form button[type="submit"], form button[type="button"] {
     min-width: 50px;
     text-align: center;
 }
+#inputPessoaCentral {
+    width: 150%; /* Aumenta a largura em 50% em relação ao container pai */
+    max-width: 400px; /* Define uma largura máxima para não ficar excessivamente grande em telas largas */
+}

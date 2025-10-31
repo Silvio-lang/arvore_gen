@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnImportarJSON = document.getElementById('btnImportarJSON');
     const inputImportJSON = document.getElementById('inputImportJSON');
     const btnExcluirRegistro = document.getElementById('btnExcluirRegistro');
-    const selectPessoaCentral = document.getElementById('selectPessoaCentral');
+    const inputPessoaCentral = document.getElementById('inputPessoaCentral'); // ATUALIZADO
+    const listaPessoas = document.getElementById('listaPessoas'); // NOVO
     const arvoreContainer = document.getElementById('arvoreContainer');
     const selectRelacao = document.getElementById('selectRelacao');
     const btnEditarSelecionado = document.getElementById('btnEditarSelecionado');
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================================================================
     // LISTA DE DICAS E FUNCIONALIDADE DO MODAL (COM NAVEGAÇÃO)
     // ================================================================
-    const dicas = [
+  const dicas = [
         "01. Para criar um vínculo (paternidade/filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
         "02. Você pode filtrar a lista de pessoas digitando qualquer parte do nome na área de Busca de Pessoas.",
         "03. 'Salvar na Nuvem' e 'Carregar da Nuvem' mantem seus registros seguros e sincronizados entre todos os usuários.",
@@ -208,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (secaoAtiva === secGerenciar) {
             atualizarListaRegistros();
         } else if (secaoAtiva === secVisualizarArvore) {
-            popularSelectPessoaCentral();
+            popularInputPessoaCentral(); // ATUALIZADO
         }
     };
 
@@ -259,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = document.createElement('label');
             item.className = 'registro-item';
             const iconAniv = isAniversarianteProximo(pessoa.nascimento) ? '🎂 ' : '';
-            const infoExtra = [pessoa.sexo, pessoa.nascimento || 'N/D'].filter(Boolean).join(' | ');
+            const infoExtra = [pessoa.nascimento || 'N/D'].filter(Boolean).join(' | ');
             const totalPais = parseArrayField(pessoa.pais).length;
             const totalFilhos = parseArrayField(pessoa.filhos).length;
             const totalConjuges = parseArrayField(pessoa.conjuge).length;
@@ -472,14 +473,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (filtroNome) filtroNome.addEventListener('input', atualizarListaRegistros);
 
-    function popularSelectPessoaCentral() {
-        if (!selectPessoaCentral) return;
-        selectPessoaCentral.innerHTML = '<option value="">Escolha uma pessoa...</option>';
+    // FUNÇÃO ATUALIZADA
+    function popularInputPessoaCentral() {
+        if (!listaPessoas) return;
+        listaPessoas.innerHTML = ''; // Limpa as opções antigas
         banco.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(pessoa => {
             const option = document.createElement('option');
-            option.value = pessoa.id;
-            option.textContent = pessoa.nome;
-            selectPessoaCentral.appendChild(option);
+            option.value = pessoa.nome;
+            option.dataset.id = pessoa.id; // Armazena o ID aqui
+            listaPessoas.appendChild(option);
         });
     }
 
@@ -500,21 +502,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const selecionado = document.querySelector('input[name="pessoaSelecionada"]:checked');
         if (!selecionado) return alert('Por favor, selecione uma pessoa na lista para visualizar a árvore.');
         const pessoaId = selecionado.value;
+        const pessoa = banco.find(p => p.id === pessoaId);
+        if (!pessoa) return;
+        
         ativarSecao(secVisualizarArvore, null);
-        selectPessoaCentral.value = pessoaId;
-        selectPessoaCentral.dispatchEvent(new Event('change'));
+        inputPessoaCentral.value = pessoa.nome;
+        inputPessoaCentral.dispatchEvent(new Event('change'));
     });
     
-    if (selectPessoaCentral) {
-        selectPessoaCentral.addEventListener('change', () => {
-            const pessoaId = selectPessoaCentral.value;
+    // BLOCO ATUALIZADO
+    if (inputPessoaCentral) {
+        inputPessoaCentral.addEventListener('change', () => {
+            const nomeSelecionado = inputPessoaCentral.value;
+            const optionSelecionada = document.querySelector(`#listaPessoas option[value="${nomeSelecionado}"]`);
             
-            if (!pessoaId) {
+            if (!optionSelecionada) {
                 arvoreContainer.innerHTML = '';
                 btnEditarNaArvore.style.display = 'none';
                 return;
-            };
+            }
 
+            const pessoaId = optionSelecionada.dataset.id;
             const pessoa = banco.find(p => p.id === pessoaId);
             if (!pessoa) return;
 
@@ -622,35 +630,67 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================================================================
     // FUNÇÕES DE SINCRONIZAÇÃO COM SUPABASE
     // ================================================================
-    async function salvarNoSupabase() {
-        if (!supabase) return alert('Supabase não carregado!');
-        if (banco.length === 0) return alert('Não há dados para salvar.');
-        
-        const userName = prompt("Por favor, digite seu nome de usuário para salvar os dados:", localStorage.getItem('arvoreUsuario') || "");
-        if (!userName || userName.trim().length < 3) {
-            return alert("Salvamento cancelado. É necessário um nome de usuário com pelo menos 3 caracteres.");
-        }
-        
-        const userNameLimpo = userName.trim();
-        localStorage.setItem('arvoreUsuario', userNameLimpo);
-        
-        mostrarLoading(`Salvando dados na nuvem...`);
-        
-        try {
-            // Futura melhoria: Implementar checagem de versão antes de salvar.
-            const dadosParaSalvar = banco.map(p => ({ ...p, user_id: userNameLimpo, versão: Math.floor(Date.now() / 1000) }));
-            const { error } = await supabase.from('app_genealogia').upsert(dadosParaSalvar, { onConflict: 'id' });
-            
-            if (error) throw error;
-            
-            esconderLoading();
-            alert(`Dados salvos na nuvem com sucesso! Total de registros enviados: ${banco.length}`);
-        } catch (err) {
-            esconderLoading();
-            console.error('Erro ao salvar no Supabase:', err);
-            alert('Erro ao salvar: ' + err.message);
-        }
+async function salvarNoSupabase() {
+    if (!supabase) return alert('Supabase não carregado!');
+    if (banco.length === 0) return alert('Não há dados para salvar.');
+
+    const userName = prompt("Por favor, digite seu nome de usuário para salvar os dados:", localStorage.getItem('arvoreUsuario') || "");
+    if (!userName || userName.trim().length < 3) {
+        return alert("Salvamento cancelado. É necessário um nome de usuário com pelo menos 3 caracteres.");
     }
+    const userNameLimpo = userName.trim();
+    localStorage.setItem('arvoreUsuario', userNameLimpo);
+
+    mostrarLoading('Verificando dados na nuvem...');
+
+    try {
+        // 1. Busca todos os dados da nuvem para comparação
+        const { data: nuvemData, error: fetchError } = await supabase.from('app_genealogia').select('id, versão');
+        if (fetchError) throw fetchError;
+
+        // 2. Trava de segurança de 80%
+        const totalRegistrosNuvem = nuvemData.length;
+        if (banco.length < totalRegistrosNuvem * 0.8) {
+            const confirmacao = prompt(`ATENÇÃO: RISCO DE PERDA DE DADOS! Você está tentando salvar ${banco.length} registros, mas a nuvem possui ${totalRegistrosNuvem}. Isso pode apagar dados. Para confirmar esta ação, digite a palavra 'CONFIRMAR' em maiúsculas:`);
+            if (confirmacao !== 'CONFIRMAR') {
+                esconderLoading();
+                return alert('Ação cancelada pelo usuário.');
+            }
+        }
+
+        mostrarLoading('Comparando versões e preparando dados...');
+
+        // 3. Cria um mapa da nuvem para acesso rápido
+        const nuvemMap = new Map(nuvemData.map(p => [p.id, p.versão]));
+        
+        // 4. Filtra apenas os registros que precisam ser atualizados
+        const registrosParaSalvar = banco.filter(p_local => {
+            const versaoNuvem = nuvemMap.get(p_local.id);
+            // Salva se o registro é novo (não existe na nuvem) ou se a versão local é mais nova
+            return !versaoNuvem || (p_local.versão || 0) > versaoNuvem;
+        });
+
+        if (registrosParaSalvar.length === 0) {
+            esconderLoading();
+            return alert('Seus dados já estão atualizados. Nada a salvar.');
+        }
+
+        mostrarLoading(`Salvando ${registrosParaSalvar.length} registros alterados na nuvem...`);
+        
+        // 5. Envia apenas os registros necessários
+        const { error: upsertError } = await supabase.from('app_genealogia').upsert(registrosParaSalvar, { onConflict: 'id' });
+        if (upsertError) throw upsertError;
+
+        esconderLoading();
+        alert(`Sincronização concluída com sucesso! Registros atualizados na nuvem: ${registrosParaSalvar.length}.`);
+
+    } catch (err) {
+        esconderLoading();
+        console.error('Erro ao salvar no Supabase:', err);
+        alert('Erro ao salvar: ' + err.message);
+    }
+}
+
 
     async function carregarDoSupabase() {
         if (!supabase) {
@@ -701,7 +741,3 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     ativarSecao(secVisualizarArvore, null);
 });
-
-
-
-
