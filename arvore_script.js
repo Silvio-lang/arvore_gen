@@ -85,16 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
         "07. Filhos e pai/mãe 'não-de-sangue' ou 'não registrados' podem ser lançados como filhos sem nenhum impedimento, podendo também vinculá-lo também aos outros parentes",
         "08. Para visualizar a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
         "09. Na visualização da Árvore, centralizada em alguém, se notar alguma falta de vínculo ou nome com erro, use o botão 'Editar' nesta tela para correção.",
-        "10 Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero de cônjuges, pais, e filhos registrados na base de dados. Auxilia a detectar erros e vinculos não registrados.",
+        "10. Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero de cônjuges, pais, e filhos registrados na base de dados. Auxilia a detectar erros e vinculos não registrados.",
         "11. Se você quiser, pode criar uma árvore separada, nova, pode fazer! mas *somente no seu computador/celular*, para não alterar os dados criados desde o surgimento desta árvore familiar. Neste caso, não salve na nuvem. Solicitamos cuidado!",
-        "12. O criador deste aplicativo é Silvio Aurich Filho, participante e atual administrador da base de dados (nuvem).",
+        "12. Procure utilizar o nome em letras MAIÚSCULAS por padrão.",
         "13. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois, os dados ficarão na memória do seu navegador, automaticamente. Se usar outro navegador (Chrome, Edge, etc.), precisará carregar da nuvem ou da pasta de Downloads novamente.",
         "14. As alterações feitas e salvas na nuvem são associados ao seu nome de usuário.",
         "15. Clique em + e - para navegar (avançar e retroceder) nestas instruções.",
         "16. Quando usado no celular, muitas vezes o aparecimento do teclado sobrepõe o conteúdo da página. Neste caso, puxe a tela para cima para continuar visualizando.",
         "17. O sistema é flexível em aceitar registros com dados faltantes para facilitar o trabalho colaborativo com introdução de nomes e vínculos.",
-        "18. Procure utilizar o nome em letras MAIÚSCULAS por padrão.",
-        "19. Em breve: geração de listas de datas de aniversários."
+        "18. Em breve: geração de listas de datas de aniversários."
     ];
 
     function mostrarDica(index) {
@@ -702,3 +701,4 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     ativarSecao(secVisualizarArvore, null);
 });
+
