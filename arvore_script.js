@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "09. Na visualização da Árvore, centralizada em alguém, se notar alguma falta de vínculo ou nome com erro, use o botão 'Editar' nesta tela para correção.",
         "10 Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero de cônjuges, pais, e filhos registrados na base de dados. Auxilia a detectar erros e vinculos não registrados.",
         "11. Se você quiser, pode criar uma árvore separada, nova, pode fazer! mas *somente no seu computador/celular*, para não alterar os dados criados desde o surgimento desta árvore familiar. Neste caso, não salve na nuvem. Solicitamos cuidado!",
-        "12. O criador deste aplicativo é Silvio Aurich Filho, participante da base de dados.",
+        "12. O criador deste aplicativo é Silvio Aurich Filho, participante e atual administrador da base de dados (nuvem).",
         "13. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois, os dados ficarão na memória do seu navegador, automaticamente. Se usar outro navegador (Chrome, Edge, etc.), precisará carregar da nuvem ou da pasta de Downloads novamente.",
         "14. As alterações feitas e salvas na nuvem são associados ao seu nome de usuário.",
         "15. Clique em + e - para navegar (avançar e retroceder) nestas instruções.",
@@ -698,5 +698,6 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     ativarSecao(secVisualizarArvore, null);
 });
+
 
 
