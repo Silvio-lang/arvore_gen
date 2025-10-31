@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "15. Clique em + e - para navegar (avançar e retroceder) nestas instruções.",
         "16. Quando usado no celular, muitas vezes o aparecimento do teclado sobrepõe o conteúdo da página. Neste caso, puxe a tela para cima para continuar visualizando.",
         "17. O sistema é flexível em aceitar registros com dados faltantes para facilitar o trabalho colaborativo com introdução de nomes e vínculos.",
-        "18. Em breve: geração de listas de datas de aniversários."
+        "18. Para criação de outra 'nuvem' com banco de dados novo/independente - leia: https://raw.githubusercontent.com/silvio-lang/arvore_gen/main/README.md "
     ];
 
     function mostrarDica(index) {
@@ -701,4 +701,5 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     ativarSecao(secVisualizarArvore, null);
 });
+
 
