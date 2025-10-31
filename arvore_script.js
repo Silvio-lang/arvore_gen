@@ -76,25 +76,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // LISTA DE DICAS E FUNCIONALIDADE DO MODAL (COM NAVEGAÇÃO)
     // ================================================================
     const dicas = [
-        "01. Para criar um vínculo (paternidade/filiação ou de casal), edite uma pessoa e use a seção 'Vínculos Atuais'.",
-        "02. Você pode filtrar a lista de pessoas digitando qualquer parte do nome no campo de Busca de Pessoas.",
-        "03. Use os botões 'Salvar na Nuvem' e 'Carregar da Nuvem' para manter seus dados seguros e sincronizados entre todos os usuários.",
+        "01. Para criar um vínculo (paternidade/filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
+        "02. Você pode filtrar a lista de pessoas digitando qualquer parte do nome na área de Busca de Pessoas.",
+        "03. 'Salvar na Nuvem' e 'Carregar da Nuvem' mantem seus registros seguros e sincronizados entre todos os usuários.",
         "04. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
-        "05. Ao vincular duas pessoas, o vínculo contrário correspondente é criado automaticamente na outra pessoa.",
+        "05. Ao vincular duas pessoas, o vínculo contrário correspondente é criado automaticamente na segunda pessoa.",
         "06. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
-        "07. Não há restrição a filhos e pai/mãe 'não-biológicos', podendo ser lançados normalmente além de registrar e vincular outros parentes seus",
+        "07. Não há restrição a filhos e pai/mãe 'não-biológicos', podendo ser lançados normalmente além de registrados e vinculados outros parentes seus",
         "08. Para visualizar a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
-        "09. Na visualização da Árvore, centralizada em alguém, se notar alguma falta de vínculo ou nome com erro, use o botão 'Editar' nesta tela para correção.",
-        "10. Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero de cônjuges, pais, e filhos registrados na base de dados. Auxilia a detectar erros e vinculos não registrados.",
-        "11. Se você quiser, pode criar uma árvore separada, nova, pode fazer! mas 'somente no seu computador ou celular' para não alterar os dados de longa data. Neste caso, não salve na nuvem. Solicitamos cautela!",
-        "12. Para criação de outra 'nuvem' com banco de dados novo/independente - leia: https://raw.githubusercontent.com/silvio-lang/arvore_gen/main/README.md"
+        "09. Na visualização da Árvore, centralizada em alguém, se notar a falta de vínculo ou erro no nome, use o botão 'Editar' nesta tela para correção.",
+        "10. Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero registrado de cônjuges, pais, e filhos na base de dados. Isto auxilia a detectar pessoas e vínculos não registrados.",
+        "11. Se você quiser criar uma árvore separada, nova, pode fazê-lo! mas 'somente no seu computador ou celular' para não afetar os dados já registrados de longa data. Neste caso, não salve na nuvem. Tenha cautela!",
+        "12. Para criação de outra 'nuvem' com banco de dados novo/independente - leia: https://raw.githubusercontent.com/silvio-lang/arvore_gen/main/README.md",
         "13. Procure utilizar o nome da pessoa e também cidade/país em letras MAIÚSCULAS para uniformização.",
-        "14. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois, os dados ficarão na memória do seu navegador. Cada navegador (Chrome, Edge, etc.), precisará carregar da nuvem ou do dispositivo uma vez.",
-        "15. As alterações feitas e salvas na nuvem são associados ao usuário que as fez.",
-        "16. Clique em + e - para navegar (avançar e retroceder) as instruções desta janela.",
-        "17. No celular, o aparecimento do teclado pode sobrepor parcialmente o conteúdo da página. Arraste a tela para cima para visualizar novamente.",
-        "18. O sistema aceita registros com dados mínimos (nome e vínculos) para facilitar o trabalho colaborativo com complementação posterior.",
-        
+        "14. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois os dados ficarão na memória do seu navegador. Cada navegador (Chrome, Edge, etc.), precisa carregar da nuvem ou do dispositivo uma vez.",
+        "15. As alterações feitas e salvas na nuvem ficam associados ao usuário que as fez.",
+        "16. Clique em + e - para navegar (avançar e retroceder) as instruções numeradas desta janela.",
+        "17. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar novamente.",
+        "18. O sistema aceita registros com dados mínimos (nome e vínculos) para facilitar o trabalho colaborativo com complementação posterior."
     ];
 
     function mostrarDica(index) {
@@ -702,6 +701,7 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     ativarSecao(secVisualizarArvore, null);
 });
+
 
 
 
