@@ -283,3 +283,15 @@ form button[type="submit"], form button[type="button"] {
     width: 150%; /* Aumenta a largura em 50% em relação ao container pai */
     max-width: 400px; /* Define uma largura máxima para não ficar excessivamente grande em telas largas */
 }
+/* Estilo para os nomes clicáveis na árvore */
+.arvore-link {
+    color: #0056b3; /* Cor azul para se parecer com um link */
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.arvore-link:hover {
+    color: #007bff; /* Cor um pouco mais clara ao passar o mouse */
+    text-decoration: none;
+}
