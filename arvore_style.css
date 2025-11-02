@@ -295,3 +295,79 @@ form button[type="submit"], form button[type="button"] {
     color: #007bff; /* Cor um pouco mais clara ao passar o mouse */
     text-decoration: none;
 }
+/* ================================================================
+   ESTILOS APRIMORADOS PARA A VISUALIZAÇÃO DA ÁRVORE
+   ================================================================ */
+
+/* Contêiner principal da árvore */
+.arvore {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espaçamento entre as seções (Pais, Central, Filhos, etc.) */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Estilo para cada seção (Pais, Cônjuge, etc.) */
+.arvore-secao {
+    background-color: #f7f9fa; /* Um fundo muito suave para agrupar os cards */
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e1e8ed;
+}
+
+/* Título de cada seção (h3) */
+.arvore-secao h3 {
+    color: var(--cor-primaria);
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-bottom: 2px solid var(--cor-secundaria);
+    padding-bottom: 8px;
+}
+
+/* Estilo base para cada "card" de pessoa */
+.arvore-item {
+    background-color: #fff;
+    padding: 12px 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 10px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    border-left: 4px solid var(--cor-secundaria);
+}
+
+/* Estilo do link clicável dentro do card */
+.arvore-link {
+    text-decoration: none;
+    color: var(--cor-texto);
+    cursor: pointer;
+    display: block; /* Faz o link ocupar todo o card */
+}
+
+/* Efeito ao passar o mouse sobre um parente clicável */
+.arvore-link .arvore-item:hover {
+    background-color: var(--cor-primaria);
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    border-left-color: var(--cor-destaque);
+}
+
+/* Estilo de destaque para a Pessoa Central */
+.arvore-central .principal {
+    background-color: #e0f7fa; /* Um azul bem claro para destacar */
+    border: 2px solid var(--cor-primaria);
+    border-left-width: 6px;
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--cor-primaria);
+}
+
+.arvore-central .principal .detalhes {
+    font-size: 0.8em;
+    font-weight: 400;
+    color: #555;
+    margin-top: 5px;
+}

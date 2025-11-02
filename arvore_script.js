@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (secaoAtiva === secGerenciar) {
             atualizarListaRegistros();
         } else if (secaoAtiva === secVisualizarArvore) {
-            popularInputPessoaCentral(); // ATUALIZADO
+            popularInputPessoaCentral();
         }
     };
 
@@ -470,7 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (filtroNome) filtroNome.addEventListener('input', atualizarListaRegistros);
 
-    // FUNÇÃO ATUALIZADA
     function popularInputPessoaCentral() {
         if (!listaPessoas) return;
         listaPessoas.innerHTML = ''; // Limpa as opções antigas
@@ -483,31 +482,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ================================================================
-    // EVENTOS DOS BOTÕES E NAVEGAÇÃO PRINCIPAL
-    // ================================================================
-    btnNovaPessoa.addEventListener('click', () => ativarSecao(secNovaPessoa, btnNovaPessoa));
-    btnGerenciar.addEventListener('click', () => ativarSecao(secGerenciar, btnGerenciar));
-
-    btnEditarSelecionado.addEventListener('click', () => {
-        const selecionado = document.querySelector('input[name="pessoaSelecionada"]:checked');
-        if (!selecionado) return alert('Por favor, selecione uma pessoa na lista para editar.');
-        ativarSecao(secGerenciar, btnGerenciar);
-        editarPessoa(selecionado.value);
-    });
-
-    btnVisualizarSelecionado.addEventListener('click', () => {
-        const selecionado = document.querySelector('input[name="pessoaSelecionada"]:checked');
-        if (!selecionado) return alert('Por favor, selecione uma pessoa na lista para visualizar a árvore.');
-        const pessoaId = selecionado.value;
-        const pessoa = banco.find(p => p.id === pessoaId);
-        if (!pessoa) return;
-        ativarSecao(secVisualizarArvore, null);
-        inputPessoaCentral.value = pessoa.nome;
-        inputPessoaCentral.dispatchEvent(new Event('change'));
-    });
-    
-    // BLOCO ATUALIZADO
     if (inputPessoaCentral) {
         inputPessoaCentral.addEventListener('change', () => {
             const nomeSelecionado = inputPessoaCentral.value;
@@ -532,96 +506,100 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ================================================================
-    // *** NOVA FUNÇÃO *** PARA NAVEGAÇÃO NA ÁRVORE
-    // ================================================================
     window.centralizarPessoaNaArvore = (id) => {
         const pessoa = banco.find(p => p.id === id);
         if (pessoa) {
             inputPessoaCentral.value = pessoa.nome;
-            // Dispara o evento 'change' para que a lógica existente de renderização seja acionada
             inputPessoaCentral.dispatchEvent(new Event('change'));
         }
     }
 
 
-    // ================================================================
-    // *** FUNÇÃO MODIFICADA *** DE RENDERIZAÇÃO DA ÁRVORE
-    // ================================================================
-    function renderizarArvore(pessoa) {
-        if (!arvoreContainer) return;
+function renderizarArvore(pessoa) {
+    if (!arvoreContainer) return;
 
-        const paisIds = parseArrayField(pessoa.pais);
-        const filhosIds = parseArrayField(pessoa.filhos);
-        const conjugesIds = parseArrayField(pessoa.conjuge);
+    const paisIds = parseArrayField(pessoa.pais);
+    const filhosIds = parseArrayField(pessoa.filhos);
+    const conjugesIds = parseArrayField(pessoa.conjuge);
 
-        let html = '<div class="arvore">';
+    // Usa um objeto para agrupar os parentes por seção para facilitar a renderização
+    const secoes = {
+        'Pais': paisIds,
+        'Cônjuge(s)': conjugesIds,
+        'Filho(s)': filhosIds
+    };
 
-        // --- PAIS ---
-        if (paisIds.length > 0) {
-            html += '<div class="arvore-secao"><h3>Pais</h3>';
-            paisIds.forEach(id => {
-                const pai = banco.find(p => p.id === id);
-                if (pai) {
-                    html += `<div class="arvore-item">
-                                <a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${pai.id}')" class="arvore-link">${pai.nome}</a>
-                             </div>`;
+    let html = '<div class="arvore">';
+
+    // --- PAIS ---
+    if (secoes['Pais'].length > 0) {
+        html += '<div class="arvore-secao"><h3>Pais</h3>';
+        secoes['Pais'].forEach(id => {
+            const parente = banco.find(p => p.id === id);
+            if (parente) {
+                // CORREÇÃO: Cada link agora é um bloco separado, garantindo a quebra de linha.
+                html += `<div><a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${parente.id}')" class="arvore-item arvore-link">${parente.nome}</a></div>`;
+            }
+        });
+        html += '</div>';
+    }
+
+    // --- PESSOA CENTRAL ---
+    html += `<div class="arvore-secao arvore-central">
+                <h3>Pessoa Central</h3>
+                <div class="arvore-item principal">
+                    ${pessoa.nome}
+                    <div class="detalhes">${pessoa.nascimento || ''}</div>
+                </div>
+             </div>`;
+
+    // --- CÔNJUGES E FILHOS (renderizados em suas próprias seções) ---
+    ['Cônjuge(s)', 'Filho(s)'].forEach(titulo => {
+        if (secoes[titulo].length > 0) {
+            html += `<div class="arvore-secao"><h3>${titulo}</h3>`;
+            secoes[titulo].forEach(id => {
+                const parente = banco.find(p => p.id === id);
+                if (parente) {
+                    // CORREÇÃO: Envolve cada link em sua própria div para forçar a quebra.
+                    html += `<div><a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${parente.id}')" class="arvore-item arvore-link">${parente.nome}</a></div>`;
                 }
             });
             html += '</div>';
         }
+    });
 
-        // --- PESSOA CENTRAL ---
-        html += `<div class="arvore-secao arvore-central">
-                    <h3>Pessoa Central</h3>
-                    <div class="arvore-item principal">
-                        ${pessoa.nome}
-                        <div class="detalhes">${pessoa.nascimento || ''}</div>
-                    </div>
-                 </div>`;
-
-        // --- CÔNJUGES E FILHOS (Agrupados) ---
-        if (conjugesIds.length > 0 || filhosIds.length > 0) {
-            html += '<div class="arvore-secao">';
-            
-            // Cônjuges
-            if (conjugesIds.length > 0) {
-                html += '<h3>Cônjuge(s)</h3>';
-                conjugesIds.forEach(id => {
-                    const conjuge = banco.find(p => p.id === id);
-                    if (conjuge) {
-                        html += `<div class="arvore-item">
-                                    <a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${conjuge.id}')" class="arvore-link">${conjuge.nome}</a>
-                                 </div>`;
-                    }
-                });
-            }
-
-            // Filhos
-            if (filhosIds.length > 0) {
-                html += '<h3>Filho(s)</h3>';
-                filhosIds.forEach(id => {
-                    const filho = banco.find(p => p.id === id);
-                    if (filho) {
-                        html += `<div class="arvore-item">
-                                    <a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${filho.id}')" class="arvore-link">${filho.nome}</a>
-                                 </div>`;
-                    }
-                });
-            }
-
-            html += '</div>';
-        }
-
-        if (paisIds.length === 0 && filhosIds.length === 0 && conjugesIds.length === 0) {
-            html += '<p>Nenhum vínculo registrado para esta pessoa.</p>';
-        }
-
-        html += '</div>'; // Fecha div.arvore
-        arvoreContainer.innerHTML = html;
+    // Mensagem para pessoa sem vínculos
+    if (paisIds.length === 0 && filhosIds.length === 0 && conjugesIds.length === 0) {
+        html += '<p>Nenhum vínculo registrado para esta pessoa.</p>';
     }
 
+    html += '</div>'; // Fecha div.arvore
+    arvoreContainer.innerHTML = html;
+}
+    // ================================================================
+    // EVENTOS DOS BOTÕES E NAVEGAÇÃO PRINCIPAL
+    // ================================================================
+    btnNovaPessoa.addEventListener('click', () => ativarSecao(secNovaPessoa, btnNovaPessoa));
+    btnGerenciar.addEventListener('click', () => ativarSecao(secGerenciar, btnGerenciar));
 
+    btnEditarSelecionado.addEventListener('click', () => {
+        const selecionado = document.querySelector('input[name="pessoaSelecionada"]:checked');
+        if (!selecionado) return alert('Por favor, selecione uma pessoa na lista para editar.');
+        ativarSecao(secGerenciar, btnGerenciar);
+        editarPessoa(selecionado.value);
+    });
+
+    btnVisualizarSelecionado.addEventListener('click', () => {
+        const selecionado = document.querySelector('input[name="pessoaSelecionada"]:checked');
+        if (!selecionado) return alert('Por favor, selecione uma pessoa na lista para visualizar a árvore.');
+        const pessoaId = selecionado.value;
+        const pessoa = banco.find(p => p.id === pessoaId);
+        if (!pessoa) return;
+        ativarSecao(secVisualizarArvore, null);
+        inputPessoaCentral.value = pessoa.nome;
+        inputPessoaCentral.dispatchEvent(new Event('change'));
+    });
+    
     // ================================================================
     // LÓGICA DE IMPORTAÇÃO E EXPORTAÇÃO
     // ================================================================
@@ -670,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
         reader.readAsText(file);
-        inputImportJSON.value = ''; // Limpa o input para permitir reimportar o mesmo arquivo
+        inputImportJSON.value = '';
     });
     
     // ================================================================
@@ -698,16 +676,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mostrarLoading('Salvando na nuvem...');
         try {
-            // Pegar todos os dados do Supabase para comparar as versões
+            // *** CORREÇÃO AQUI ***
             const { data: dadosNuvem, error: fetchError } = await supabase
-                .from('pessoas')
+                .from('app_genealogia') 
                 .select('id, versão');
                 
             if (fetchError) throw fetchError;
 
             const dadosParaEnviar = banco.filter(local => {
                 const nuvem = dadosNuvem.find(d => d.id === local.id);
-                // Envia se não existe na nuvem ou se a versão local é mais nova
                 return !nuvem || (local.versão || 0) > (nuvem.versão || 0); 
             });
 
@@ -717,17 +694,17 @@ document.addEventListener('DOMContentLoaded', () => {
                  return;
             }
             
-            // Garante que a versão seja atualizada antes de enviar
             const userName = localStorage.getItem('arvoreUsuario');
             dadosParaEnviar.forEach(p => {
                 p.versão = Math.floor(Date.now() / 1000);
                 p.user_id = userName;
             });
 
-            const { error } = await supabase.from('pessoas').upsert(dadosParaEnviar);
+            // *** CORREÇÃO AQUI ***
+            const { error } = await supabase.from('app_genealogia').upsert(dadosParaEnviar);
             if (error) throw error;
             
-            salvarBancoLocal(banco); // Salva as novas versões localmente
+            salvarBancoLocal(banco);
             alert(`${dadosParaEnviar.length} registros foram salvos/atualizados na nuvem!`);
 
         } catch (error) {
@@ -743,7 +720,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         mostrarLoading('Carregando da nuvem...');
         try {
-            const { data, error } = await supabase.from('pessoas').select('*');
+            // *** CORREÇÃO AQUI ***
+            const { data, error } = await supabase.from('app_genealogia').select('*');
             if (error) throw error;
             
             if (confirm(`Foram encontrados ${data.length} registros na nuvem. Deseja substituir seus dados locais por estes?`)) {
