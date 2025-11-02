@@ -371,3 +371,67 @@ form button[type="submit"], form button[type="button"] {
     color: #555;
     margin-top: 5px;
 }
+/* Torna o container do modal uma referência para o posicionamento dos botões */
+.modal-content {
+    position: relative;
+    /* Adiciona um espaço à direita para o texto não ficar atrás dos botões */
+    padding-right: 65px; 
+}
+
+/* ================================================================
+   ESTILOS PARA NAVEGAÇÃO HORIZONTAL DE DICAS
+   ================================================================ */
+
+/* Remove o padding extra do modal-content para não criar espaço vazio */
+.modal-content {
+    padding-right: 25px; 
+}
+
+/* Container para os botões de navegação das dicas */
+.dicas-nav {
+    display: flex;
+    justify-content: center; /* Centraliza os botões horizontalmente */
+    align-items: center;
+    gap: 15px; /* Espaço entre os botões e o contador */
+    margin-bottom: 20px; /* Espaço entre os botões e o texto da dica abaixo */
+}
+
+/* Estilo dos botões de seta (Anterior/Próxima) */
+.dicas-nav button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 16px;
+    line-height: 1;
+    text-align: center;
+    padding: 0;
+    
+    /* Garante que os estilos anteriores não interfiram */
+    position: static;
+    transform: none;
+    flex-grow: 0;
+    margin-top: 0;
+}
+
+.dicas-nav button:hover {
+    background-color: var(--cor-secundaria);
+    color: white;
+    border-color: var(--cor-secundaria);
+    transform: scale(1.05);
+}
+
+/* Estilo do contador */
+#dicaContador {
+    font-size: 1em;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Container do texto da dica para garantir alinhamento */
+.dica-content-wrapper {
+    text-align: center;
+    min-height: 50px; /* Garante uma altura mínima para o texto não "pular" */
+}
