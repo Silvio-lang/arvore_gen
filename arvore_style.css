@@ -188,7 +188,7 @@ form button[type="submit"], form button[type="button"] {
     max-height: 400px;
     overflow-y: auto;
 }
-.registro-item {       /*  CONFIGURAÇÃO DAS LINHAS DA LISTA DE PESSOAS
+.registro-item {
     display: flex;
     align-items: center; /* Garante o alinhamento vertical centralizado */
     padding: 8px 5px;    /* Aumenta o espaço interno vertical */
@@ -440,4 +440,3 @@ html, body {
     position: relative; /* Permite o ajuste fino da posição */
     top: 0.5rem; /* Desloca o texto para baixo (aprox. 4px) */
 }
-
