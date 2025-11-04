@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "17. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar novamente.",
         "18. O sistema aceita registros com dados mínimos (nome e vínculos) para facilitar o trabalho colaborativo com complementação posterior."
     ];
+
     function mostrarDica(index) {
         dicaAtualIndex = index;
         if (dicaAtualIndex < 0) {
@@ -292,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!registroEditando) return;
         
         // Preencher o formulário na nova seção de edição
-        document.getElementById('edit-id').value = registroEditando.id;
+              // document.getElementById('edit-id').value = registroEditando.id; //
         document.getElementById('edit-nome').value = registroEditando.nome;
         document.getElementById('edit-sexo').value = registroEditando.sexo;
         document.getElementById('edit-nascimento').value = registroEditando.nascimento;
@@ -300,8 +301,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-profissao').value = registroEditando.profissao;
         document.getElementById('edit-cidade_pais').value = registroEditando.cidade_pais_principal;
         
-        const labelNomePessoaEditada = document.getElementById('labelNomePessoaEditada');
-        if(labelNomePessoaEditada) labelNomePessoaEditada.textContent = `Editando: ${registroEditando.nome}`;
+const labelNomePessoaEditada = document.getElementById('labelNomePessoaEditada');
+if (labelNomePessoaEditada) {
+    labelNomePessoaEditada.textContent = 'Editando ' + registroEditando.nome;
+    // Adicione esta linha para atualizar o novo layout do vínculo
+    document.getElementById('nomePessoaPrincipalVinculo').textContent = registroEditando.nome;
+}
 
         atualizarVinculosList();
         popularSelectVinculo();
@@ -396,31 +401,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     if (btnAdicionarVinculo) {
-        btnAdicionarVinculo.addEventListener('click', () => {
-            if (!registroEditando || !selectRelacao || !selectPessoaVinculo) return;
-            const relacao = selectRelacao.value;
-            const pessoaId = selectPessoaVinculo.value;
-            const pessoaVinculada = banco.find(p => p.id === pessoaId);
-            if (!relacao || !pessoaId || !pessoaVinculada) {
-                alert('Selecione uma relação e uma pessoa.');
-                return;
-            }
-            
-            if (relacao === 'pai_mae' || relacao === 'pai') { // ESTOU definindo o OUTRO como meu pai/mãe
-                registroEditando.pais = garantirRelacaoUnica(registroEditando.pais, pessoaId); // Eu sou filho dele
-                pessoaVinculada.filhos = garantirRelacaoUnica(pessoaVinculada.filhos, registroEditando.id); // Ele é meu pai
-            } else if (relacao === 'filho_a' || relacao === 'filho') { // ESTOU definindo o OUTRO como meu filho
-                registroEditando.filhos = garantirRelacaoUnica(registroEditando.filhos, pessoaId); // Eu sou pai/mãe dele
-                pessoaVinculada.pais = garantirRelacaoUnica(pessoaVinculada.pais, registroEditando.id); // Ele é meu filho
-            } else if (relacao === 'conjuge') {
-                registroEditando.conjuge = garantirRelacaoUnica(registroEditando.conjuge, pessoaId);
-                pessoaVinculada.conjuge = garantirRelacaoUnica(pessoaVinculada.conjuge, registroEditando.id);
-            }
-            salvarBancoLocal(banco);
-            atualizarVinculosList();
-            selectPessoaVinculo.value = '';
-        });
+btnAdicionarVinculo.addEventListener('click', () => {
+    const tipoRelacao = selectRelacao.value;
+    const pessoaVinculoId = selectPessoaVinculo.value;
+    const pessoaVinculo = banco.find(p => p.id === pessoaVinculoId);
+
+    if (!registroEditando || !pessoaVinculo) {
+        alert("Por favor, selecione uma pessoa para criar o vínculo.");
+        return;
     }
+
+    // --- LÓGICA DE PARENTESCO CORRIGIDA ---
+    if (tipoRelacao === 'pai') { 
+        // Se a frase é "[A] é pai/mãe de [B]"
+        // Ação Correta: A (registroEditando) é o pai, B (pessoaVinculo) é o filho.
+        registroEditando.filhos = garantirRelacaoUnica(registroEditando.filhos, pessoaVinculoId);
+        pessoaVinculo.pais = garantirRelacaoUnica(pessoaVinculo.pais, registroEditando.id);
+
+    } else if (tipoRelacao === 'filho') { 
+        // Se a frase é "[A] é filho(a) de [B]"
+        // Ação Correta: A (registroEditando) é o filho, B (pessoaVinculo) é o pai.
+        registroEditando.pais = garantirRelacaoUnica(registroEditando.pais, pessoaVinculoId);
+        pessoaVinculo.filhos = garantirRelacaoUnica(pessoaVinculo.filhos, registroEditando.id);
+        
+    } else if (tipoRelacao === 'conjuge') {
+        // Ação para cônjuge (recíproco)
+        registroEditando.conjuge = garantirRelacaoUnica(registroEditando.conjuge, pessoaVinculoId);
+        pessoaVinculo.conjuge = garantirRelacaoUnica(pessoaVinculo.conjuge, registroEditando.id);
+    }
+
+    salvarBancoLocal(banco);
+    atualizarVinculosList();
+});
+}
+
 
     const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
     if (btnSalvarEdicao) {
@@ -529,14 +543,31 @@ function renderizarArvore(pessoa) {
         });
         html += '</div>';
     }
-    // --- PESSOA CENTRAL ---
+
+// --- PESSOA CENTRAL (AJUSTADO PARA EXIBIÇÃO MINIMALISTA E FIEL) ---
+    
+    // 1. Prepara a Cidade Principal (usa a nomenclatura CORRETA do seu objeto)
+    const cidade = pessoa.cidade_pais_principal ? `, ${pessoa.cidade_pais_principal}` : '';
+    
+    // 2. Prepara a Data de Falecimento (com a Cruz ✝ e Fidelidade ao Dado)
+    let falecimento = '';
+    // Usa a nomenclatura CORRETA do seu objeto: 'pessoa.falecimento'
+    if (pessoa.falecimento && pessoa.falecimento.trim() !== '') {
+        falecimento = ` - ✝ ${pessoa.falecimento}`; 
+    }
+    
+    // 3. Monta a string de Detalhes Completa
+    // Usa 'pessoa.nascimento' (já validado) e adiciona a cidade e o falecimento
+    const detalhesCompletos = `${pessoa.nascimento || ''}${cidade}${falecimento}`;
+
     html += `<div class="arvore-secao arvore-central">
                 <h3>Pessoa Central</h3>
                 <div class="arvore-item principal">
                     ${pessoa.nome}
-                    <div class="detalhes">${pessoa.nascimento || ''}</div>
+                    <div class="detalhes">${detalhesCompletos}</div>
                 </div>
-             </div>`;
+            </div>`;
+  
     // --- CÔNJUGES E FILHOS (renderizados em suas próprias seções) ---
     ['Cônjuge(s)', 'Filho(s)'].forEach(titulo => {
         if (secoes[titulo].length > 0) {
@@ -637,41 +668,73 @@ function renderizarArvore(pessoa) {
         }
         return nome;
     }
-    btnSalvarSupabase.addEventListener('click', async () => {
-        if (!supabase) return alert("A conexão com o Supabase não foi inicializada.");
-        if (!solicitarNomeUsuario()) return;
-        mostrarLoading('Salvando na nuvem...');
-        try {
-            const {  dadosNuvem, error: fetchError } = await supabase
-                .from('app_genealogia') 
-                .select('id, versão');
-            if (fetchError) throw fetchError;
-            const dadosParaEnviar = banco.filter(local => {
-                const nuvem = dadosNuvem.find(d => d.id === local.id);
-                return !nuvem || (local.versão || 0) > (nuvem.versão || 0); 
-            });
-            if (dadosParaEnviar.length === 0) {
-                 alert("Todos os dados locais já estão sincronizados com a nuvem.");
-                 esconderLoading();
-                 return;
-            }
-            const userName = localStorage.getItem('arvoreUsuario');
-            dadosParaEnviar.forEach(p => {
-                p.versão = Math.floor(Date.now() / 1000);
-                p.user_id = userName;
-            });
 
-            const { error } = await supabase.from('app_genealogia').upsert(dadosParaEnviar);
-            if (error) throw error;
-            salvarBancoLocal(banco);
-            alert(`${dadosParaEnviar.length} registros foram salvos/atualizados na nuvem!`);
-        } catch (error) {
-            console.error('Erro ao salvar no Supabase:', error);
-            alert(`Erro ao salvar na nuvem: ${error.message}`);
-        } finally {
+btnSalvarSupabase.addEventListener('click', async () => {
+    if (!supabase) return alert("A conexão com o Supabase não foi inicializada.");
+    if (!solicitarNomeUsuario()) return;
+
+    mostrarLoading('Sincronizando com a nuvem...');
+
+    try {
+        // CORREÇÃO 1: Acessar a propriedade 'data' e renomeá-la para 'dadosNuvem'
+        const { data: dadosNuvem, error: fetchError } = await supabase
+            .from('app_genealogia')
+            .select('id, versão');
+
+        if (fetchError) throw fetchError;
+        // Adiciona uma verificação para o caso de a resposta da nuvem ser inválida
+        if (!dadosNuvem) throw new Error("Não foi possível obter os dados da nuvem para comparação.");
+
+        const dadosParaEnviar = banco.filter(local => {
+            const nuvem = dadosNuvem.find(d => d.id === local.id);
+            return !nuvem || (local.versão || 0) > (nuvem.versão || 0);
+        });
+
+        if (dadosParaEnviar.length === 0) {
+            alert("Todos os dados locais já estão sincronizados com a nuvem.");
             esconderLoading();
+            return;
         }
-    });
+
+        const userName = localStorage.getItem('arvoreUsuario');
+
+        // CORREÇÃO 2: Garantir a integridade dos dados antes de enviar
+        const dadosLimpadosEProntos = dadosParaEnviar.map(pessoa => {
+            const pessoaLimpa = { ...pessoa };
+            // Garante que os campos de relacionamento sejam sempre arrays
+            pessoaLimpa.pais = parseArrayField(pessoa.pais);
+            pessoaLimpa.filhos = parseArrayField(pessoa.filhos);
+            pessoaLimpa.conjuge = parseArrayField(pessoa.conjuge);
+            // Atualiza a versão e o autor
+            pessoaLimpa.versão = Math.floor(Date.now() / 1000);
+            pessoaLimpa.user_id = userName;
+            return pessoaLimpa;
+        });
+
+        const { error } = await supabase.from('app_genealogia').upsert(dadosLimpadosEProntos);
+
+        if (error) throw error;
+        
+        // Sincroniza a nova versão com o banco local para evitar reenvios desnecessários
+        banco.forEach(local => {
+            const salvo = dadosLimpadosEProntos.find(s => s.id === local.id);
+            if (salvo) {
+                local.versão = salvo.versão;
+            }
+        });
+        salvarBancoLocal(banco);
+
+        alert(`${dadosLimpadosEProntos.length} registros foram salvos/atualizados na nuvem!`);
+
+    } catch (error) {
+        console.error('Erro ao salvar no Supabase:', error);
+        alert(`Erro ao salvar na nuvem: ${error.message}`);
+    } finally {
+        esconderLoading();
+    }
+});
+
+
     btnCarregarSupabase.addEventListener('click', async () => {
         if (!supabase) return alert("A conexão com o Supabase não foi inicializada.");
         mostrarLoading('Carregando da nuvem...');
@@ -697,5 +760,4 @@ function renderizarArvore(pessoa) {
     banco = carregarBancoLocal();
     exibirRegistroAtual();
     ativarSecao(secAbertura, null); // ATUALIZADO: Inicia na Tela de Abertura (Hub/Refúgio)
-
 });

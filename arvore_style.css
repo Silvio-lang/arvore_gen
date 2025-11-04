@@ -190,11 +190,12 @@ form button[type="submit"], form button[type="button"] {
 }
 .registro-item {
     display: flex;
-    align-items: center;
-    padding: 12px 5px;
+    align-items: center; /* Garante o alinhamento vertical centralizado */
+    padding: 8px 5px;    /* Aumenta o espaço interno vertical */
     border-bottom: 1px solid #eee;
-    gap: 10px;
+    gap: 25px;            /* AUMENTADO: Aumenta o afastamento horizontal */
 }
+
 .registro-item:hover { background-color: #f9f9f9; }
 .registro-item input[type="radio"] { margin-right: 5px; transform: scale(1.2); accent-color: var(--cor-primaria); }
 .registro-info { flex: 1; cursor: pointer; }
@@ -412,4 +413,30 @@ html, body {
 .botao-projeto:hover {
     background-color: #f0f0f0; /* Cor suave ao passar o mouse */
     border-color: #333;
+}
+
+/* Estilos para o novo layout de criação de vínculos */
+.vinculo-creator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+/* Estilos para o novo layout de criação de vínculos */
+.vinculo-creator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+/* Estilo para o nome da pessoa (fonte pequena e preta) */
+.vinculo-creator .vinculo-pessoa-nome {
+    font-size: 12px;
+    color: #000; /* Cor preta, como solicitado */
+    font-weight: normal; /* Remove o negrito padrão */
+    position: relative; /* Permite o ajuste fino da posição */
+    top: 0.5rem; /* Desloca o texto para baixo (aprox. 4px) */
 }
