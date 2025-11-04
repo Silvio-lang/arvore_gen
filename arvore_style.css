@@ -188,12 +188,12 @@ form button[type="submit"], form button[type="button"] {
     max-height: 400px;
     overflow-y: auto;
 }
-.registro-item {
+.registro-item {       /*  CONFIGURAÇÃO DAS LINHAS DA LISTA DE PESSOAS
     display: flex;
     align-items: center; /* Garante o alinhamento vertical centralizado */
     padding: 8px 5px;    /* Aumenta o espaço interno vertical */
     border-bottom: 1px solid #eee;
-    gap: 25px;            /* AUMENTADO: Aumenta o afastamento horizontal */
+    gap: 5px;            /* AUMENTADO: Aumenta o afastamento horizontal */
 }
 
 .registro-item:hover { background-color: #f9f9f9; }
@@ -440,3 +440,4 @@ html, body {
     position: relative; /* Permite o ajuste fino da posição */
     top: 0.5rem; /* Desloca o texto para baixo (aprox. 4px) */
 }
+
