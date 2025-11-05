@@ -679,8 +679,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // PLACA DE CUIDADO / OBSTÁCULO PSICOLÓGICO: Exige nome e Confirmação de Seriedade
         const userName = prompt(
-            "ALERTA: Você está prestes a salvar suas alterações na Nuvem.\n\n" +
-            "Esta ação pode afetar dados de outros colaboradores. O último a salvar prevalece.\n\n" +
+            "LEMBRETE: Você está prestes a salvar suas alterações na Nuvem.\n\n" +
+            "Esta ação pode afetar dados de outros colaboradores e o último a salvar prevalece. Cada um pode fazer seu backup, no seu próprio aparelho.\n\n" +
             "Por favor, digite seu nome de usuário e pressione OK para confirmar o salvamento:", 
             localStorage.getItem('arvoreUsuario') || ""
         );
