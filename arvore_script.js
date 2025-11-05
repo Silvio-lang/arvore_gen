@@ -2,8 +2,9 @@
 // ================================================================
 // CONFIGURAÇÃO DO SUPABASE
 // ================================================================
-const SUPABASE_URL = 'https://keaimlhudjtijdujovdu.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlYWltbGh1ZGp0aWpkdWpvdmR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NTk5NTQsImV4cCI6MjA3NjUzNTk1NH0.xv_GSrMSAW555j-h6UmFOaoq7sIa47OxLZ4LXPMUErs';
+const SUPABASE_URL = 'https://keaimlhudjtijdujovdu.supabase.co'; 
+// colocadas iniciais nesta chave API para não ser utilizada
+const SUPABASE_KEY = 'eySAFJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlYWltbGh1ZGp0aWpkdWpvdmR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NTk5NTQsImV4cCI6MjA3NjUzNTk1NH0.xv_GSrMSAW555j-h6UmFOaoq7sIa47OxLZ4LXPMUErs';
 // Inicializar Supabase
 let supabase = null;
 if (window.supabase) {
@@ -776,4 +777,5 @@ document.addEventListener('DOMContentLoaded', () => {
     banco = carregarBancoLocal();
     exibirRegistroAtual();
     ativarSecao(secAbertura, null); // ATUALIZADO: Inicia na Tela de Abertura (Hub/Refúgio)
+
 });
