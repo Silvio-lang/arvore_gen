@@ -92,8 +92,8 @@ footer {
    ================================================================ */
 nav {
     display: flex;
-    justify-content: flex-end; /* Alinha o botão Início à direita */
-    margin-bottom: 10px; /* Reduz o espaçamento da navegação superior */
+    justify-content: flex-end; /* Alinha o botão Início à direita: 'end' */
+    margin-bottom: 5px; /* Reduz o espaçamento da navegação superior */
     padding: 5px 0;
     flex-wrap: wrap;
     border-bottom: 1px solid var(--cor-borda); /* Adiciona separador visual */
@@ -101,7 +101,7 @@ nav {
 /* Estilo para o botão de Início/Refúgio */
 #btnRefugio {
     background-color: var(--cor-destaque);
-    color: white;
+    color: black;
     padding: 8px 15px;
     font-size: 0.9em;
     font-weight: 600;
@@ -372,7 +372,9 @@ form button[type="submit"], form button[type="button"] {
 }
 @media only screen and (min-width: 900px) {
     nav {
-        justify-content: flex-end; /* Mantém o Início à direita */
+        /*justify-content: flex-start;   Mantém tecla [Início] à esquerda */
+        /*justify-content: flex-end;   Mantém tecla [Início] à direita */
+        justify-content:  center; /* Mantém tecla Início ao centro */
     }
     button, input[type="submit"] {
         flex-grow: 0; 
@@ -444,7 +446,7 @@ html, body {
 /* Estilo para a imagem na tela de abertura */
 .imagem-abertura {
     /* Mude de 100% para algo como 50% ou 60% */
-    max-width: 70%; /* Por exemplo, 50% da largura do contêiner */
+    max-width: 50%; /* Por exemplo, 50% da largura do contêiner */
     height: auto; /* Mantém a proporção original da imagem */
     display: block; /* Remove espaços extras abaixo da imagem */
     margin: 20px auto; /* Centraliza a imagem e adiciona margem vertical */
@@ -461,5 +463,4 @@ html, body {
 .hub-button {
     margin: 10px;
     display: inline-block;
-
 }

@@ -11,7 +11,7 @@
     <div class="container">
         <header>
             <h1>🌳 Árvore Genealógica</h1>
-            <p>Um aplicativo para construir e gerenciar sua história familiar.</p>
+            <p>Um aplicativo para construir e gerenciar a história familiar.</p>
         </header>
         <nav>
             <button id="btnRefugio" style="display: none;">🏠 Início</button>
@@ -100,6 +100,8 @@
                 <div id="vinculosLista"></div>
 
 <div class="vinculo-creator">
+    <h3>Novo Vinculo:</h3>
+  <dir id="escolha-vínculo"></div>
     <strong id="nomePessoaPrincipalVinculo" class="vinculo-pessoa-nome"></strong>
     <select id="selectRelacao">
         <option value="filho">é filho(a) de</option>
@@ -116,11 +118,11 @@
         </section>
         
         <footer>
-            <button id="btnExportarJSON">Salvar LOCAL</button>
-            <button id="btnImportarJSON">Carregar LOCAL</button>
+            <button id="btnExportarJSON">SALVAR DADOS</button>
+            <button id="btnImportarJSON">CARREGAR</button>
             <button id="btnSalvarSupabase" style="display: none;">☁️ Salvar na Nuvem</button>
             <button id="btnCarregarSupabase" style="display: none;">⬇️ Carregar da Nuvem</button>
-            <button id="btnDicas" title="Ver Dicas de Uso">💡</button>
+            <button id="btnDicas" title="Dicas de Uso">💡</button>
             <input type="file" id="inputImportJSON" accept=".json,.txt" style="display: none;">
         </footer>
     </div>

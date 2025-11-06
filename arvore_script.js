@@ -1,16 +1,19 @@
-// arvore_script.js - Versão Final (Last Write Wins)
+// arvore_script.js - Versão Final (Last Write Wins e Nuvem Desativada)
 // ================================================================
-// CONFIGURAÇÃO DO SUPABASE
+// CONFIGURAÇÃO DO SUPABASE (CHAVE INVALIDADA PARA FORÇAR USO DE ARQUIVOS)
 // ================================================================
-const SUPABASE_URL = 'https://keaimlhudjtijdujovdu.supabase.co'; 
-// colocadas iniciais nesta chave API para não ser utilizada
+const SUPABASE_URL = 'https://keaimlhudjtijdujovdu.supabase.co';
+// CHAVE INTENCIONALMENTE INVALIDADA com as iniciais do nome para garantir que a Nuvem não funcione:
 const SUPABASE_KEY = 'eySAFJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlYWltbGh1ZGp0aWpkdWpvdmR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5NTk5NTQsImV4cCI6MjA3NjUzNTk1NH0.xv_GSrMSAW555j-h6UmFOaoq7sIa47OxLZ4LXPMUErs';
-// Inicializar Supabase
+
+// Inicializar Supabase (DESATIVADA)
 let supabase = null;
-if (window.supabase) {
-    const { createClient } = window.supabase;
-    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-}
+// if (window.supabase) {
+//     const { createClient } = window.supabase;
+//     supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// }
+// ================================================================
+
 document.addEventListener('DOMContentLoaded', () => {
     // Seletores de Elementos DOM
     const secAbertura = document.getElementById('secAbertura'); // NOVO: Tela de Abertura
@@ -76,24 +79,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // LISTA DE DICAS E FUNCIONALIDADE DO MODAL (COM NAVEGAÇÃO)
     // ================================================================
     const dicas = [
-        "01. Para criar um vínculo (paternidade/filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
-        "02. Você pode filtrar a lista de pessoas digitando qualquer parte do nome na área de Busca de Pessoas.",
-        "03. 'Salvar na Nuvem' e 'Carregar da Nuvem' mantem seus registros seguros e sincronizados entre todos os usuários.",
-        "04. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
-        "05. Ao vincular duas pessoas, o vínculo correspondente é criado automaticamente na segunda pessoa.",
-        "06. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
-        "07. Não há restrição a filhos e pai/mãe 'não-biológicos', podendo ser lançados normalmente, além de registrados parentes seus e vinculados.",
-        "08. Para visualizar a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
-        "09. Na visualização da Árvore, centralizada em alguém, se notar a falta de vínculo ou erro no nome, use o botão 'Editar' nesta tela para correção.",
-        "10. Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero registrado de (c)ônjuges, (p)ais, e (f)ilhos na base de dados. Isto auxilia a detectar pessoas e vínculos não registrados.",
-        "11. Se você quiser criar uma árvore separada, nova, pode fazê-lo! mas 'somente no seu computador ou celular' para não afetar os dados já registrados de longa data. Neste caso, não salve na nuvem. Tenha cautela!",
-        "12. Para criação de outra 'nuvem' com banco de dados novo/independente - leia: https://raw.githubusercontent.com/silvio-lang/arvore_gen/main/README.md",
-        "13. Procure utilizar o nome da pessoa e  cidade/país em letras MAIÚSCULAS para uniformização.",
-        "14. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois os dados ficarão na memória do seu navegador. Cada navegador (Chrome, Edge, etc.), precisa carregar da nuvem ou do dispositivo uma vez.",
-        "15. As alterações feitas e salvas na nuvem ficam associados ao usuário que as fez.",
-        "16. Clique em < e > para navegar (avançar e retroceder) as instruções numeradas desta janela.",
-        "17. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar novamente.",
-        "18. O sistema aceita registros com dados mínimos (nome e vínculos) para facilitar o trabalho colaborativo com complementação posterior."
+
+        "01. Na tela de Busca de Pessoas, filtre a lista de pessoas digitando qualquer parte do nome .",
+        "02. Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero registrado de (c)ônjuges, (p)ais, e (f)ilhos na base de dados. Isto auxilia a detectar pessoas e vínculos não registrados.",
+        "03. Para visualizar a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
+        "04. Na visualização da Árvore, de alguém, quando notar a falta de vínculo ou erro no nome, use o botão 'Editar' nesta tela para correção desta pesssoa.",
+        "05. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
+        "06 Ao vincular duas pessoas, o vínculo  é criado automaticamente nas duas pessoas.",
+        "07. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
+        "08. Não há restrição a filhos e pai/mãe 'não-biológicos', podendo ser lançados normalmente, além de registrados seus parentes e vínculos.",
+        "09. São aceitos registros com dados mínimos (nome e vínculos) para facilitar o trabalho colaborativo com complementação posterior.",
+        "10 Para criar um vínculo (paternidade/filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
+        "11. Clique em < e > para navegar (avançar e retroceder) as instruções numeradas desta janela.",
+        "12. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar novamente.",
+        "13. Forneça as suas atualizações às pessoas da família de sua proximidade através do arquivo salvo na pasta de Downloads. Assim, os núcleos mais próximos podem se expandir nos registros."
+//        "13. 'Salvar na Nuvem' e 'Carregar da Nuvem' mantém seus registros seguros e //sincronizados entre todos os usuários.",
+//        "14 Se você quiser criar uma árvore separada, nova, pode fazê-lo! mas 'somente no seu //computador ou celular' para não afetar os dados já registrados de longa data. Neste caso, não //salve na nuvem. Tenha cautela!",
+//        "15. Para criação de outra 'nuvem' com banco de dados novo/independente - leia: //https://raw.githubusercontent.com/silvio-lang/arvore_gen/main/README.md",
+//        "16. Procure utilizar o nome da pessoa e  cidade/país em letras MAIÚSCULAS para //uniformização.",
+//        "17. No primeiro uso do aplicativo é necessário carregar da nuvem. Depois os dados ficarão //na memória do seu navegador. Cada navegador (Chrome, Edge, etc.), precisa carregar da nuvem //ou do dispositivo uma vez.",
+//        "18. As alterações feitas e salvas na nuvem ficam associados ao usuário que as fez.",
     ];
 
     function mostrarDica(index) {
@@ -513,15 +518,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 arvoreContainer.innerHTML = '';
                 btnEditarNaArvore.style.display = 'none';
                 return;
+
             }
             const pessoaId = optionSelecionada.dataset.id;
             const pessoa = banco.find(p => p.id === pessoaId);
             if (!pessoa) return;
             renderizarArvore(pessoa);
             btnEditarNaArvore.style.display = 'block';
+            btnEditarNaArvore.textContent = `✏️ Editar ${pessoa.nome}`; // <--- MUDANÇA AQUI
             btnEditarNaArvore.onclick = () => {
                  editarPessoa(pessoaId);
             };
+
         });
     }
     window.centralizarPessoaNaArvore = (id) => {
@@ -571,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const detalhesCompletos = `${pessoa.nascimento || ''}${cidade}${falecimento}`;
 
         html += `<div class="arvore-secao arvore-central">
-                    <h3>Pessoa Central</h3>
+           <!--         <h3>Pessoa Central</h3>    -->
                     <div class="arvore-item principal">
                         ${pessoa.nome}
                         <div class="detalhes">${detalhesCompletos}</div>
@@ -635,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     btnImportarJSON.addEventListener('click', () => inputImportJSON.click());
     
-    // INÍCIO DO BLOCO A - CORREÇÃO DE SEGURANÇA NA IMPORTAÇÃO (HD -> VERSÃO ZERO)
+    // CORREÇÃO DE SEGURANÇA NA IMPORTAÇÃO (HD -> VERSÃO ZERO)
     inputImportJSON.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -650,7 +658,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         dadosImportados.forEach(pessoa => {
                             pessoa.versão = 0; 
                         });
-                        // FIM DA LÓGICA DE SEGURANÇA
 
                         banco = dadosImportados;
                         salvarBancoLocal(banco);
@@ -668,114 +675,26 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
         inputImportJSON.value = '';
     });
-    // FIM DO BLOCO A
 
     // ================================================================
-    // LÓGICA DO SUPABASE
+    // LÓGICA DO SUPABASE (FUNÇÕES VÃO RETORNAR ERRO DE NÃO-INICIALIZAÇÃO)
     // ================================================================
 
-    // INÍCIO DO BLOCO B - CORREÇÃO DA SINCRONIZAÇÃO (Last Write Wins)
     btnSalvarSupabase.addEventListener('click', async () => {
-        if (!supabase) return alert("A conexão com o Supabase não foi inicializada.");
+        if (!supabase) return alert("A conexão com a Nuvem está desativada. Por favor, utilize a importação/exportação de arquivos.");
         
-        // PLACA DE CUIDADO / OBSTÁCULO PSICOLÓGICO: Exige nome e Confirmação de Seriedade
-        const userName = prompt(
-            "LEMBRETE: Você está prestes a salvar suas alterações na Nuvem.\n\n" +
-            "Esta ação pode afetar dados de outros colaboradores e o último a salvar prevalece. Cada um pode fazer seu backup, no seu próprio aparelho.\n\n" +
-            "Por favor, digite seu nome de usuário e pressione OK para confirmar o salvamento:", 
-            localStorage.getItem('arvoreUsuario') || ""
-        );
-
-        if (!userName || userName.trim() === "") {
-            return alert("O nome de usuário é obrigatório para salvar na nuvem. Sincronização cancelada.");
-        }
-        localStorage.setItem('arvoreUsuario', userName.trim());
-
-        mostrarLoading('Sincronizando com a nuvem...');
-        
-        try {
-            // 1. OBTEM DADOS DA NUVEM (APENAS PARA TRATAMENTO DE TIMESTAMPS ANTIGOS)
-            const { data, error: fetchError } = await supabase.from('app_genealogia').select('id, versão');
-            if (fetchError) throw fetchError;
-            
-            const dadosNuvem = data || []; 
-            const dadosParaEnviar = banco.filter(local => {
-                const nuvem = dadosNuvem.find(d => d.id === local.id);
-                
-                // --- TRATAMENTO DE VERSÃO (APENAS LIMPEZA DE DADOS ANTIGOS) ---
-                let versaoNuvem = parseInt(nuvem?.versão) || 0; 
-                const LIMITE_TIMESTAMP = 1000000000; // 1 Bilhão
-                if (versaoNuvem > LIMITE_TIMESTAMP) {
-                    // Se for o timestamp antigo, trata como zero para que a versão local '1' passe.
-                    versaoNuvem = 0; 
-                }
-                
-                // NO MODO 'LAST WRITE WINS', TODO REGISTRO QUE EXISTE LOCALMENTE É ENVIADO.
-                // Não há filtro V:Local > V:Nuvem.
-                return true; 
-            });
-
-            if (dadosParaEnviar.length === 0) {
-                alert("Nenhum registro local para enviar.");
-                esconderLoading();
-                return;
-            }
-
-            // 3. PREPARAÇÃO FINAL PARA UPSERT (USA A VERSÃO SEQUENCIAL)
-            const dadosLimpadosEProntos = dadosParaEnviar.map(pessoa => {
-                const pessoaLimpa = { ...pessoa };
-                pessoaLimpa.pais = parseArrayField(pessoa.pais);
-                pessoaLimpa.filhos = parseArrayField(pessoa.filhos);
-                pessoaLimpa.conjuge = parseArrayField(pessoa.conjuge);
-                
-                // USA A VERSÃO SEQUENCIAL DO OBJETO LOCAL (local.versão)
-                pessoaLimpa.versão = pessoa.versão; 
-                pessoaLimpa.user_id = userName.trim(); // Usa o nome inserido no prompt
-                return pessoaLimpa;
-            });
-
-            // 4. ENVIO (UPSERT)
-            const { error } = await supabase.from('app_genealogia').upsert(dadosLimpadosEProntos);
-            if (error) throw error;
-
-            // 5. FINALIZAÇÃO LOCAL
-            salvarBancoLocal(banco); 
-
-            alert(`${dadosLimpadosEProntos.length} registros foram salvos/atualizados na nuvem!`);
-
-        } catch (error) {
-            console.error('Erro ao salvar no Supabase:', error);
-            alert(`Erro ao salvar na nuvem: ${error.message}`);
-        } finally {
-            esconderLoading();
-        }
+        // ... (O restante do código Supabase aqui não será executado) ...
     });
-    // FIM DO BLOCO B
 
     btnCarregarSupabase.addEventListener('click', async () => {
-        if (!supabase) return alert("A conexão com o Supabase não foi inicializada.");
-        mostrarLoading('Carregando da nuvem...');
-        try {
-            const { data, error } = await supabase.from('app_genealogia').select('*');
-            if (error) throw error;
-            if (confirm(`Foram encontrados ${data.length} registros na nuvem. Deseja substituir seus dados locais por estes?`)) {
-                banco = data;
-                salvarBancoLocal(banco);
-                alert("Dados carregados da nuvem com sucesso!");
-                ativarSecao(secGerenciar, null); // Ativa a seção de gerenciamento após carregar
-            }
-        } catch (error) {
-            console.error('Erro ao carregar do Supabase:', error);
-            alert(`Erro ao carregar da nuvem: ${error.message}`);
-        } finally {
-            esconderLoading();
-        }
+        if (!supabase) return alert("A conexão com a Nuvem está desativada. Por favor, utilize a importação/exportação de arquivos.");
+        // ... (O restante do código Supabase aqui não será executado) ...
     });
+    
     // ================================================================
     // INICIALIZAÇÃO
     // ================================================================
     banco = carregarBancoLocal();
     exibirRegistroAtual();
     ativarSecao(secAbertura, null); // ATUALIZADO: Inicia na Tela de Abertura (Hub/Refúgio)
-
 });
