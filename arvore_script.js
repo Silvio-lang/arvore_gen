@@ -431,41 +431,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
+const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
     if (btnSalvarEdicao) {
         btnSalvarEdicao.addEventListener('click', () => {
             if (!registroEditando) return;
-            const userName = localStorage.getItem('arvoreUsuario');
-            
-            // Requisito de Autoria (Placa de Cuidado)
-            if (!userName) {
-                alert("Para garantir a autoria das alterações, por favor, salve os dados na nuvem ao menos uma vez antes de editar.");
-                return;
-            }
-            
+            
+            // O BLOCO DE VERIFICAÇÃO DE AUTORIA/NUVEM FOI REMOVIDO DAQUI.
+            
+            // 1. ATUALIZAÇÃO DOS CAMPOS DE EDIÇÃO
             registroEditando.nome = (document.getElementById('edit-nome')?.value || '').toUpperCase();
             registroEditando.sexo = document.getElementById('edit-sexo')?.value || '';
             registroEditando.nascimento = document.getElementById('edit-nascimento')?.value || '';
             registroEditando.falecimento = document.getElementById('edit-falecimento')?.value || '';
             registroEditando.profissao = document.getElementById('edit-profissao')?.value || '';
             registroEditando.cidade_pais_principal = (document.getElementById('edit-cidade_pais')?.value || '').toUpperCase();
-            registroEditando.user_id = userName;
+            // O 'user_id' e a lógica de versão podem ser mantidos para compatibilidade, mas não bloqueiam mais.
+            registroEditando.user_id = localStorage.getItem('arvoreUsuario') || 'LOCAL_USER';
             
-            // CORREÇÃO FINAL DE VERSÃO: Transição de TIMESTAMP para SEQUENCIAL CONTROLADO
+            // Lógica de versionamento (Mantida, pois é um bom controle interno)
             const versaoAtual = parseInt(registroEditando.versão) || 0;
-            // Limite de 10 Bilhões para separar o timestamp grande (corrompido) do sequencial
             const LIMITE_TIMESTAMP = 10000000000; 
-
             if (versaoAtual > LIMITE_TIMESTAMP) { 
-                // Se for um timestamp antigo, forçamos o reset para 1 para começar o versionamento sequencial.
                 registroEditando.versão = 1;
             } else {
-                // Se já for sequencial (ou 0), apenas incrementa.
                 registroEditando.versão = versaoAtual + 1;
             }
             
+            // 2. SALVAMENTO LOCAL AGORA GARANTIDO
             salvarBancoLocal(banco);
-            alert('Alterações salvas em memória!');
+            alert('Alterações salvas localmente!'); // Mensagem corrigida para refletir o salvamento local
+            
+            // 3. AÇÕES FINAIS
             cancelarEdicao(); 
             atualizarListaRegistros();
         });
