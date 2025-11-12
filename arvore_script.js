@@ -431,41 +431,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
-    if (btnSalvarEdicao) {
-        btnSalvarEdicao.addEventListener('click', () => {
-            if (!registroEditando) return;
-            
-            // O BLOCO DE VERIFICAÇÃO DE AUTORIA/NUVEM FOI REMOVIDO DAQUI.
-            
-            // 1. ATUALIZAÇÃO DOS CAMPOS DE EDIÇÃO
-            registroEditando.nome = (document.getElementById('edit-nome')?.value || '').toUpperCase();
-            registroEditando.sexo = document.getElementById('edit-sexo')?.value || '';
-            registroEditando.nascimento = document.getElementById('edit-nascimento')?.value || '';
-            registroEditando.falecimento = document.getElementById('edit-falecimento')?.value || '';
-            registroEditando.profissao = document.getElementById('edit-profissao')?.value || '';
-            registroEditando.cidade_pais_principal = (document.getElementById('edit-cidade_pais')?.value || '').toUpperCase();
-            // O 'user_id' e a lógica de versão podem ser mantidos para compatibilidade, mas não bloqueiam mais.
-            registroEditando.user_id = localStorage.getItem('arvoreUsuario') || 'LOCAL_USER';
-            
-            // Lógica de versionamento (Mantida, pois é um bom controle interno)
-            const versaoAtual = parseInt(registroEditando.versão) || 0;
-            const LIMITE_TIMESTAMP = 10000000000; 
-            if (versaoAtual > LIMITE_TIMESTAMP) { 
-                registroEditando.versão = 1;
-            } else {
-                registroEditando.versão = versaoAtual + 1;
-            }
-            
-            // 2. SALVAMENTO LOCAL AGORA GARANTIDO
-            salvarBancoLocal(banco);
-            alert('Alterações salvas localmente!'); // Mensagem corrigida para refletir o salvamento local
-            
-            // 3. AÇÕES FINAIS
-            cancelarEdicao(); 
-            atualizarListaRegistros();
-        });
-    }
+// arvore_script.js (Trecho btnSalvarEdicao)
+
+    const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
+    if (btnSalvarEdicao) {
+        btnSalvarEdicao.addEventListener('click', () => {
+            if (!registroEditando) return;
+            
+            // ATUALIZAÇÃO DOS CAMPOS DE EDIÇÃO (Bloco mantido)
+            registroEditando.nome = (document.getElementById('edit-nome')?.value || '').toUpperCase();
+            registroEditando.sexo = document.getElementById('edit-sexo')?.value || '';
+            registroEditando.nascimento = document.getElementById('edit-nascimento')?.value || '';
+            registroEditando.falecimento = document.getElementById('edit-falecimento')?.value || '';
+            registroEditando.profissao = document.getElementById('edit-profissao')?.value || '';
+            registroEditando.cidade_pais_principal = (document.getElementById('edit-cidade_pais')?.value || '').toUpperCase();
+            registroEditando.user_id = localStorage.getItem('arvoreUsuario') || 'LOCAL_USER';
+            
+            // Lógica de versionamento (Mantida)
+            const versaoAtual = parseInt(registroEditando.versão) || 0;
+            const LIMITE_TIMESTAMP = 10000000000; 
+            if (versaoAtual > LIMITE_TIMESTAMP) { 
+                registroEditando.versão = 1;
+            } else {
+                registroEditando.versão = versaoAtual + 1;
+            }
+            
+            // SALVAMENTO LOCAL AGORA GARANTIDO
+            salvarBancoLocal(banco);
+            
+            // MENSAGEM FINAL: Usando "memória" e incentivando o backup para o HD.
+            alert(`Edição salva na MEMÓRIA do Navegador! Total de registros: ${banco.length}. Use o botão SALVAR DADOS para salvar no seu HD.`); 
+            
+            // AÇÕES FINAIS
+            cancelarEdicao(); 
+            atualizarListaRegistros();
+        });
+    }
     
     function cancelarEdicao() {
         registroEditando = null;
@@ -610,32 +611,35 @@ const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
         inputPessoaCentral.value = pessoa.nome;
         inputPessoaCentral.dispatchEvent(new Event('change'));
     });
-    // ================================================================
-    // LÓGICA DE IMPORTAÇÃO E EXPORTAÇÃO
-    // ================================================================
-    btnExportarJSON.addEventListener('click', () => {
-        if (banco.length === 0) {
-            alert("Não há dados para exportar.");
-            return;
-        }
-        // FEEDBACK VISUAL: Mensagem de processamento (2 segundos)
-        mostrarLoading("Salvando dados... Verifique a pasta Downloads!");
-        
-        const dataStr = JSON.stringify(banco, null, 2);
-        const dataBlob = new Blob([dataStr], {
-            type: 'application/json'
-        });
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        // ATUALIZAÇÃO: Nome base simples para permitir numeração automática pelo SO (arvore, arvore(1), ...)
-        link.download = `arvore.json`; 
-        link.click();
-        URL.revokeObjectURL(url);
+// arvore_script.js (Trecho btnExportarJSON)
 
-        // FEEDBACK VISUAL: Esconde a mensagem após 2000 ms (2 segundos)
-        setTimeout(esconderLoading, 2000); 
-    });
+    // ================================================================
+    // LÓGICA DE IMPORTAÇÃO E EXPORTAÇÃO
+    // ================================================================
+    btnExportarJSON.addEventListener('click', () => {
+        if (banco.length === 0) {
+            alert("Não há dados para exportar.");
+            return;
+        }
+        
+        // CORREÇÃO: Incluindo o número de registros no feedback (2 segundos)
+        mostrarLoading(`Salvando ${banco.length} registros... Verifique a pasta Downloads!`);
+        
+        const dataStr = JSON.stringify(banco, null, 2);
+        const dataBlob = new Blob([dataStr], {
+            type: 'application/json'
+        });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `arvore.json`; 
+        link.click();
+        URL.revokeObjectURL(url);
+
+        // FEEDBACK VISUAL: Esconde a mensagem após 2000 ms (2 segundos)
+        setTimeout(esconderLoading, 2000); 
+    });
+
     btnImportarJSON.addEventListener('click', () => inputImportJSON.click());
     
     // CORREÇÃO DE SEGURANÇA NA IMPORTAÇÃO (HD -> VERSÃO ZERO)
