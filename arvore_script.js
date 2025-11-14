@@ -27,7 +27,7 @@ let dicaAtualIndex = 0;
 // ================================================================
 function atualizarListaAniversarios() {
     const hoje = new Date();
-    const mesAtual = hoje.getMonth() + 1; // getMonth é 0-base, então somamos 1
+    const mesAtual = hoje.getMonth() + 1; 
     const aniversariantesLista = document.getElementById('aniversariantesLista');
     const mesAtualSpan = document.getElementById('mesAtual');
     
@@ -39,22 +39,24 @@ function atualizarListaAniversarios() {
     
     mesAtualSpan.textContent = nomesMeses[hoje.getMonth()];
 
-    // A variável 'banco' é acessada aqui porque foi declarada fora do DOMContentLoaded
     const aniversariantes = banco.filter(pessoa => {
+        // 1. CHAVE: Excluir pessoas que tenham data de falecimento registrada
+        if (pessoa.falecimento && pessoa.falecimento.trim() !== '') {
+            return false;
+        }
+
         if (!pessoa.nascimento) return false;
         
         let partes;
-        let dia, mes;
+        let mes;
 
         if (pessoa.nascimento.includes('-')) {
             // Formato ISO (YYYY-MM-DD)
             partes = pessoa.nascimento.split('-');
             mes = parseInt(partes[1]);
-            dia = parseInt(partes[2]);
         } else if (pessoa.nascimento.includes('/')) {
             // Formato Brasileiro (DD/MM/YYYY)
             partes = pessoa.nascimento.split('/');
-            dia = parseInt(partes[0]);
             mes = parseInt(partes[1]);
         } else {
             return false;
@@ -76,7 +78,7 @@ function atualizarListaAniversarios() {
     aniversariantesLista.innerHTML = '';
 
     if (aniversariantes.length === 0) {
-        aniversariantesLista.innerHTML = '<p>Nenhum aniversariante registrado neste mês.</p>';
+        aniversariantesLista.innerHTML = '<p>Nenhum aniversariante de pessoas vivas registrado neste mês.</p>';
         return;
     }
 
@@ -94,14 +96,13 @@ function atualizarListaAniversarios() {
         
         const idadeAtual = anoNascimento ? (new Date().getFullYear() - parseInt(anoNascimento)) : '?';
         
-        // CORREÇÃO: Pegar o dia formatado para exibir dentro dos parênteses
         const diaFormatado = diaAniversario ? diaAniversario.padStart(2, '0') : '?';
         const mesFormatado = mesAtual.toString().padStart(2, '0');
 
         const item = document.createElement('div');
         item.className = 'aniversariante-item';
         
-        // Exibe o dia em destaque e na descrição (CORRIGIDO)
+        // Exibe o dia em destaque e na descrição 
         item.innerHTML = `
             <span style="font-weight: bold; color: #005f73;">${diaFormatado}/${mesFormatado}</span> - 
             ${pessoa.nome} 
