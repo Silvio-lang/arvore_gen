@@ -454,13 +454,51 @@ html, body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para destacar */
 }
 
-/* Os outros estilos permanecem os mesmos */
 #secAbertura {
-    text-align: center;
+    text-align: center; /* Centraliza a imagem e o container de botões */
     padding: 20px;
 }
 
-.hub-button {
-    margin: 10px;
-    display: inline-block;
+/* Regra para a imagem (opcional, mas bom para garantir centralização) */
+.imagem-abertura {
+    display: block; 
+    margin: 0 auto 20px auto; 
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- PADRONIZAÇÃO DO HUB DE BOTÕES --- */
+
+/* 1. Alinha os botões horizontalmente e os centraliza */
+#secAbertura #hub-botoes {
+    display: flex; /* CHAVE: Coloca os botões na mesma linha */
+    flex-wrap: wrap; 
+    justify-content: center; /* Centraliza o grupo de botões horizontalmente */
+    
+    /* Centraliza o bloco de botões na tela */
+    max-width: 800px;
+    margin: 20px auto; 
+}
+
+/* 2. Aplica largura e altura fixas em todos os botões do hub */
+#secAbertura #hub-botoes button {
+    /* Define uma largura uniforme (250px é um bom tamanho padrão) */
+    width: 250px;  
+    height: 60px;
+    
+    /* Espaçamento uniforme entre todos os botões */
+    margin: 8px; 
+    
+    /* Garante que o conteúdo (texto e ícone) esteja centralizado e alinhado */
+    display: flex; 
+    align-items: center;
+    justify-content: flex-start; /* Alinha o texto na borda esquerda do botão */
+    padding: 0 15px;
+    font-size: 1.0em;
+}
+
+/* 3. Estiliza os ícones dentro dos botões (se estiver usando Material Icons) */
+#secAbertura #hub-botoes button .material-icons {
+    margin-right: 10px;
+    font-size: 1.2em;
 }

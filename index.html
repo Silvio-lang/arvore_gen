@@ -17,12 +17,17 @@
             <button id="btnRefugio" style="display: none;">🏠 Início</button>
         </nav>
         
-        <section id="secAbertura">
+<section id="secAbertura">
             <img src="arvore_familia.png" alt="Árvore Genealógica da Família" class="imagem-abertura">
-            <button id="btnGerenciarHub" class="hub-button">🔍 Lista/Pessoas</button>
-            <button id="btnNovaPessoaHub" class="hub-button">➕ Incluir Nova Pessoa</button>
+            
+            <!-- NOVO: Container que permite o alinhamento horizontal (FLEX) -->
+            <div id="hub-botoes"> 
+                <button id="btnGerenciarHub" class="hub-button">🔍 Lista/Pessoas</button>
+                <button id="btnNovaPessoaHub" class="hub-button">➕ Incluir Nova Pessoa</button>
+                <button id="btnVerAniversarios" class="hub-button">🎂 Aniversariantes do Mês</button>
+            </div>
         </section>
-        
+       
         <section id="secNovaPessoa">
             <h2>Incluindo Nova Pessoa</h2>
             <form id="pessoaForm">
@@ -48,15 +53,41 @@
             <div id="registroAtualContainer">Nenhum registro criado nesta sessão.</div>
         </section>
         
-        <section id="secGerenciar">
+<section id="secGerenciar">
             <h2>Registros</h2>
-            <label>Filtrar por Nome ou Sobrenome:</label>
-            <input type="text" id="filtroNome">
+            
+            <!-- NOVO CONTAINER: Agrupa os filtros em uma coluna (COM A ESTRUTURA CORRETA) -->
+            <div id="filtrosContainer">
+                
+                <div class="filtro-grupo">
+                    <label for="filtroNome">Filtrar por Nome ou Sobrenome:</label>
+                    <input type="text" id="filtroNome">
+                </div>
+                
+                <div class="filtro-grupo">
+                    <label for="filtroCidadePais">Filtrar por Cidade, País ou Local:</label>
+                    <input type="text" id="filtroCidadePais">
+                </div>
+                
+            </div>
+            <!-- FIM DO CONTAINER DE FILTROS -->
+            
             <div id="botoesAcaoGlobais">
                 <button id="btnVisualizarSelecionado">🌳 Visualizar Árvore</button>
             </div>
-            <div id="registrosLista"></div> </section>
+            <div id="registrosLista"></div>
+        </section>
         
+        <!-- O bloco secAniversariantes deve vir DEPOIS de secGerenciar -->
+        <section id="secAniversariantes" style="display:none;">
+            <h2>🎂 Aniversariantes do Mês: <span id="mesAtual"></span></h2>
+            <div id="aniversariantesLista">
+                <!-- Lista de aniversariantes será gerada aqui -->
+                <p>Carregando aniversariantes...</p>
+            </div>
+            <button id="btnVoltarAniversariantes">← Voltar para Início</button>
+        </section>
+
         <section id="secVisualizarArvore">
             <h2 style="text-align: center;">Árvore Genealógica - Visualização</h2>
             <div class="form-group">
