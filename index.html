@@ -99,11 +99,11 @@
             <div id="arvoreContainer"></div>
         </section>
         
-        <section id="secEditarPessoa">
+<section id="secEditarPessoa">
             <h2>Editar Registro</h2>
             <form id="editarForm">
-               <!--  <label>ID:</label>  -->
-               <!-- <input type="text" id="edit-id" readonly>  -->
+                <!-- <label>ID:</label> -->
+                <!-- <input type="text" id="edit-id" readonly> -->
                 <label>Nome completo:</label>
                 <input type="text" id="edit-nome">
                 <label>Sexo:</label>
@@ -120,29 +120,46 @@
                 <input type="text" id="edit-profissao">
                 <label>Cidade/País principal:</label>
                 <input type="text" id="edit-cidade_pais">
-                <button type="button" id="btnSalvarEdicao">Salvar Alterações</button>
-                <button type="button" id="btnExcluirRegistro">Excluir Registro</button>
-                <button type="button" id="btnCancelarEditar">Cancelar</button>
+                
+                <!-- BOTÕES DE AÇÃO NA EDIÇÃO (Substituído e simplificado) -->
+                <div style="margin-top: 30px; text-align: center;">
+                    <!-- NOVO PONTO ÚNICO DE SALVAMENTO NA MEMÓRIA -->
+                    <button type="button" id="btnConcluirEdicoes" class="principal-button">
+                        ✅ Concluir Edições
+                    </button>
+                    <!-- Mantido -->
+                    <button type="button" id="btnExcluirRegistro" class="secundario-button">
+                        Excluir Registro
+                    </button>
+                    <!-- Mantido, mas agora com lógica de descarte de alterações -->
+                    <button type="button" id="btnCancelarEditar" class="secundario-button">
+                        Cancelar
+                    </button>
+                </div>
+
             </form>
             <div id="vinculosSection" style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #ddd;">
                 <h3 id="labelNomePessoaEditada" class="vinculo-pessoa-nome">Editando Pessoa: [Nome]</h3>
                 <h3>Vínculos Atuais:</h3>
                 <div id="vinculosLista"></div>
 
-<div class="vinculo-creator">
-    <h3>Novo Vinculo:</h3>
-  <dir id="escolha-vínculo"></div>
-    <strong id="nomePessoaPrincipalVinculo" class="vinculo-pessoa-nome"></strong>
-    <select id="selectRelacao">
-        <option value="filho">é filho(a) de</option>
-        <option value="pai">é pai/mãe de</option>
-        <option value="conjuge">é cônjuge de</option>
-    </select>
-    <select id="selectPessoaVinculo">
-        <option value="">Selecione uma pessoa...</option>
-    </select>
-    <button type="button" id="btnAdicionarVinculo">Salvar Vínculo</button>
-</div>
+                <div class="vinculo-creator">
+                    <h3>Novo Vinculo:</h3>
+                    <div id="escolha-vínculo"></div>
+                    <strong id="nomePessoaPrincipalVinculo" class="vinculo-pessoa-nome"></strong>
+                    <select id="selectRelacao">
+                        <option value="filho">é filho(a) de</option>
+                        <option value="pai">é pai/mãe de</option>
+                        <option value="conjuge">é cônjuge de</option>
+                    </select>
+                    <select id="selectPessoaVinculo">
+                        <option value="">Selecione uma pessoa...</option>
+                    </select>
+                    <!-- Botão pequeno e verde de INCLUIR VÍNCULO -->
+                    <button type="button" id="btnAdicionarVinculo" class="botao-inclusao-vinculo">
+                        Incluir
+                    </button>
+                </div>
 
             </div>
         </section>

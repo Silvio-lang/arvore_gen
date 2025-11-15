@@ -1,4 +1,4 @@
-// arvore_script.js - Versão Final e Estável (Inclui Aniversariantes)
+// arvore_script.js - Versão Final e Estável (Arquitetura de Controle Consciente)
 // ================================================================
 // CONFIGURAÇÃO DO SUPABASE (CHAVE INVALIDADA PARA FORÇAR USO DE ARQUIVOS)
 // ================================================================
@@ -8,14 +8,9 @@ const SUPABASE_KEY = 'eySAFJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 // Inicializar Supabase (DESATIVADA)
 let supabase = null;
-// if (window.supabase) {
-//     const { createClient } = window.supabase;
-//     supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-// }
 // ================================================================
 
 // Variáveis Globais (AGORA VERDADEIRAMENTE GLOBAIS)
-// Estas variáveis são acessíveis por todas as funções (como atualizarListaAniversarios)
 let banco = []; 
 let ultimoRegistro = null;
 let registroEditando = null;
@@ -23,7 +18,7 @@ let dicaAtualIndex = 0;
 
 
 // ================================================================
-// FUNÇÃO PARA ATUALIZAR LISTA DE ANIVERSÁRIOS (Nova Funcionalidade)
+// FUNÇÃO PARA ATUALIZAR LISTA DE ANIVERSÁRIOS 
 // ================================================================
 function atualizarListaAniversarios() {
     const hoje = new Date();
@@ -40,7 +35,7 @@ function atualizarListaAniversarios() {
     mesAtualSpan.textContent = nomesMeses[hoje.getMonth()];
 
     const aniversariantes = banco.filter(pessoa => {
-        // 1. CHAVE: Excluir pessoas que tenham data de falecimento registrada
+        // 1. CHAVE: Excluir pessoas que tenham data de falecimento registrada (manter apenas pessoas vivas)
         if (pessoa.falecimento && pessoa.falecimento.trim() !== '') {
             return false;
         }
@@ -112,8 +107,6 @@ function atualizarListaAniversarios() {
     });
 }
 // ================================================================
-// FIM DA FUNÇÃO DE ANIVERSÁRIOS
-// ================================================================
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -131,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const registroAtualContainer = document.getElementById('registroAtualContainer');
     const registrosLista = document.getElementById('registrosLista');
     const filtroNome = document.getElementById('filtroNome');
+    const filtroCidadePais = document.getElementById('filtroCidadePais'); 
     const editarForm = document.getElementById('editarForm');
     const btnCancelarEditar = document.getElementById('btnCancelarEditar');
     const btnCancelarInclusao = document.getElementById('btnCancelarInclusao');
@@ -156,20 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnDicaAnterior = document.getElementById('btnDicaAnterior');
     const btnDicaProxima = document.getElementById('btnDicaProxima');
     const dicaContador = document.getElementById('dicaContador');
+    const btnConcluirEdicoes = document.getElementById('btnConcluirEdicoes'); // NOVO PONTO DE SALVAMENTO
 
-    // NOVO: Seletores de Aniversariantes
+    // Seletores de Aniversariantes
     const secAniversariantes = document.getElementById('secAniversariantes');
     const btnVerAniversarios = document.getElementById('btnVerAniversarios');
-    const btnVoltarAniversariantes = document.getElementById('btnVoltarAniversariantes');
-    // mesAtualSpan e aniversariantesLista são globais/já usados na função
-
-    // Variáveis Globais (REMOVIDAS daqui)
-    // let banco = [];
-    // let ultimoRegistro = null;
-    // let registroEditando = null;
-    // let dicaAtualIndex = 0;
-    
-    // A variável 'banco' será carregada logo abaixo:
     
     // ================================================================
     // FUNÇÕES DE FEEDBACK VISUAL (LOADING)
@@ -218,9 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
         dicaTexto.textContent = dicas[dicaAtualIndex];
         dicaContador.textContent = `${dicaAtualIndex + 1} / ${dicas.length}`;
     }
+    // CORREÇÃO: Força a Dica a iniciar no índice 0 (Dica 01)
     const abrirDicaModal = () => {
-        const indiceSorteado = Math.floor(Math.random() * dicas.length);
-        mostrarDica(indiceSorteado);
+        mostrarDica(0); 
         dicasModal.style.display = 'block';
     };
     const fecharDicaModal = () => {
@@ -333,17 +318,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnNovaPessoaHub) {
         btnNovaPessoaHub.addEventListener('click', () => ativarSecao(secNovaPessoa, null));
     }
-    // NOVO: Listener para o botão de Aniversários
+    // Listener para o botão de Aniversários
     if (btnVerAniversarios) {
         btnVerAniversarios.addEventListener('click', () => {
             atualizarListaAniversarios(); // Carrega os dados antes de mostrar
             ativarSecao(secAniversariantes, null);
         });
-    }
-
-    // NOVO: Listener para o botão Voltar da seção de Aniversários
-    if (btnVoltarAniversariantes) {
-        btnVoltarAniversariantes.addEventListener('click', () => ativarSecao(secAbertura, null));
     }
 
 
@@ -368,7 +348,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 cidade_pais_principal: (document.getElementById('cidade_pais')?.value || '').toUpperCase(),
                 pais: [],
                 filhos: [],
-                conjuge: []
+                conjuge: [],
+                // O campo 'amigos' foi removido para manter a pureza genealógica
             };
             banco.push(novaPessoa);
             ultimoRegistro = novaPessoa;
@@ -387,12 +368,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-function atualizarListaRegistros() {
+    function atualizarListaRegistros() {
         if (!registrosLista) return;
         
         // NOVO: Captura o valor dos dois filtros
         const termoFiltroNome = (document.getElementById('filtroNome')?.value || '').toLowerCase();
-        const termoFiltroCidade = (document.getElementById('filtroCidadePais')?.value || '').toLowerCase(); // NOVO FILTRO
+        const termoFiltroCidade = (document.getElementById('filtroCidadePais')?.value || '').toLowerCase(); 
         
         const pessoasFiltradas = banco.filter(pessoa => {
             let mostrar = true;
@@ -402,9 +383,10 @@ function atualizarListaRegistros() {
                 mostrar = false;
             }
 
-            // 2. FILTRO POR CIDADE/PAÍS (NOVO)
+            // 2. FILTRO POR CIDADE/PAÍS 
             if (termoFiltroCidade) {
-                const cidadePais = pessoa.cidade_pais_principal ? pessoa.cidade_pais_principal.toLowerCase() : '';
+                // Acessa o campo cidade_pais_principal
+                const cidadePais = pessoa.cidade_pais_principal ? pessoa.cidade_pais_principal.toLowerCase() : ''; 
                 if (!cidadePais.includes(termoFiltroCidade)) {
                     mostrar = false;
                 }
@@ -440,8 +422,10 @@ function atualizarListaRegistros() {
     }
 
     // NOVO LISTENER: Adiciona o listener para o filtro de Cidade/País
-    const filtroCidadePais = document.getElementById('filtroCidadePais');
     if (filtroCidadePais) filtroCidadePais.addEventListener('input', atualizarListaRegistros);
+    if (filtroNome) filtroNome.addEventListener('input', atualizarListaRegistros);
+
+
     function editarPessoa(id) {
         registroEditando = banco.find(p => p.id === id);
         if (!registroEditando) return;
@@ -470,15 +454,15 @@ function atualizarListaRegistros() {
         if (!vinculosLista || !registroEditando) return;
         vinculosLista.innerHTML = '';
         const vinculos = [];
-        // Adiciona pais (a pessoa editada é filho)
+        
+        // Adiciona todos os tipos de vínculos para exibição
         parseArrayField(registroEditando.pais).map(id => banco.find(p => p.id === id)).filter(Boolean)
-            .forEach(p => vinculos.push({ tipo: 'pai', pessoa: p })); // Tipo "pai" para quem está vinculado
-        // Adiciona filhos (a pessoa editada é pai/mãe)
+            .forEach(p => vinculos.push({ tipo: 'pai', pessoa: p })); 
         parseArrayField(registroEditando.filhos).map(id => banco.find(p => p.id === id)).filter(Boolean)
-            .forEach(p => vinculos.push({ tipo: 'filho', pessoa: p })); // Tipo "filho" para quem está vinculado
-        // Adiciona cônjuges
+            .forEach(p => vinculos.push({ tipo: 'filho', pessoa: p })); 
         parseArrayField(registroEditando.conjuge).map(id => banco.find(p => p.id === id)).filter(Boolean)
             .forEach(p => vinculos.push({ tipo: 'cônjuge', pessoa: p }));
+            
         if (vinculos.length === 0) {
             vinculosLista.innerHTML = 'Nenhum vínculo registrado.';
             return;
@@ -486,10 +470,11 @@ function atualizarListaRegistros() {
         vinculos.forEach((vinc, idx) => {
             const item = document.createElement('div');
             let tipoLabel = vinc.tipo;
-            // Corrigindo a exibição do tipo para o contexto da pessoa sendo editada
+            
             if (vinc.tipo === 'pai') tipoLabel = 'É Filho(a) de';
             if (vinc.tipo === 'filho') tipoLabel = 'É Pai/Mãe de';
             if (vinc.tipo === 'cônjuge') tipoLabel = 'É Cônjuge de';
+            
             item.innerHTML = `
                 ${tipoLabel}: ${vinc.pessoa.nome}
                 <button class="remover-vinculo-btn" data-id="${vinc.pessoa.id}" data-tipo-vinculo="${vinc.tipo}">Remover</button>
@@ -510,26 +495,32 @@ function atualizarListaRegistros() {
         const pessoaVinculada = banco.find(p => p.id === idVinculado);
         
         // 1. Atualiza a pessoa que está sendo editada (registroEditando)
-        if (tipo === 'pai') { // A pessoa editada tem esse como PAI (ou seja, está no array 'pais')
+        if (tipo === 'pai') { 
             registroEditando.pais = parseArrayField(registroEditando.pais).filter(id => id !== idVinculado);
-        } else if (tipo === 'filho') { // A pessoa editada tem esse como FILHO (ou seja, está no array 'filhos')
+        } else if (tipo === 'filho') { 
             registroEditando.filhos = parseArrayField(registroEditando.filhos).filter(id => id !== idVinculado);
-        } else if (tipo === 'cônjuge') { // CÔNJUGE
+        } else if (tipo === 'cônjuge') { 
             registroEditando.conjuge = parseArrayField(registroEditando.conjuge).filter(id => id !== idVinculado);
         }
         
         // 2. Atualiza a pessoa vinculada (o contrário)
         if(pessoaVinculada) {
-            if (tipo === 'pai') { // Se o outro é meu pai, eu sou o filho dele
+            if (tipo === 'pai') { 
                 pessoaVinculada.filhos = parseArrayField(pessoaVinculada.filhos).filter(id => id !== registroEditando.id);
-            } else if (tipo === 'filho') { // Se o outro é meu filho, eu sou o pai/mãe dele
+            } else if (tipo === 'filho') { 
                 pessoaVinculada.pais = parseArrayField(pessoaVinculada.pais).filter(id => id !== registroEditando.id);
-            } else if (tipo === 'cônjuge') { // Se o outro é meu cônjuge, eu sou o cônjuge dele
+            } else if (tipo === 'cônjuge') { 
                 pessoaVinculada.conjuge = parseArrayField(pessoaVinculada.conjuge).filter(id => id !== registroEditando.id);
             }
         }
 
-        salvarBancoLocal(banco);
+        // NOVO FLUXO: NÃO SALVAMOS NO LOCAL STORAGE AQUI. O SALVAMENTO É FEITO APENAS PELO BTN CONCLUIR EDIÇÕES.
+        // salvarBancoLocal(banco); <-- LINHA REMOVIDA
+        
+        // Feedback de sucesso da AÇÃO, mas não do SALVAMENTO COMPLETO
+        mostrarLoading("Vínculo removido! Clique em 'Concluir Edições' para salvar na memória.");
+        setTimeout(esconderLoading, 2000); 
+
         atualizarVinculosList();
     }
 
@@ -563,35 +554,39 @@ function atualizarListaRegistros() {
                 return;
             }
 
-            // --- LÓGICA DE PARENTESCO CORRIGIDA ---
+            // --- LÓGICA DE PARENTESCO ---
             if (tipoRelacao === 'pai') { 
-                // Ação Correta: A (registroEditando) é o pai, B (pessoaVinculo) é o filho.
                 registroEditando.filhos = garantirRelacaoUnica(registroEditando.filhos, pessoaVinculoId);
                 pessoaVinculo.pais = garantirRelacaoUnica(pessoaVinculo.pais, registroEditando.id);
 
             } else if (tipoRelacao === 'filho') { 
-                // Ação Correta: A (registroEditando) é o filho, B (pessoaVinculo) é o pai.
                 registroEditando.pais = garantirRelacaoUnica(registroEditando.pais, pessoaVinculoId);
                 pessoaVinculo.filhos = garantirRelacaoUnica(pessoaVinculo.filhos, registroEditando.id);
                 
             } else if (tipoRelacao === 'conjuge') {
-                // Ação para cônjuge (recíproco)
                 registroEditando.conjuge = garantirRelacaoUnica(registroEditando.conjuge, pessoaVinculoId);
                 pessoaVinculo.conjuge = garantirRelacaoUnica(pessoaVinculo.conjuge, registroEditando.id);
             }
 
-            salvarBancoLocal(banco);
+            // NOVO FLUXO: NÃO SALVAMOS NO LOCAL STORAGE AQUI. DEFERIMOS PARA O BTN CONCLUIR EDIÇÕES.
+            // salvarBancoLocal(banco); <-- LINHA REMOVIDA
+            
+            // Feedback de sucesso da AÇÃO, mas não do SALVAMENTO COMPLETO
+            mostrarLoading("Vínculo adicionado! Clique em 'Concluir Edições' para salvar na memória.");
+            setTimeout(esconderLoading, 2000); 
+
             atualizarVinculosList();
         });
     }
 
-
-    const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
-    if (btnSalvarEdicao) {
-        btnSalvarEdicao.addEventListener('click', () => {
+    // ================================================================
+    // NOVO PONTO DE PERSISTÊNCIA: CONCLUIR EDIÇÕES
+    // ================================================================
+    if (btnConcluirEdicoes) {
+        btnConcluirEdicoes.addEventListener('click', () => {
             if (!registroEditando) return;
             
-            // ATUALIZAÇÃO DOS CAMPOS DE EDIÇÃO (Bloco mantido)
+            // 1. COLETAR ALTERAÇÕES DOS CAMPOS DE TEXTO E SALVÁ-LAS NO REGISTRO
             registroEditando.nome = (document.getElementById('edit-nome')?.value || '').toUpperCase();
             registroEditando.sexo = document.getElementById('edit-sexo')?.value || '';
             registroEditando.nascimento = document.getElementById('edit-nascimento')?.value || '';
@@ -600,7 +595,7 @@ function atualizarListaRegistros() {
             registroEditando.cidade_pais_principal = (document.getElementById('edit-cidade_pais')?.value || '').toUpperCase();
             registroEditando.user_id = localStorage.getItem('arvoreUsuario') || 'LOCAL_USER';
             
-            // Lógica de versionamento (Mantida)
+            // 2. Lógica de versionamento (Mantida)
             const versaoAtual = parseInt(registroEditando.versão) || 0;
             const LIMITE_TIMESTAMP = 10000000000; 
             if (versaoAtual > LIMITE_TIMESTAMP) { 
@@ -609,23 +604,33 @@ function atualizarListaRegistros() {
                 registroEditando.versão = versaoAtual + 1;
             }
             
-            // SALVAMENTO LOCAL AGORA GARANTIDO
+            // 3. SALVAMENTO ÚNICO NA MEMÓRIA (localStorage)
             salvarBancoLocal(banco);
             
-            // MENSAGEM FINAL: Usando "memória" e incentivando o SALVAR DADOS (JSON).
-            alert(`Edição salva na MEMÓRIA do Navegador! Total de registros: ${banco.length}. Use o botão SALVAR DADOS (JSON) para salvar no seu HD.`); 
+            // MENSAGEM FINAL DE SUCESSO
+            alert(`Edições concluídas e salvas na MEMÓRIA do Navegador! Total de registros: ${banco.length}.`); 
             
             // AÇÕES FINAIS
-            cancelarEdicao(); 
+            registroEditando = null;
+            ativarSecao(secGerenciar, null); 
             atualizarListaRegistros();
         });
     }
+    
+    // O botão btnSalvarEdicao foi removido/substituído.
     
     function cancelarEdicao() {
         registroEditando = null;
         ativarSecao(secGerenciar, null); 
     }
-    if (btnCancelarEditar) btnCancelarEditar.addEventListener('click', () => ativarSecao(secGerenciar, null)); 
+    if (btnCancelarEditar) btnCancelarEditar.addEventListener('click', () => {
+        // PERGUNTA DE SEGURANÇA: Se o usuário clica em Cancelar, ele perde as alterações pendentes.
+        if (confirm("Você tem alterações pendentes que não foram salvas. Deseja realmente cancelar e descartá-las?")) {
+            // Recarrega o banco local para descartar alterações no registroEditando temporário
+            banco = carregarBancoLocal(); 
+            ativarSecao(secGerenciar, null);
+        }
+    }); 
     
     if (btnExcluirRegistro) {
         btnExcluirRegistro.addEventListener('click', () => {
@@ -638,13 +643,14 @@ function atualizarListaRegistros() {
                 p.filhos = parseArrayField(p.filhos).filter(id => id !== registroEditando.id);
                 p.conjuge = parseArrayField(p.conjuge).filter(id => id !== registroEditando.id);
             });
-            salvarBancoLocal(banco);
+            salvarBancoLocal(banco); // Exclusão deve ser salva imediatamente
             alert('Registro excluído!');
             ativarSecao(secGerenciar, null); 
             atualizarListaRegistros();
         });
     }
     if (filtroNome) filtroNome.addEventListener('input', atualizarListaRegistros);
+    if (filtroCidadePais) filtroCidadePais.addEventListener('input', atualizarListaRegistros);
     
     // ================================================================
     // LÓGICA DE IMPORTAÇÃO E EXPORTAÇÃO
@@ -763,13 +769,15 @@ function atualizarListaRegistros() {
         const paisIds = parseArrayField(pessoa.pais);
         const filhosIds = parseArrayField(pessoa.filhos);
         const conjugesIds = parseArrayField(pessoa.conjuge);
+        
         // Usa um objeto para agrupar os parentes por seção para facilitar a renderização
         const secoes = {
             'Pais': paisIds,
             'Cônjuge(s)': conjugesIds,
-            'Filho(s)': filhosIds
+            'Filho(s)': filhosIds,
         };
         let html = '<div class="arvore">';
+        
         // --- PAIS ---
         if (secoes['Pais'].length > 0) {
             html += '<div class="arvore-secao"><h3>Pais</h3>';
@@ -797,7 +805,7 @@ function atualizarListaRegistros() {
             </div>
         </div>`;
         
-        // --- CÔNJUGES E FILHOS (renderizados em suas próprias seções) ---
+        // --- OUTRAS RELAÇÕES ---
         ['Cônjuge(s)', 'Filho(s)'].forEach(titulo => {
             if (secoes[titulo].length > 0) {
                 html += `<div class="arvore-secao"><h3>${titulo}</h3>`;
@@ -810,6 +818,7 @@ function atualizarListaRegistros() {
                 html += '</div>';
             }
         });
+        
         // Mensagem para pessoa sem vínculos
         if (paisIds.length === 0 && filhosIds.length === 0 && conjugesIds.length === 0) {
             html += '<p>Nenhum vínculo registrado para esta pessoa.</p>';
@@ -817,25 +826,36 @@ function atualizarListaRegistros() {
         html += '</div>'; // Fecha div.arvore
         arvoreContainer.innerHTML = html;
     }
+// arvore_script.js (Trecho do listener)
 
     // ================================================================
     // EVENTOS DOS BOTÕES E NAVEGAÇÃO PRINCIPAL
     // ================================================================
     
-    btnVisualizarSelecionado.addEventListener('click', () => {
-        const selecionado = document.querySelector('input[name="pessoaSelecionada"]:checked');
-        if (!selecionado) return alert('Por favor, selecione uma pessoa na lista para visualizar a árvore.');
-        const pessoaId = selecionado.value;
-        const pessoa = banco.find(p => p.id === pessoaId);
-        if (!pessoa) return;
-        ativarSecao(secVisualizarArvore, null);
-        inputPessoaCentral.value = pessoa.nome;
-        inputPessoaCentral.dispatchEvent(new Event('change'));
-    });
+    if (btnVisualizarSelecionado) { // Garante que o elemento existe antes de anexar o evento
+        btnVisualizarSelecionado.addEventListener('click', () => {
+            const selecionado = document.querySelector('input[name="pessoaSelecionada"]:checked');
+            if (!selecionado) return alert('Por favor, selecione uma pessoa na lista para visualizar a família.');
+            
+            const pessoaId = selecionado.value;
+            const pessoa = banco.find(p => p.id === pessoaId);
+            
+            if (!pessoa) return;
+            
+            ativarSecao(secVisualizarArvore, null);
+            inputPessoaCentral.value = pessoa.nome;
+            inputPessoaCentral.dispatchEvent(new Event('change'));
+        });
+    }
+    
+    // ... (restante dos listeners, como o btnExportarJSON) ...
     
     // ================================================================
     // INICIALIZAÇÃO
     // ================================================================
+    
+    // ... (código de inicialização) ...
+    // =VELOCIDADE= INICIALIZAÇÃO E EVENTOS
     banco = carregarBancoLocal();
     exibirRegistroAtual();
     ativarSecao(secAbertura, null); 

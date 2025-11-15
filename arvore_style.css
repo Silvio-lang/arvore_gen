@@ -502,3 +502,116 @@ html, body {
     margin-right: 10px;
     font-size: 1.2em;
 }
+/* --- ESTILOS DE BOTÕES DE AÇÃO ÚNICA (Controle Consciente) --- */
+
+/* Estilo para o Botão Principal [Concluir Edições] */
+.principal-button {
+    background-color: #005f73;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin: 5px;
+    transition: background-color 0.2s;
+}
+
+.principal-button:hover {
+    background-color: #004b5a;
+}
+
+/* Estilo para o botão de Inclusão de Vínculo (pequeno e verde [INCLUIR]) */
+.botao-inclusao-vinculo {
+    background-color: #38a3a5; /* Verde azulado claro */
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-left: 10px;
+    transition: background-color 0.2s;
+}
+
+.botao-inclusao-vinculo:hover {
+    background-color: #2299a9;
+}
+
+/* Estilo para os botões secundários (Excluir, Cancelar) */
+.secundario-button {
+    background-color: #e5e5e5;
+    color: #333;
+    padding: 12px 25px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin: 5px;
+    transition: background-color 0.2s;
+}
+
+.secundario-button:hover {
+    background-color: #d4d4d4;
+}
+/* arvore_style.css (Novos estilos para Edição de Vínculos) */
+
+/* 1. Estilo para a Linha de Criação de Vínculo (Organização Horizontal) */
+.vinculo-creator {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Garante responsividade em celular */
+    gap: 10px; /* Espaço entre os elementos */
+    margin-top: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* 2. Estilo para o Botão [Incluir] (Pequeno, Verde, Alinhado à Direita) */
+.botao-inclusao-vinculo {
+    background-color: #38a3a5;
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    
+    /* CHAVE PARA O ALINHAMENTO: Empurra o botão para a direita */
+    margin-left: auto; 
+    
+    transition: background-color 0.2s;
+}
+
+.botao-inclusao-vinculo:hover {
+    background-color: #2299a9;
+}
+
+/* 3. Estilo para o Botão [Remover] (Pequeno e Vermelho) */
+.remover-vinculo-btn {
+    background-color: #e63946; /* Vermelho forte */
+    color: white;
+    font-weight: normal;
+    padding: 3px 8px; /* Mais compacto */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em; /* Fonte pequena */
+    margin-left: 15px; /* Separa o botão do nome */
+    transition: background-color 0.2s;
+}
+
+.remover-vinculo-btn:hover {
+    background-color: #cf2b39;
+}
+
+/* 4. Alinhamento dos itens de Vínculo com o botão [Remover] */
+#vinculosLista div {
+    display: flex;
+    justify-content: space-between; /* Espalha o nome para a esquerda e o botão para a direita */
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px dotted #eee;
+}
