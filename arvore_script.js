@@ -176,20 +176,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // LISTA DE DICAS E FUNCIONALIDADE DO MODAL (COM NAVEGAÇÃO)
     // ================================================================
     const dicas = [
-
-        "01. Na tela de Busca de Pessoas, filtre a lista de pessoas digitando qualquer parte do nome .",
-        "02. Na tela de Busca de Pessoas, os 3 números que aparecem à direita do nome são: o numero registrado de (c)ônjuges, (p)ais, e (f)ilhos na base de dados. Isto auxilia a detectar pessoas e vínculos não registrados.",
-        "03. Para visualizar a árvore genealógica de alguém, selecione a pessoa na lista e clique em 'Visualizar Árvore'.",
-        "04. Na visualização da Árvore, de alguém, quando notar a falta de vínculo ou erro no nome, use o botão 'Editar' nesta tela para correção desta pesssoa.",
-        "05. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
-        "06 Ao vincular duas pessoas, o vínculo  é criado automaticamente nas duas pessoas.",
-        "07. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
-        "08. Não há restrição a filhos e pai/mãe 'não-biológicos', podendo ser lançados normalmente, além de registrados seus parentes e vínculos.",
-        "09. São aceitos registros com dados mínimos (nome e vínculos) para facilitar o trabalho colaborativo com complementação posterior.",
-        "10. Para criar um vínculo (paternidade/filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
-        "11. Clique em < e > para navegar (avançar e retroceder) as instruções numeradas desta janela.",
-        "12. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar novamente.",
-        "13. Forneça as suas atualizações às pessoas da família de sua proximidade através do arquivo salvo na pasta de Downloads. Assim, os núcleos mais próximos podem se expandir nos registros."
+        "01. Clique em < e > para navegar (avançar e retroceder) as instruções numeradas desta janela.",
+        "02. Na lista de pessoas, os 3 números à direita do nome são: o numero de (c)ônjuges, (p)ais, e (f)ilhos vinculados. Isto auxilia a detectar pessoas e vínculos ainda não registrados.",
+        "03. Na visualização da família de alguém, ao notar erros, use o botão 'Editar' nesta tela.",
+        "04. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
+        "05 Ao vincular duas pessoas, o vínculo  é criado automaticamente nas duas pessoas.",
+        "06. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
+        "07. Não há restrição a filhos e pai/mãe 'não-biológicos' nem registros de seus parentes e vínculos.",
+        "08. Registros podem ser colocados com dados mínimos (nome/apelido e vínculos) para complementação futura.",
+        "09. Para criar um vínculo (paternidade, filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
+        "10. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar.",
+        "11. Intercambie as atualizações com pessoas próximas, da família, através do arquivo salvo na pasta de Downloads.",
+        "12. Sem carregar nenhuma rede familiar a partir de um arquivo 'arvore.json', será iniciada uma nova." 
     ];
 
     function mostrarDica(index) {
