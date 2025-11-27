@@ -1,4 +1,4 @@
-// arvore_script.js - Versão Final e Estável (Arquitetura de Controle Consciente)
+// arvore_script.js - Versão Final e Estável (Navegação Aprimorada)
 // ================================================================
 // CONFIGURAÇÃO DO SUPABASE (CHAVE INVALIDADA PARA FORÇAR USO DE ARQUIVOS)
 // ================================================================
@@ -150,11 +150,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnDicaAnterior = document.getElementById('btnDicaAnterior');
     const btnDicaProxima = document.getElementById('btnDicaProxima');
     const dicaContador = document.getElementById('dicaContador');
-    const btnConcluirEdicoes = document.getElementById('btnConcluirEdicoes'); // NOVO PONTO DE SALVAMENTO
+    const btnConcluirEdicoes = document.getElementById('btnConcluirEdicoes'); // PONTO ÚNICO DE SALVAMENTO
 
     // Seletores de Aniversariantes
     const secAniversariantes = document.getElementById('secAniversariantes');
     const btnVerAniversarios = document.getElementById('btnVerAniversarios');
+    
+    // NOVO SELETOR DE NAVEGAÇÃO RÁPIDA
+    const btnListaPessoasVisu = document.getElementById('btnListaPessoasVisu'); 
     
     // ================================================================
     // FUNÇÕES DE FEEDBACK VISUAL (LOADING)
@@ -187,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "09. Para criar um vínculo (paternidade, filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
         "10. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar.",
         "11. Intercambie as atualizações com pessoas próximas, da família, através do arquivo salvo na pasta de Downloads.",
-        "12. Sem carregar nenhuma rede familiar a partir de um arquivo 'arvore.json', será iniciada uma nova." 
+        "12. Sem carregar nenhuma rede familiar a partir de um arquivo 'arvore.json', será iniciada uma nova."
     ];
 
     function mostrarDica(index) {
@@ -287,9 +290,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Inclui a nova seção para esconder
         [secAbertura, secNovaPessoa, secGerenciar, secVisualizarArvore, secEditarPessoa, secAniversariantes].forEach(sec => sec.style.display = 'none'); 
         
-        // Esconde ou mostra o botão de Início/Refúgio
+        // Esconde ou mostra os botões de Navegação Rápida
+        const mostrarBotoesRapidos = (secaoAtiva !== secAbertura);
+        
         if (btnRefugio) {
-            btnRefugio.style.display = (secaoAtiva !== secAbertura) ? 'block' : 'none';
+            btnRefugio.style.display = mostrarBotoesRapidos ? 'inline-block' : 'none';
+        }
+        if (btnListaPessoasVisu) { // NOVO BOTÃO DE LISTA
+            btnListaPessoasVisu.style.display = mostrarBotoesRapidos ? 'inline-block' : 'none';
         }
         
         if (secaoAtiva) secaoAtiva.style.display = 'block';
@@ -309,6 +317,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnRefugio) {
         btnRefugio.addEventListener('click', () => ativarSecao(secAbertura, null));
     }
+    // NOVO: Listener para o botão de Lista/Pessoas na Navegação Rápida
+    if (btnListaPessoasVisu) {
+        btnListaPessoasVisu.addEventListener('click', () => ativarSecao(secGerenciar, null));
+    }
+
     // Listeners para os botões do Hub (Tela de Abertura)
     if (btnGerenciarHub) {
         btnGerenciarHub.addEventListener('click', () => ativarSecao(secGerenciar, null));
@@ -347,7 +360,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 pais: [],
                 filhos: [],
                 conjuge: [],
-                // O campo 'amigos' foi removido para manter a pureza genealógica
             };
             banco.push(novaPessoa);
             ultimoRegistro = novaPessoa;
@@ -475,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             item.innerHTML = `
                 ${tipoLabel}: ${vinc.pessoa.nome}
-                <button class="remover-vinculo-btn" data-id="${vinc.pessoa.id}" data-tipo-vinculo="${vinc.tipo}">Remover</button>
+                <button class="remover-vinculo-btn" data-id="${vinc.pessoa.id}" data-tipo-vinculo="${vinc.tipo}">[Remover]</button>
             `;
             vinculosLista.appendChild(item);
         });
@@ -490,10 +502,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function removerVinculoPorIdETipo(idVinculado, tipo) {
         if (!registroEditando) return;
+        // Encontra o registro na memória de trabalho
         const pessoaVinculada = banco.find(p => p.id === idVinculado);
         
         // 1. Atualiza a pessoa que está sendo editada (registroEditando)
         if (tipo === 'pai') { 
+            // Fortalecimento: Garante que o array existe antes de filtrar
             registroEditando.pais = parseArrayField(registroEditando.pais).filter(id => id !== idVinculado);
         } else if (tipo === 'filho') { 
             registroEditando.filhos = parseArrayField(registroEditando.filhos).filter(id => id !== idVinculado);
@@ -513,7 +527,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // NOVO FLUXO: NÃO SALVAMOS NO LOCAL STORAGE AQUI. O SALVAMENTO É FEITO APENAS PELO BTN CONCLUIR EDIÇÕES.
-        // salvarBancoLocal(banco); <-- LINHA REMOVIDA
         
         // Feedback de sucesso da AÇÃO, mas não do SALVAMENTO COMPLETO
         mostrarLoading("Vínculo removido! Clique em 'Concluir Edições' para salvar na memória.");
@@ -552,22 +565,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // --- LÓGICA DE PARENTESCO ---
+            // --- LÓGICA DE PARENTESCO (FORTALECIDA) ---
             if (tipoRelacao === 'pai') { 
+                // Ação Correta: A (registroEditando) é o pai, B (pessoaVinculo) é o filho.
                 registroEditando.filhos = garantirRelacaoUnica(registroEditando.filhos, pessoaVinculoId);
                 pessoaVinculo.pais = garantirRelacaoUnica(pessoaVinculo.pais, registroEditando.id);
 
             } else if (tipoRelacao === 'filho') { 
+                // Ação Correta: A (registroEditando) é o filho, B (pessoaVinculo) é o pai.
                 registroEditando.pais = garantirRelacaoUnica(registroEditando.pais, pessoaVinculoId);
                 pessoaVinculo.filhos = garantirRelacaoUnica(pessoaVinculo.filhos, registroEditando.id);
                 
             } else if (tipoRelacao === 'conjuge') {
+                // Ação para cônjuge (recíproco)
                 registroEditando.conjuge = garantirRelacaoUnica(registroEditando.conjuge, pessoaVinculoId);
                 pessoaVinculo.conjuge = garantirRelacaoUnica(pessoaVinculo.conjuge, registroEditando.id);
             }
 
             // NOVO FLUXO: NÃO SALVAMOS NO LOCAL STORAGE AQUI. DEFERIMOS PARA O BTN CONCLUIR EDIÇÕES.
-            // salvarBancoLocal(banco); <-- LINHA REMOVIDA
             
             // Feedback de sucesso da AÇÃO, mas não do SALVAMENTO COMPLETO
             mostrarLoading("Vínculo adicionado! Clique em 'Concluir Edições' para salvar na memória.");
@@ -602,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 registroEditando.versão = versaoAtual + 1;
             }
             
-            // 3. SALVAMENTO ÚNICO NA MEMÓRIA (localStorage)
+            // 3. SALVAMENTO ÚNICO NA MEMÓRIA (localStorage) - SALVA TUDO, INCLUINDO VÍNCULOS PENDENTES
             salvarBancoLocal(banco);
             
             // MENSAGEM FINAL DE SUCESSO
@@ -615,7 +630,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // O botão btnSalvarEdicao foi removido/substituído.
     
     function cancelarEdicao() {
         registroEditando = null;
@@ -824,7 +838,6 @@ document.addEventListener('DOMContentLoaded', () => {
         html += '</div>'; // Fecha div.arvore
         arvoreContainer.innerHTML = html;
     }
-// arvore_script.js (Trecho do listener)
 
     // ================================================================
     // EVENTOS DOS BOTÕES E NAVEGAÇÃO PRINCIPAL
@@ -846,14 +859,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // ... (restante dos listeners, como o btnExportarJSON) ...
-    
     // ================================================================
     // INICIALIZAÇÃO
     // ================================================================
-    
-    // ... (código de inicialização) ...
-    // =VELOCIDADE= INICIALIZAÇÃO E EVENTOS
     banco = carregarBancoLocal();
     exibirRegistroAtual();
     ativarSecao(secAbertura, null); 
