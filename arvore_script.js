@@ -190,7 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
         "09. Para criar um vínculo (paternidade, filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
         "10. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar.",
         "11. Intercambie as atualizações com pessoas próximas, da família, através do arquivo salvo na pasta de Downloads.",
-        "12. Sem carregar nenhuma rede familiar a partir de um arquivo 'arvore.json', será iniciada uma nova."
+        "12. Sem carregar nenhuma rede familiar a partir de um arquivo 'arvore.json', será iniciada uma nova rede.",
+        "13. Caso haja interesse, tenho montada uma rede (arquivo) focada nos familiares de meu núcleo. Telegram: t.me/SilvioAurich ",
+        "14. Este aplicativo está em constante evolução e melhoria. Acompanhe."
     ];
 
     function mostrarDica(index) {
