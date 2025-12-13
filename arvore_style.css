@@ -615,3 +615,22 @@ html, body {
     padding: 5px 0;
     border-bottom: 1px dotted #eee;
 }
+/* arvore_style.css */
+
+/* Regras para os detalhes da pessoa central (Datas, Cidade) */
+.arvore-secao .detalhes {
+    font-size: 0.85em; /* Reduz o tamanho da fonte */
+    color: #555;
+    margin-top: 5px;
+    font-weight: normal; /* Sobrescreve negrito herdado */
+}
+
+/* Regras para as NOTAS (que usa a classe detalhes-notas) */
+.arvore-secao .detalhes-notas {
+    font-size: 0.85em; /* Garante o mesmo tamanho para as notas */
+    color: #555;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px dotted #ccc; /* Linha sutil para separar as notas */
+    font-weight: normal; /* Sobrescreve negrito herdado */
+}

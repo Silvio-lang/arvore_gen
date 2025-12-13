@@ -1,4 +1,4 @@
-// arvore_script.js - Versão Final e Estável (Navegação Aprimorada)
+// arvore_script.js - Versão Final e Estável (NOTAS Integradas à Visualização)
 // ================================================================
 // CONFIGURAÇÃO DO SUPABASE (CHAVE INVALIDADA PARA FORÇAR USO DE ARQUIVOS)
 // ================================================================
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const secAniversariantes = document.getElementById('secAniversariantes');
     const btnVerAniversarios = document.getElementById('btnVerAniversarios');
     
-    // NOVO SELETOR DE NAVEGAÇÃO RÁPIDA
+    // SELETOR DE NAVEGAÇÃO RÁPIDA
     const btnListaPessoasVisu = document.getElementById('btnListaPessoasVisu'); 
     
     // ================================================================
@@ -190,9 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "09. Para criar um vínculo (paternidade, filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
         "10. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar.",
         "11. Intercambie as atualizações com pessoas próximas, da família, através do arquivo salvo na pasta de Downloads.",
-        "12. Sem carregar nenhuma rede familiar a partir de um arquivo 'arvore.json', será iniciada uma nova rede.",
-        "13. Caso haja interesse, tenho montada uma rede (arquivo) focada nos familiares de meu núcleo. Telegram: t.me/SilvioAurich ",
-        "14. Este aplicativo está em constante evolução e melhoria. Acompanhe."
+        "12. Sem carregar nenhuma rede familiar a partir de um arquivo 'arvore.json', será iniciada uma nova."
     ];
 
     function mostrarDica(index) {
@@ -359,6 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 falecimento: document.getElementById('falecimento')?.value || '',
                 profissao: document.getElementById('profissao')?.value || '',
                 cidade_pais_principal: (document.getElementById('cidade_pais')?.value || '').toUpperCase(),
+                // NOVO CAMPO DE OBSERVAÇÕES
+                observacoes: document.getElementById('observacoes')?.value || '',
                 pais: [],
                 filhos: [],
                 conjuge: [],
@@ -449,6 +449,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-falecimento').value = registroEditando.falecimento;
         document.getElementById('edit-profissao').value = registroEditando.profissao;
         document.getElementById('edit-cidade_pais').value = registroEditando.cidade_pais_principal;
+        // NOVO: Preencher campo de observações (usa || '' para garantir retrocompatibilidade)
+        document.getElementById('edit-observacoes').value = registroEditando.observacoes || ''; 
         
         const labelNomePessoaEditada = document.getElementById('labelNomePessoaEditada');
         if (labelNomePessoaEditada) {
@@ -608,6 +610,9 @@ document.addEventListener('DOMContentLoaded', () => {
             registroEditando.falecimento = document.getElementById('edit-falecimento')?.value || '';
             registroEditando.profissao = document.getElementById('edit-profissao')?.value || '';
             registroEditando.cidade_pais_principal = (document.getElementById('edit-cidade_pais')?.value || '').toUpperCase();
+            // NOVO: Coletar campo de observações
+            registroEditando.observacoes = document.getElementById('edit-observacoes')?.value || '';
+            
             registroEditando.user_id = localStorage.getItem('arvoreUsuario') || 'LOCAL_USER';
             
             // 2. Lógica de versionamento (Mantida)
@@ -778,8 +783,20 @@ document.addEventListener('DOMContentLoaded', () => {
             inputPessoaCentral.dispatchEvent(new Event('change'));
         }
     }
-    function renderizarArvore(pessoa) {
+     function renderizarArvore(pessoa) {
         if (!arvoreContainer) return;
+
+        // --- LÓGICA DE INTEGRAÇÃO DE NOTAS (NOVO) ---
+        const notas = pessoa.observacoes ? pessoa.observacoes.trim() : '';
+        let notasHtml = '';
+
+        if (notas.length > 0) {
+            // CORREÇÃO: Removendo <strong> e font-weight: bold. A string 'NOTAS: ' fica em texto simples.
+           notasHtml = `<div class="detalhes-notas"><span style="white-space: pre-wrap;">NOTAS: ${notas}</span></div>`;
+        }
+        
+        // --- FIM LÓGICA DE INTEGRAÇÃO DE NOTAS ---
+        
         const paisIds = parseArrayField(pessoa.pais);
         const filhosIds = parseArrayField(pessoa.filhos);
         const conjugesIds = parseArrayField(pessoa.conjuge);
@@ -816,6 +833,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="arvore-item principal">
                 ${pessoa.nome}
                 <div class="detalhes">${detalhesCompletos}</div>
+                ${notasHtml} <!-- INSERÇÃO DAS NOTAS AQUI -->
             </div>
         </div>`;
         

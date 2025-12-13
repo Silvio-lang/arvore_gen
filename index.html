@@ -2,25 +2,27 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Árvore Genealógica</title>
     <link rel="stylesheet" href="arvore_style.css">
+    <!-- Removido o link do Tailwind CSS para manter seus estilos originais -->
+    <script src="arvore_script.js" defer></script>
 </head>
 <body>
-   <div id="loadingMessage" style="display:none; position:fixed; top:0; left:0; width:100%; background:#fff3cd; color:#664d03; font-weight:bold; text-align:center; padding:1em; z-index:1000; border-bottom: 1px solid #ffc107;">Carregando...</div>
+    <div id="loadingMessage" style="display:none; position:fixed; top:0; left:0; width:100%; background:#fff3cd; color:#664d03; font-weight:bold; text-align:center; padding:1em; z-index:1000; border-bottom: 1px solid #ffc107;">Carregando...</div>
     <div class="container">
         <header>
             <h1>🌳 Árvore Genealógica</h1>
-            <p>Para construir e lembrar a história da família</p>
+            <p>Para configurar e lembrar a história da família</p>
         </header>
 
-<nav>
-    <button id="btnRefugio" style="display: none;">🏠 Início</button>
-    <!-- NOVO BOTÃO DE ACESSO RÁPIDO: Lista de Pessoas -->
-    <button id="btnListaPessoasVisu" style="display: none;">🔍 Lista/Pessoas</button>
-</nav>
+        <nav>
+            <button id="btnRefugio" style="display: none;">🏠 Início</button>
+            <!-- NOVO BOTÃO DE ACESSO RÁPIDO: Lista de Pessoas -->
+            <button id="btnListaPessoasVisu" style="display: none;">🔍 Lista/Pessoas</button>
+        </nav>
         
-<section id="secAbertura">
+        <section id="secAbertura">
             <img src="arvore_familia.png" alt="Árvore Genealógica da Família" class="imagem-abertura">
             
             <!-- NOVO: Container que permite o alinhamento horizontal (FLEX) -->
@@ -30,7 +32,7 @@
                 <button id="btnVerAniversarios" class="hub-button">🎂 Aniversariantes do Mês🎈🎈</button>
             </div>
         </section>
-       
+        
         <section id="secNovaPessoa">
             <h2>Incluindo Nova Pessoa</h2>
             <form id="pessoaForm">
@@ -50,13 +52,18 @@
                 <input type="text" id="profissao">
                 <label>Cidade/País principal (opcional):</label>
                 <input type="text" id="cidade_pais">
+                
+                <!-- NOVO CAMPO NOTAS (Uso Pessoal) -->
+                <label>NOTAS (Uso Pessoal):</label>
+                <textarea id="observacoes" rows="4"></textarea>
+
                 <button type="submit">Salvar Registro</button>
                 <button type="button" id="btnCancelarInclusao">Cancelar</button>
             </form>
             <div id="registroAtualContainer">Nenhum registro criado nesta sessão.</div>
         </section>
         
-<section id="secGerenciar">
+        <section id="secGerenciar">
             <h2>Registros</h2>
             
             <!-- NOVO CONTAINER: Agrupa os filtros em uma coluna (COM A ESTRUTURA CORRETA) -->
@@ -90,7 +97,7 @@
             </div>
         </section>
 
-        <section id="secVisualizarArvore">
+<section id="secVisualizarArvore">
             <h2 style="text-align: center;">Árvore Genealógica - Visualização</h2>
             <div class="form-group">
                 <label for="inputPessoaCentral">Buscar e selecionar a pessoa central da árvore:</label>
@@ -98,15 +105,19 @@
                 <datalist id="listaPessoas">
                     </datalist>
             </div>
+           <!-- NOVO CONTAINER PARA AS NOTAS DA PESSOA CENTRAL -->
+            <div id="notasVisualizacao" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 4px; display: none;">
+                <strong style="display: block; margin-bottom: 5px; font-size: 1.1em; color: #333;">NOTAS:</strong>
+                <p id="notasConteudo" style="white-space: pre-wrap;"></p>
+            </div>
             <button id="btnEditarNaArvore" style="display: none; margin-top: 10px; background-color: #ee9b00;">✏️ Editar Pessoa Central</button>
             <div id="arvoreContainer"></div>
         </section>
         
-<section id="secEditarPessoa">
+        <section id="secEditarPessoa">
             <h2>Editar Registro</h2>
             <form id="editarForm">
-                <!-- <label>ID:</label> -->
-                <!-- <input type="text" id="edit-id" readonly> -->
+                <!-- Campos de texto -->
                 <label>Nome completo:</label>
                 <input type="text" id="edit-nome">
                 <label>Sexo:</label>
@@ -124,17 +135,20 @@
                 <label>Cidade/País principal:</label>
                 <input type="text" id="edit-cidade_pais">
                 
-                <!-- BOTÕES DE AÇÃO NA EDIÇÃO (Substituído e simplificado) -->
+                <!-- NOVO CAMPO NOTAS (Uso Pessoal) -->
+                <label>NOTAS (Uso Pessoal):</label>
+                <textarea id="edit-observacoes" rows="4"></textarea>
+
+                <!-- BOTÕES DE AÇÃO NA EDIÇÃO (Controle Consciente) -->
                 <div style="margin-top: 30px; text-align: center;">
-                    <!-- NOVO PONTO ÚNICO DE SALVAMENTO NA MEMÓRIA -->
+                    <!-- PONTO ÚNICO DE SALVAMENTO NA MEMÓRIA -->
                     <button type="button" id="btnConcluirEdicoes" class="principal-button">
                         ✅ Concluir Edições
                     </button>
-                    <!-- Mantido -->
+                    <!-- Excluir e Cancelar -->
                     <button type="button" id="btnExcluirRegistro" class="secundario-button">
                         Excluir Registro
                     </button>
-                    <!-- Mantido, mas agora com lógica de descarte de alterações -->
                     <button type="button" id="btnCancelarEditar" class="secundario-button">
                         Cancelar
                     </button>
@@ -160,7 +174,7 @@
                     </select>
                     <!-- Botão pequeno e verde de INCLUIR VÍNCULO -->
                     <button type="button" id="btnAdicionarVinculo" class="botao-inclusao-vinculo">
-                        Incluir
+                        [Incluir]
                     </button>
                 </div>
 
@@ -176,21 +190,22 @@
             <input type="file" id="inputImportJSON" accept=".json,.txt" style="display: none;">
         </footer>
     </div>
-<div id="dicasModal" class="modal">
-    <div class="modal-content">
-        <span class="close-button">&times;</span>
-        <h3>Instruções e Dicas</h3>
-        <div class="dicas-nav">
-            <button id="btnDicaAnterior" title="Dica anterior">&#9664;</button>
-            <span id="dicaContador">0 / 0</span>
-            <button id="btnDicaProxima" title="Próxima dica">&#9654;</button>
-        </div>
-        <div class="dica-content-wrapper">
-            <p id="dicaTexto">Carregando dicas...</p>
+    
+    <div id="dicasModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Instruções e Dicas</h3>
+            <div class="dicas-nav">
+                <button id="btnDicaAnterior" title="Dica anterior">&#9664;</button>
+                <span id="dicaContador">0 / 0</span>
+                <button id="btnDicaProxima" title="Próxima dica">&#9654;</button>
+            </div>
+            <div class="dica-content-wrapper">
+                <p id="dicaTexto">Carregando dicas...</p>
+            </div>
         </div>
     </div>
-</div>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="arvore_script.js"></script>
 </body>
 </html>
