@@ -1,4 +1,4 @@
-// arvore_script.js - Versão Final e Estável (Modal de Dicas Limpo - Cartão de Identidade da Pessoa Central)
+// arvore_script.js - Versão Final e Estável (Corrigida: Bug de Aspas e Silhueta CSS)
 // ================================================================
 // CONFIGURAÇÃO DO SUPABASE (CHAVE INVALIDADA PARA FORÇAR USO DE ARQUIVOS)
 // ================================================================
@@ -15,6 +15,51 @@ let banco = [];
 let ultimoRegistro = null;
 let registroEditando = null;
 let dicaAtualIndex = 0;
+
+
+// ================================================================
+// FUNÇÃO PARA GERAR CAMINHO DE FOTO PADRONIZADO (Finalizada)
+// ================================================================
+/**
+ * Garante que o caminho da foto comece com 'fotos/' e preenche automaticamente
+ * com 'nome_pessoa.jpg' se o campo de input estiver vazio.
+ * @param {string} nomePessoa O nome da pessoa (usado para auto-geração).
+ * @param {string} inputPath O nome do arquivo ou caminho fornecido pelo usuário.
+ * @returns {string} O caminho padronizado.
+ */
+function gerarCaminhoFotoFinal(nomePessoa, inputPath) {
+    // Usa o nome da pessoa em maiúsculas (como está no BD) para extrair o nome limpo
+    // Remove acentos e caracteres especiais para melhor compatibilidade com nomes de arquivo.
+    const normalizarNome = (str) => {
+        // Normaliza para remover acentos e caracteres especiais (e.g., ç -> c)
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    };
+    const nomeLimpo = normalizarNome(nomePessoa || '').trim().toLowerCase();
+    const inputLimpo = (inputPath || '').trim();
+    const prefixo = 'fotos/';
+
+    if (inputLimpo === '') {
+        // Se o input está vazio, gera automaticamente o nome: nome_pessoa.jpg
+        if (nomeLimpo) {
+            // Substitui espaços por '_' (sublinhado) e garante o sufixo .jpg
+            const nomeArquivo = nomeLimpo.replace(/\s+/g, '_') + '.jpg';
+            return prefixo + nomeArquivo;
+        }
+        return ''; // Não há nome para gerar
+    }
+    
+    // Se o usuário inseriu algo, mas não o prefixo 'fotos/' nem 'http', adiciona o prefixo
+    if (!inputLimpo.startsWith('http') && !inputLimpo.startsWith(prefixo)) {
+        // Se o usuário digitou o nome do arquivo (ex: 'Minha Foto.jpg'),
+        // faz a substituição de espaços por sublinhados no nome digitado
+        const nomeArquivoComSublinhado = normalizarNome(inputLimpo).replace(/\s+/g, '_');
+        return prefixo + nomeArquivoComSublinhado;
+    }
+
+    // Retorna o caminho inserido (completo ou URL externa)
+    return inputLimpo;
+}
+// ================================================================
 
 
 // ================================================================
@@ -142,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const arvoreContainer = document.getElementById('arvoreContainer');
     const selectRelacao = document.getElementById('selectRelacao');
     const btnVisualizarSelecionado = document.getElementById('btnVisualizarSelecionado');
+    const btnExportarSelecionadosMD = document.getElementById('btnExportarSelecionadosMD'); // NOVO BOTÃO
     const btnSalvarSupabase = document.getElementById('btnSalvarSupabase');
     const btnCarregarSupabase = document.getElementById('btnCarregarSupabase');
     const btnDicas = document.getElementById('btnDicas');
@@ -287,6 +333,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
         return diffDias >= -2 && diffDias <= 0;
     };
+    
+    // ================================================================
+    // FUNÇÃO PARA GERAR CAMINHO DE FOTO PADRONIZADO (Finalizada)
+    // ================================================================
+    /**
+     * Garante que o caminho da foto comece com 'fotos/' e preenche automaticamente
+     * com 'nome_pessoa.jpg' se o campo de input estiver vazio.
+     * @param {string} nomePessoa O nome da pessoa (usado para auto-geração).
+     * @param {string} inputPath O nome do arquivo ou caminho fornecido pelo usuário.
+     * @returns {string} O caminho padronizado.
+     */
+    function gerarCaminhoFotoFinal(nomePessoa, inputPath) {
+        // Usa o nome da pessoa em maiúsculas (como está no BD) para extrair o nome limpo
+        // Remove acentos e caracteres especiais para melhor compatibilidade com nomes de arquivo.
+        const normalizarNome = (str) => {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        };
+        const nomeLimpo = normalizarNome(nomePessoa || '').trim().toLowerCase();
+        const inputLimpo = (inputPath || '').trim();
+        const prefixo = 'fotos/';
+
+        if (inputLimpo === '') {
+            // Se o input está vazio, gera automaticamente o nome: nome_pessoa.jpg
+            if (nomeLimpo) {
+                // Substitui espaços por '_' (sublinhado) e garante o sufixo .jpg
+                const nomeArquivo = nomeLimpo.replace(/\s+/g, '_') + '.jpg';
+                return prefixo + nomeArquivo;
+            }
+            return ''; // Não há nome para gerar
+        }
+        
+        // Se o usuário inseriu algo, mas não o prefixo 'fotos/' nem 'http', adiciona o prefixo
+        if (!inputLimpo.startsWith('http') && !inputLimpo.startsWith(prefixo)) {
+            // Se o usuário digitou o nome do arquivo (ex: 'Minha Foto.jpg'),
+            // faz a substituição de espaços por sublinhados no nome digitado
+            const nomeArquivoComSublinhado = normalizarNome(inputLimpo).replace(/\s+/g, '_');
+            return prefixo + nomeArquivoComSublinhado;
+        }
+
+        // Retorna o caminho inserido (completo ou URL externa)
+        return inputLimpo;
+    }
+    // ================================================================
+
     // ================================================================
     // LÓGICA DA INTERFACE (UI)
     // ================================================================
@@ -353,17 +443,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pessoaForm) {
         pessoaForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            
+            // O nome deve ser obtido e padronizado antes de gerar o caminho
+            const nomePessoa = (document.getElementById('nome')?.value || '').toUpperCase();
+            const fotoPathInput = document.getElementById('foto_path')?.value || '';
+            
+            // --- APLICA A NOVA FUNÇÃO DE FORMATAÇÃO DE CAMINHO ---
+            const fotoPathPadronizado = gerarCaminhoFotoFinal(nomePessoa, fotoPathInput);
+            // ---------------------------------------------------
+            
             const novaPessoa = {
                 id: gerarId(),
                 // NOME MANTIDO EM MAIÚSCULAS PARA CONSISTÊNCIA DA BASE DE DADOS
-                nome: (document.getElementById('nome')?.value || '').toUpperCase(), 
+                nome: nomePessoa, 
                 sexo: document.getElementById('sexo')?.value || '',
                 nascimento: document.getElementById('nascimento')?.value || '',
                 falecimento: document.getElementById('falecimento')?.value || '',
                 profissao: document.getElementById('profissao')?.value || '',
                 cidade_pais_principal: (document.getElementById('cidade_pais')?.value || '').toUpperCase(),
-                // NOVO CAMPO DE FOTO
-                foto_path: document.getElementById('foto_path')?.value || '',
+                // SALVA O CAMINHO PADRONIZADO
+                foto_path: fotoPathPadronizado,
                 // CAMPO DE OBSERVAÇÕES
                 observacoes: document.getElementById('observacoes')?.value || '',
                 pais: [],
@@ -428,7 +527,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalConjuges = parseArrayField(pessoa.conjuge).length;
 
             item.innerHTML = `
-                <input type="radio" name="pessoaSelecionada" value="${pessoa.id}">
+                <!-- CORREÇÃO: MUDADO DE radio PARA CHECKBOX para permitir seleção múltipla -->
+                <input type="checkbox" name="pessoaSelecionada" value="${pessoa.id}">
                 <span class="registro-nome-container">
                     <span class="registro-nome">${iconAniv}${pessoa.nome}</span>
                 </span>
@@ -456,8 +556,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-falecimento').value = registroEditando.falecimento;
         document.getElementById('edit-profissao').value = registroEditando.profissao;
         document.getElementById('edit-cidade_pais').value = registroEditando.cidade_pais_principal;
-        // NOVO: Preencher campo de foto
-        document.getElementById('edit-foto_path').value = registroEditando.foto_path || '';
+        
+        // --- NOVO: Exibe o nome do arquivo, removendo o prefixo "fotos/" e sublinhados ---
+        const caminhoCompleto = registroEditando.foto_path || '';
+        // Mostra apenas o nome do arquivo se o caminho for padronizado
+        let nomeArquivo = caminhoCompleto;
+        if (caminhoCompleto.startsWith('fotos/')) {
+            nomeArquivo = caminhoCompleto.substring('fotos/'.length);
+        }
+        // Remove sublinhados para facilitar a leitura no campo de edição
+        nomeArquivo = nomeArquivo.replace(/_/g, ' '); 
+        document.getElementById('edit-foto_path').value = nomeArquivo;
+        // ------------------------------------------------------------------
+
         // Preencher campo de observações (usa || '' para garantir retrocompatibilidade)
         document.getElementById('edit-observacoes').value = registroEditando.observacoes || ''; 
         
@@ -616,15 +727,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!registroEditando) return;
             
             // 1. COLETAR ALTERAÇÕES DOS CAMPOS DE TEXTO E SALVÁ-LAS NO REGISTRO
+            
+            const novoNome = (document.getElementById('edit-nome')?.value || '').toUpperCase();
+            const fotoPathInput = document.getElementById('edit-foto_path')?.value || '';
+            
+            // --- APLICA A NOVA FUNÇÃO DE FORMATAÇÃO DE CAMINHO NA EDIÇÃO ---
+            const fotoPathPadronizado = gerarCaminhoFotoFinal(novoNome, fotoPathInput);
+            // --------------------------------------------------------------
+            
             // NOME MANTIDO EM MAIÚSCULAS
-            registroEditando.nome = (document.getElementById('edit-nome')?.value || '').toUpperCase();
+            registroEditando.nome = novoNome;
             registroEditando.sexo = document.getElementById('edit-sexo')?.value || '';
             registroEditando.nascimento = document.getElementById('edit-nascimento')?.value || '';
             registroEditando.falecimento = document.getElementById('edit-falecimento')?.value || '';
             registroEditando.profissao = document.getElementById('edit-profissao')?.value || '';
             registroEditando.cidade_pais_principal = (document.getElementById('edit-cidade_pais')?.value || '').toUpperCase();
-            // NOVO: Coletar campo de foto
-            registroEditando.foto_path = document.getElementById('edit-foto_path')?.value || '';
+            // NOVO: Coletar campo de foto PADRONIZADO
+            registroEditando.foto_path = fotoPathPadronizado;
             // Coletar campo de observações
             registroEditando.observacoes = document.getElementById('edit-observacoes')?.value || '';
             
@@ -754,7 +873,80 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
         inputImportJSON.value = '';
     });
+    
+    // ================================================================
+    // NOVO: LÓGICA DE EXPORTAÇÃO SELETIVA EM MARKDOWN (MD)
+    // ================================================================
+    
+    // Função utilitária para obter nomes de parentes
+    const getParentesNomes = (ids) => {
+        return parseArrayField(ids).map(id => {
+            const p = banco.find(p => p.id === id);
+            return p ? p.nome : '[Registro Removido]';
+        }).join(', ');
+    };
 
+    function exportarSelecionadosMarkdown() {
+        const selecionados = document.querySelectorAll('input[name="pessoaSelecionada"]:checked');
+        
+        if (selecionados.length === 0) {
+            alert("Por favor, selecione uma ou mais pessoas na lista para exportar.");
+            return;
+        }
+
+        mostrarLoading(`Exportando ${selecionados.length} registros em Markdown...`);
+        
+        let markdownContent = `# Relatório Familiar - Árvore Genealógica\n\n`;
+        markdownContent += `*Data da Exportação: ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
+        markdownContent += `---\n\n`;
+
+        selecionados.forEach((input, index) => {
+            const pessoaId = input.value;
+            const pessoa = banco.find(p => p.id === pessoaId);
+
+            if (!pessoa) return;
+
+            // --- SEÇÃO DA PESSOA ---
+            markdownContent += `## ${index + 1}. ${pessoa.nome}\n`;
+            markdownContent += `**Gênero:** ${pessoa.sexo === 'M' ? 'Masculino' : (pessoa.sexo === 'F' ? 'Feminino' : 'Não Informado')}\n`;
+            
+            if (pessoa.nascimento) markdownContent += `**Nascimento:** ${pessoa.nascimento}\n`;
+            if (pessoa.falecimento) markdownContent += `**Falecimento:** ${pessoa.falecimento}\n`;
+            if (pessoa.profissao) markdownContent += `**Profissão:** ${pessoa.profissao}\n`;
+            if (pessoa.cidade_pais_principal) markdownContent += `**Localidade:** ${pessoa.cidade_pais_principal}\n`;
+
+            // --- VÍNCULOS ---
+            markdownContent += `\n### Vínculos\n`;
+            
+            const conjugeNomes = getParentesNomes(pessoa.conjuge);
+            const paisNomes = getParentesNomes(pessoa.pais);
+            const filhosNomes = getParentesNomes(pessoa.filhos);
+
+            markdownContent += `* **Cônjuge(s):** ${conjugeNomes || 'Nenhum'}\n`;
+            markdownContent += `* **Pai/Mãe:** ${paisNomes || 'Nenhum'}\n`;
+            markdownContent += `* **Filho(s):** ${filhosNomes || 'Nenhum'}\n`;
+            
+            // IMPORTANTE: O campo 'observacoes' (Notas Pessoais) NÃO É INCLUÍDO
+            
+            markdownContent += `\n---\n\n`;
+        });
+        
+        const dataStr = markdownContent;
+        const dataBlob = new Blob([dataStr], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'relatorio_familiar.md';
+        
+        link.click();
+        URL.revokeObjectURL(url);
+
+        setTimeout(esconderLoading, 2000); 
+    }
+    
+    if (btnExportarSelecionadosMD) {
+        btnExportarSelecionadosMD.addEventListener('click', exportarSelecionadosMarkdown);
+    }
 
     // ================================================================
     // LÓGICA DE VISUALIZAÇÃO DE ÁRVORE
@@ -799,13 +991,33 @@ document.addEventListener('DOMContentLoaded', () => {
             inputPessoaCentral.dispatchEvent(new Event('change'));
         }
     }
-    // NOVO: Função renderizarArvore com Cartão de Identidade Separado
+    
+    // NOVO: Silhueta SVG em Base64 para ser injetada como URL de fundo no CSS
+    // Base64 gerado de um SVG (Material Icons 'Person')
+    const SILHUETA_BASE64 = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzQ0NDQ0NCI+PHBhdGggZD0iTTEyIDEyYzIyMSAwIDQtMTc5IDQtNHMtMTc5LTQtNC00LTQgMTc5LTQgNHMxNzkgNCA0IDR6bTAgMmMtMjY3IDAtOCA1MzQgLTggNHYyaDE2di0yYzAtMjY2LTUzMy00LTgtNHoiLz48L3N2Zz4=`;
+
+
+    // NOVO: Função renderizarArvore com Cartão de Identidade e Fallback CSS
     function renderizarArvore(pessoa) {
         if (!arvoreContainer) return;
 
         const notas = pessoa.observacoes ? pessoa.observacoes.trim() : '';
         const fotoPath = pessoa.foto_path ? pessoa.foto_path.trim() : '';
         
+        // CORREÇÃO: Usa a classe CSS "sem-foto" se fotoPath estiver vazio.
+        // Se há um caminho, usa a tag <img>. Se não há, usa um <div> com a classe `sem-foto`
+        // para que o CSS injete a silhueta no background.
+        let fotoContent = '';
+        
+        if (fotoPath) {
+            // Se houver caminho da foto, usa a tag <img>. Removido onerror para simplificar e evitar o bug de string.
+            fotoContent = `<img src="${fotoPath}" class="miniatura-foto">`;
+        } else {
+            // Se o caminho estiver vazio, usa um <div> com a classe para fallback via CSS
+            fotoContent = `<div class="miniatura-foto sem-foto"></div>`;
+        }
+
+
         const cidade = pessoa.cidade_pais_principal ? `, ${pessoa.cidade_pais_principal}` : '';
         let falecimento = '';
         if (pessoa.falecimento && pessoa.falecimento.trim() !== '') {
@@ -816,9 +1028,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // ================================================================
         // 1. CONSTRUÇÃO DO CARTÃO DE IDENTIDADE (Bloco de Destaque)
         // ================================================================
+        // CORREÇÃO: Removidos os caracteres de aspas duplas e > que apareceram devido ao erro de string no HTML
         let cartaoIdentidade = `
             <div class="cartao-identidade">
-                ${fotoPath ? `<img src="${fotoPath}" class="miniatura-foto">` : ''}
+                ${fotoContent}
                 
                 <div class="cartao-info">
                     <h3 class="nome-central">${pessoa.nome}</h3>
@@ -894,10 +1107,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (btnVisualizarSelecionado) { // Garante que o elemento existe antes de anexar o evento
         btnVisualizarSelecionado.addEventListener('click', () => {
-            const selecionado = document.querySelector('input[name="pessoaSelecionada"]:checked');
-            if (!selecionado) return alert('Por favor, selecione uma pessoa na lista para visualizar a família.');
+            // CORREÇÃO E VALIDAÇÃO: Busca todos os checkboxes marcados
+            const selecionados = document.querySelectorAll('input[name="pessoaSelecionada"]:checked');
             
-            const pessoaId = selecionado.value;
+            if (selecionados.length === 0) {
+                return alert('Por favor, assinale uma pessoa na lista para visualizar a família.');
+            }
+            if (selecionados.length > 1) {
+                // MENSAGEM CLARA PARA O USUÁRIO (Sua ideia)
+                return alert('Para a "Visualização da Família", assinale APENAS UMA pessoa para ser o ponto central.');
+            }
+            
+            // Se houver exatamente 1 pessoa marcada, prossegue com a visualização
+            const pessoaId = selecionados[0].value;
             const pessoa = banco.find(p => p.id === pessoaId);
             
             if (!pessoa) return;

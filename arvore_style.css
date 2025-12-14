@@ -175,6 +175,7 @@ form button[type="submit"], form button[type="button"] {
     flex-direction: row; 
     gap: 10px;
     margin: 20px 0;
+    flex-wrap: wrap; /* Permite que os botões quebrem linha */
 }
 #botoesAcaoGlobais button {
     flex-grow: 0;
@@ -198,7 +199,8 @@ form button[type="submit"], form button[type="button"] {
 }
 
 .registro-item:hover { background-color: #f9f9f9; }
-.registro-item input[type="radio"] { margin-right: 5px; transform: scale(1.2); accent-color: var(--cor-primaria); }
+/* Estilo para a checkbox, diferenciando do radio anterior */
+.registro-item input[type="checkbox"] { margin-right: 5px; transform: scale(1.2); accent-color: var(--cor-primaria); } 
 .registro-info { flex: 1; cursor: pointer; }
 .registro-nome { font-weight: bold; }
 .registro-detalhes { color: #777; font-size: 0.85em; }
@@ -262,17 +264,34 @@ form button[type="submit"], form button[type="button"] {
 
 
 /* ================================================================
-   ESTILOS DE MINIATURA DE FOTO
+   ESTILOS DE MINIATURA DE FOTO E SILHUETA (Corrigido)
    ================================================================ */
+/* Estilo base para a imagem e o fallback (div) */
 .miniatura-foto {
-    /* Dimensões adaptadas ao novo layout do Cartão de Identidade */
+    /* Garante o formato circular e o tamanho fixo */
     width: 100px;
     height: 100px;
-    object-fit: cover;
     border-radius: 50%;
-    border: 3px solid var(--cor-destaque); /* Borda mais destacada */
-    flex-shrink: 0; /* Garante que a foto não encolha */
+    border: 3px solid var(--cor-destaque);
+    flex-shrink: 0; 
+    
+    /* Configurações visuais para a imagem (para o img tag) */
+    object-fit: cover;
+    display: block; /* Garante que as imagens se comportem bem no layout */
 }
+
+/* NOVO: Estilo para o Fallback (quando a foto não existe) */
+.miniatura-foto.sem-foto {
+    /* Injenta a silhueta no background */
+    /* CORREÇÃO DA BASE64: Utiliza uma codificação validada e corrigida */
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2EwYTBhMCI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCA1LjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPjwvc3ZnPg==');
+    background-size: 70%; /* Tamanho do ícone SVG dentro do círculo */
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: #f0f0f0; /* Fundo claro para o círculo da silhueta */
+    border: 3px solid #ccc; /* Borda mais neutra para o fallback */
+}
+
 
 /* Regras para os detalhes da pessoa central (Datas, Cidade) */
 .arvore-secao .detalhes {

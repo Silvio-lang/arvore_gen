@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Árvore Genealógica</title>
+    
+    <!-- SOLUÇÃO DEFINITIVA E SEGURA: BLOQUEIA A VISIBILIDADE DO MODAL ANTES DE TUDO -->
+    <!-- Esta regra é lida primeiro pelo navegador, impedindo o flicker do Modal de Dicas. -->
+    <style>
+        .modal {
+            display: none !important; /* Força o ocultamento imediato da classe modal */
+        }
+    </style>
+    
     <link rel="stylesheet" href="arvore_style.css">
     <!-- Removido o link do Tailwind CSS para manter seus estilos originais -->
     <script src="arvore_script.js" defer></script>
@@ -53,9 +62,9 @@
                 <label>Cidade/País principal (opcional):</label>
                 <input type="text" id="cidade_pais">
                 
-                <!-- CAMPO DA FOTO COM NOVA STRING DE INSTRUÇÃO -->
-                <label>Caminho da Foto (necessário enviar a foto para colocar na nuvem - Ex: arvore_fotos/nome.jpg):</label>
-                <input type="text" id="foto_path" placeholder="Ex: arvore_fotos/Albino.jpg">
+                <!-- INSTRUÇÃO ATUALIZADA: DEIXE EM BRANCO PARA AUTOMATIZAR (Nome_da_Pessoa.jpg) -->
+                <label>Nome do Arquivo da Foto (na pasta 'fotos/' - Deixe em branco para usar Nome_da_Pessoa.jpg):</label>
+                <input type="text" id="foto_path" placeholder="Ex: Cristina_Aurich.jpg">
 
                 <!-- CAMPO DE NOTAS -->
                 <label>NOTAS (Uso Pessoal):</label>
@@ -88,6 +97,7 @@
             
             <div id="botoesAcaoGlobais">
                 <button id="btnVisualizarSelecionado">👨‍👩‍👦‍👦 Visualizar Família de: (assinalar)</button>
+                <button id="btnExportarSelecionadosMD">📝 Exportar Selecionados (MD)</button>
             </div>
             <div id="registrosLista"></div>
         </section>
@@ -136,9 +146,9 @@
                 <label>Cidade/País principal:</label>
                 <input type="text" id="edit-cidade_pais">
                 
-                <!-- CAMPO DA FOTO PARA EDIÇÃO COM NOVA STRING DE INSTRUÇÃO -->
-                <label>Caminho da Foto (necessário enviar a foto para colocar na nuvem):</label>
-                <input type="text" id="edit-foto_path">
+                <!-- INSTRUÇÃO ATUALIZADA: DEIXE EM BRANCO PARA AUTOMATIZAR (Nome_da_Pessoa.jpg) -->
+                <label>Nome do Arquivo da Foto (na pasta 'fotos/' - Deixe em branco para usar Nome_da_Pessoa.jpg):</label>
+                <input type="text" id="edit-foto_path" placeholder="Ex: Albino_Schulz.jpg">
 
                 <!-- CAMPO NOTAS -->
                 <label>NOTAS (Uso Pessoal):</label>
@@ -201,13 +211,15 @@
         </footer>
     </div>
     
-    <div id="dicasModal" class="modal">
+    <!-- MODAL DE DICAS -->
+    <div id="dicasModal" class="modal"> 
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h3>Instruções e Dicas</h3>
             <div class="dicas-nav">
                 <button id="btnDicaAnterior" title="Dica anterior">&#9664;</button>
-                <span id="dicaContador">0 / 0</span>
+                <!-- SUBSTITUÍDO: "0 / 0" por um placeholder mais discreto -->
+                <span id="dicaContador">Carregando...</span> 
                 <button id="btnDicaProxima" title="Próxima dica">&#9654;</button>
             </div>
             <div class="dica-content-wrapper">
@@ -216,8 +228,6 @@
         </div>
     </div>
     
-    <!-- O MODAL DE FOTO FOI REMOVIDO DAQUI -->
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
