@@ -1,4 +1,4 @@
-// arvore_script.js - Versão Final e Estável (NOTAS Integradas à Visualização)
+// arvore_script.js - Versão Final e Estável (Modal de Dicas Limpo - Cartão de Identidade da Pessoa Central)
 // ================================================================
 // CONFIGURAÇÃO DO SUPABASE (CHAVE INVALIDADA PARA FORÇAR USO DE ARQUIVOS)
 // ================================================================
@@ -108,6 +108,8 @@ function atualizarListaAniversarios() {
 }
 // ================================================================
 
+// FUNÇÕES DE MODAL DE FOTOS FORAM REMOVIDAS
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // Seletores de Elementos DOM
@@ -158,6 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // SELETOR DE NAVEGAÇÃO RÁPIDA
     const btnListaPessoasVisu = document.getElementById('btnListaPessoasVisu'); 
+    
+    // As configurações de fechamento do modal de fotos foram removidas
     
     // ================================================================
     // FUNÇÕES DE FEEDBACK VISUAL (LOADING)
@@ -351,13 +355,16 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const novaPessoa = {
                 id: gerarId(),
-                nome: (document.getElementById('nome')?.value || '').toUpperCase(),
+                // NOME MANTIDO EM MAIÚSCULAS PARA CONSISTÊNCIA DA BASE DE DADOS
+                nome: (document.getElementById('nome')?.value || '').toUpperCase(), 
                 sexo: document.getElementById('sexo')?.value || '',
                 nascimento: document.getElementById('nascimento')?.value || '',
                 falecimento: document.getElementById('falecimento')?.value || '',
                 profissao: document.getElementById('profissao')?.value || '',
                 cidade_pais_principal: (document.getElementById('cidade_pais')?.value || '').toUpperCase(),
-                // NOVO CAMPO DE OBSERVAÇÕES
+                // NOVO CAMPO DE FOTO
+                foto_path: document.getElementById('foto_path')?.value || '',
+                // CAMPO DE OBSERVAÇÕES
                 observacoes: document.getElementById('observacoes')?.value || '',
                 pais: [],
                 filhos: [],
@@ -449,7 +456,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-falecimento').value = registroEditando.falecimento;
         document.getElementById('edit-profissao').value = registroEditando.profissao;
         document.getElementById('edit-cidade_pais').value = registroEditando.cidade_pais_principal;
-        // NOVO: Preencher campo de observações (usa || '' para garantir retrocompatibilidade)
+        // NOVO: Preencher campo de foto
+        document.getElementById('edit-foto_path').value = registroEditando.foto_path || '';
+        // Preencher campo de observações (usa || '' para garantir retrocompatibilidade)
         document.getElementById('edit-observacoes').value = registroEditando.observacoes || ''; 
         
         const labelNomePessoaEditada = document.getElementById('labelNomePessoaEditada');
@@ -594,6 +603,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             atualizarVinculosList();
         });
+        
+        // Altera o texto do botão para CONFIRMAR
+        btnAdicionarVinculo.textContent = "CONFIRMAR";
     }
 
     // ================================================================
@@ -604,13 +616,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!registroEditando) return;
             
             // 1. COLETAR ALTERAÇÕES DOS CAMPOS DE TEXTO E SALVÁ-LAS NO REGISTRO
+            // NOME MANTIDO EM MAIÚSCULAS
             registroEditando.nome = (document.getElementById('edit-nome')?.value || '').toUpperCase();
             registroEditando.sexo = document.getElementById('edit-sexo')?.value || '';
             registroEditando.nascimento = document.getElementById('edit-nascimento')?.value || '';
             registroEditando.falecimento = document.getElementById('edit-falecimento')?.value || '';
             registroEditando.profissao = document.getElementById('edit-profissao')?.value || '';
             registroEditando.cidade_pais_principal = (document.getElementById('edit-cidade_pais')?.value || '').toUpperCase();
-            // NOVO: Coletar campo de observações
+            // NOVO: Coletar campo de foto
+            registroEditando.foto_path = document.getElementById('edit-foto_path')?.value || '';
+            // Coletar campo de observações
             registroEditando.observacoes = document.getElementById('edit-observacoes')?.value || '';
             
             registroEditando.user_id = localStorage.getItem('arvoreUsuario') || 'LOCAL_USER';
@@ -747,6 +762,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function popularInputPessoaCentral() {
         if (!listaPessoas) return;
         listaPessoas.innerHTML = ''; // Limpa as opções antigas
+        // Nomes de listagem mantidos em maiúsculas (consistência de busca)
         banco.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(pessoa => {
             const option = document.createElement('option');
             option.value = pessoa.nome;
@@ -783,45 +799,13 @@ document.addEventListener('DOMContentLoaded', () => {
             inputPessoaCentral.dispatchEvent(new Event('change'));
         }
     }
-     function renderizarArvore(pessoa) {
+    // NOVO: Função renderizarArvore com Cartão de Identidade Separado
+    function renderizarArvore(pessoa) {
         if (!arvoreContainer) return;
 
-        // --- LÓGICA DE INTEGRAÇÃO DE NOTAS (NOVO) ---
         const notas = pessoa.observacoes ? pessoa.observacoes.trim() : '';
-        let notasHtml = '';
-
-        if (notas.length > 0) {
-            // CORREÇÃO: Removendo <strong> e font-weight: bold. A string 'NOTAS: ' fica em texto simples.
-           notasHtml = `<div class="detalhes-notas"><span style="white-space: pre-wrap;">NOTAS: ${notas}</span></div>`;
-        }
+        const fotoPath = pessoa.foto_path ? pessoa.foto_path.trim() : '';
         
-        // --- FIM LÓGICA DE INTEGRAÇÃO DE NOTAS ---
-        
-        const paisIds = parseArrayField(pessoa.pais);
-        const filhosIds = parseArrayField(pessoa.filhos);
-        const conjugesIds = parseArrayField(pessoa.conjuge);
-        
-        // Usa um objeto para agrupar os parentes por seção para facilitar a renderização
-        const secoes = {
-            'Pais': paisIds,
-            'Cônjuge(s)': conjugesIds,
-            'Filho(s)': filhosIds,
-        };
-        let html = '<div class="arvore">';
-        
-        // --- PAIS ---
-        if (secoes['Pais'].length > 0) {
-            html += '<div class="arvore-secao"><h3>Pais</h3>';
-            secoes['Pais'].forEach(id => {
-                const parente = banco.find(p => p.id === id);
-                if (parente) {
-                    html += `<div><a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${parente.id}')" class="arvore-item arvore-link">${parente.nome}</a></div>`;
-                }
-            });
-            html += '</div>';
-        }
-
-        // --- PESSOA CENTRAL (AJUSTADO PARA EXIBIÇÃO MINIMALISTA E FIEL) ---
         const cidade = pessoa.cidade_pais_principal ? `, ${pessoa.cidade_pais_principal}` : '';
         let falecimento = '';
         if (pessoa.falecimento && pessoa.falecimento.trim() !== '') {
@@ -829,34 +813,79 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const detalhesCompletos = `${pessoa.nascimento || ''}${cidade}${falecimento}`;
 
-        html += `<div class="arvore-secao arvore-central">
-            <div class="arvore-item principal">
-                ${pessoa.nome}
-                <div class="detalhes">${detalhesCompletos}</div>
-                ${notasHtml} <!-- INSERÇÃO DAS NOTAS AQUI -->
+        // ================================================================
+        // 1. CONSTRUÇÃO DO CARTÃO DE IDENTIDADE (Bloco de Destaque)
+        // ================================================================
+        let cartaoIdentidade = `
+            <div class="cartao-identidade">
+                ${fotoPath ? `<img src="${fotoPath}" class="miniatura-foto">` : ''}
+                
+                <div class="cartao-info">
+                    <h3 class="nome-central">${pessoa.nome}</h3>
+                    <div class="detalhes-centrais">${detalhesCompletos}</div>
+                    ${notas ? `<div class="detalhes-notas-central"><span style="white-space: pre-wrap;">NOTAS: ${notas}</span></div>` : ''}
+                </div>
             </div>
-        </div>`;
+            <div class="separator"></div>
+        `;
+        // ================================================================
+
+        const paisIds = parseArrayField(pessoa.pais);
+        const filhosIds = parseArrayField(pessoa.filhos);
+        const conjugesIds = parseArrayField(pessoa.conjuge);
         
-        // --- OUTRAS RELAÇÕES ---
-        ['Cônjuge(s)', 'Filho(s)'].forEach(titulo => {
-            if (secoes[titulo].length > 0) {
-                html += `<div class="arvore-secao"><h3>${titulo}</h3>`;
-                secoes[titulo].forEach(id => {
-                    const parente = banco.find(p => p.id === id);
-                    if (parente) {
-                        html += `<div><a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${parente.id}')" class="arvore-item arvore-link">${parente.nome}</a></div>`;
-                    }
-                });
-                html += '</div>';
-            }
-        });
+        const secoes = {
+            'Pais': paisIds,
+            'Cônjuge(s)': conjugesIds,
+            'Filho(s)': filhosIds,
+        };
+        
+        let htmlVinculos = '<div class="arvore">';
+        
+        // --- PAIS ---
+        if (secoes['Pais'].length > 0) {
+            htmlVinculos += '<div class="arvore-secao"><h3>Pais</h3>';
+            secoes['Pais'].forEach(id => {
+                const parente = banco.find(p => p.id === id);
+                if (parente) {
+                    htmlVinculos += `<div><a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${parente.id}')" class="arvore-item arvore-link">${parente.nome}</a></div>`;
+                }
+            });
+            htmlVinculos += '</div>';
+        }
+        
+        // --- CÔNJUGES ---
+        if (secoes['Cônjuge(s)'].length > 0) {
+             htmlVinculos += '<div class="arvore-secao"><h3>Cônjuge(s)</h3>';
+            secoes['Cônjuge(s)'].forEach(id => {
+                const parente = banco.find(p => p.id === id);
+                if (parente) {
+                    htmlVinculos += `<div><a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${parente.id}')" class="arvore-item arvore-link">${parente.nome}</a></div>`;
+                }
+            });
+            htmlVinculos += '</div>';
+        }
+        
+        // --- FILHOS ---
+        if (secoes['Filho(s)'].length > 0) {
+            htmlVinculos += '<div class="arvore-secao"><h3>Filho(s)</h3>';
+            secoes['Filho(s)'].forEach(id => {
+                const parente = banco.find(p => p.id === id);
+                if (parente) {
+                    htmlVinculos += `<div><a href="javascript:void(0)" onclick="centralizarPessoaNaArvore('${parente.id}')" class="arvore-item arvore-link">${parente.nome}</a></div>`;
+                }
+            });
+            htmlVinculos += '</div>';
+        }
         
         // Mensagem para pessoa sem vínculos
         if (paisIds.length === 0 && filhosIds.length === 0 && conjugesIds.length === 0) {
-            html += '<p>Nenhum vínculo registrado para esta pessoa.</p>';
+            htmlVinculos += '<p>Nenhum vínculo registrado para esta pessoa.</p>';
         }
-        html += '</div>'; // Fecha div.arvore
-        arvoreContainer.innerHTML = html;
+        htmlVinculos += '</div>'; 
+        
+        // Junta o Cartão de Identidade e os Vínculos
+        arvoreContainer.innerHTML = cartaoIdentidade + htmlVinculos;
     }
 
     // ================================================================

@@ -153,7 +153,8 @@ form label {
     color: #555;
 }
 form input[type="text"],
-form select {
+form select,
+form textarea { /* Adicionado textarea aqui para herdar o estilo de largura */
     width: 100%;
     padding: 10px;
     margin-top: 5px;
@@ -191,9 +192,9 @@ form button[type="submit"], form button[type="button"] {
 .registro-item {
     display: flex;
     align-items: center; /* Garante o alinhamento vertical centralizado */
-    padding: 8px 5px;    /* Aumenta o espaço interno vertical */
+    padding: 8px 5px;     /* Aumenta o espaço interno vertical */
     border-bottom: 1px solid #eee;
-    gap: 5px;            /* AUMENTADO: Aumenta o afastamento horizontal */
+    gap: 5px;             /* AUMENTADO: Aumenta o afastamento horizontal */
 }
 
 .registro-item:hover { background-color: #f9f9f9; }
@@ -219,11 +220,105 @@ form button[type="submit"], form button[type="button"] {
    SEÇÃO VISUALIZAR ÁRVORE
    ================================================================ */
 #arvoreContainer { margin-top: 20px; padding: 15px; background-color: #fafafa; border-radius: 8px; border: 1px solid #eee; }
+
+/* --- NOVO ESTILO: CARTÃO DE IDENTIDADE (Pessoa Central) --- */
+.cartao-identidade {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #e0f7fa; /* Cor de fundo suave para destaque */
+    border: 2px solid var(--cor-primaria);
+    border-radius: 8px;
+    box-shadow: var(--sombra);
+}
+.cartao-info {
+    flex-grow: 1;
+}
+.cartao-identidade .nome-central {
+    margin: 0;
+    font-size: 1.5em; /* Nome grande e em destaque */
+    font-weight: 700;
+    color: var(--cor-primaria);
+}
+.cartao-identidade .detalhes-centrais {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 5px;
+}
+.cartao-identidade .detalhes-notas-central {
+    font-size: 0.8em;
+    color: #777;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #b2ebf2; /* Separador de notas */
+}
+.separator {
+    border-bottom: 1px solid var(--cor-borda);
+    margin: 10px 0 20px 0;
+}
+/* --- FIM: CARTÃO DE IDENTIDADE --- */
+
+
 /* ================================================================
-   MODAL DE DICAS E ARVORE (SEM ALTERAÇÃO GRANDE)
+   ESTILOS DE MINIATURA DE FOTO
    ================================================================ */
-.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-.modal-content { background-color: #fefefe; margin: 25% auto; padding: 25px; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; animation: fadeIn 0.5s; padding-right: 25px; }
+.miniatura-foto {
+    /* Dimensões adaptadas ao novo layout do Cartão de Identidade */
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--cor-destaque); /* Borda mais destacada */
+    flex-shrink: 0; /* Garante que a foto não encolha */
+}
+
+/* Regras para os detalhes da pessoa central (Datas, Cidade) */
+.arvore-secao .detalhes {
+    font-size: 0.85em; 
+    color: #555;
+    margin-top: 5px;
+    font-weight: normal;
+}
+/* Regras para as NOTAS (que usa a classe detalhes-notas) */
+.arvore-secao .detalhes-notas {
+    font-size: 0.85em; 
+    color: #555;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px dotted #ccc;
+    font-weight: normal;
+}
+/* ================================================================
+   MODAL DE DICAS E LAYOUT DO MODAL
+   ================================================================ */
+.modal { 
+    display: none; /* Mantido para o caso de o <style> no <head> ser ignorado */
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.6); 
+}
+
+.modal-content { 
+    background-color: #fefefe; 
+    margin: 25% auto; /* Centralização tradicional */
+    padding: 25px; 
+    border: 1px solid #888; 
+    width: 90%; 
+    max-width: 500px; /* GARANTIA DE LARGURA MÁXIMA */
+    border-radius: 10px; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+    position: relative; 
+    animation: fadeIn 0.5s; 
+    padding-right: 25px; 
+}
+
 .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; position: absolute; top: 10px; right: 20px; }
 .close-button:hover, .close-button:focus { color: black; text-decoration: none; cursor: pointer; }
 @keyframes fadeIn { from {opacity: 0; transform: translateY(-20px);} to {opacity: 1; transform: translateY(0);} }
@@ -251,6 +346,7 @@ form button[type="submit"], form button[type="button"] {
     transform: none;
     flex-grow: 0;
     margin-top: 0;
+    cursor: pointer;
 }
 .dicas-nav button:hover {
     background-color: var(--cor-secundaria);
@@ -264,84 +360,59 @@ form button[type="submit"], form button[type="button"] {
     min-width: 50px;
     text-align: center;
 }
-#inputPessoaCentral {
-    width: 150%; 
-    max-width: 400px; 
-}
-.arvore-link {
-    color: #0056b3; 
-    text-decoration: underline;
-    cursor: pointer;
-    font-weight: bold;
-}
-.arvore-link:hover {
-    color: #007bff; 
-    text-decoration: none;
-}
-/* ================================================================
-   ESTILOS APRIMORADOS PARA A VISUALIZAÇÃO DA ÁRVORE
-   ================================================================ */
-.arvore {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-.arvore-secao {
-    background-color: #f7f9fa; 
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #e1e8ed;
-}
-.arvore-secao h3 {
-    color: var(--cor-primaria);
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.1em;
-    font-weight: 600;
-    border-bottom: 2px solid var(--cor-secundaria);
-    padding-bottom: 8px;
-}
-.arvore-item {
-    background-color: #fff;
-    padding: 12px 15px;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    margin-bottom: 10px;
-    font-weight: 500;
-    transition: all 0.2s ease-in-out;
-    border-left: 4px solid var(--cor-secundaria);
-}
-.arvore-link {
-    text-decoration: none;
-    color: var(--cor-texto);
-    cursor: pointer;
-    display: block; 
-}
-.arvore-link .arvore-item:hover {
-    background-color: var(--cor-primaria);
-    color: #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
-    border-left-color: var(--cor-destaque);
-}
-.arvore-central .principal {
-    background-color: #e0f7fa; 
-    border: 2px solid var(--cor-primaria);
-    border-left-width: 6px;
-    font-size: 1.2em;
-    font-weight: 700;
-    color: var(--cor-primaria);
-}
-.arvore-central .principal .detalhes {
-    font-size: 0.8em;
-    font-weight: 400;
-    color: #555;
-    margin-top: 5px;
-}
 .dica-content-wrapper {
     text-align: center;
     min-height: 50px; 
+}
+/* Estilo para a linha de criação de vínculo (ajustado para melhor responsividade) */
+.vinculo-creator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+/* Estilo para o botão de inclusão de vínculo (CONFIRMAR) */
+.botao-inclusao-vinculo {
+    background-color: #38a3a5;
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-left: auto; /* Empurra o botão para a direita */
+    transition: background-color 0.2s;
+}
+.botao-inclusao-vinculo:hover {
+    background-color: #2299a9;
+}
+/* Estilo para o botão de remoção de vínculo */
+.remover-vinculo-btn {
+    background-color: #e63946;
+    color: white;
+    font-weight: normal;
+    padding: 3px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-left: 15px;
+    transition: background-color 0.2s;
+}
+.remover-vinculo-btn:hover {
+    background-color: #cf2b39;
+}
+/* Alinhamento dos itens de Vínculo com o botão [Remover] */
+#vinculosLista div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px dotted #eee;
 }
 /* ================================================================
    REGRAS DE RESPONSIVIDADE (MEDIA QUERIES)
@@ -363,7 +434,7 @@ form button[type="submit"], form button[type="button"] {
         font-size: 1.1em;
     }
     .modal-content {
-        margin: 15% auto; 
+        margin: 15% auto; /* Ajusta a centralização para telas maiores */
     }
     .hub-button {
         padding: 30px;
@@ -372,9 +443,7 @@ form button[type="submit"], form button[type="button"] {
 }
 @media only screen and (min-width: 900px) {
     nav {
-        /*justify-content: flex-start;   Mantém tecla [Início] à esquerda */
-        /*justify-content: flex-end;   Mantém tecla [Início] à direita */
-        justify-content:  center; /* Mantém tecla Início ao centro */
+        justify-content: center; /* Mantém tecla Início ao centro */
     }
     button, input[type="submit"] {
         flex-grow: 0; 
@@ -390,75 +459,28 @@ html, body {
     padding-left: 10px;
     padding-right: 10px;
 }
-/* Bloco para garantir que ambos os botões tenham o tamanho minimalista solicitado */
-.botao-projeto {
-    /* Dimensões Solicitadas: 70px x 20px */
-    width: 70px !important; 
-    height: 20px !important; 
-
-    /* Garante que padding/borda não aumentem o tamanho final */
-    box-sizing: border-box !important; 
-
-    /* Ajustes internos para que o texto caiba */
-    padding: 0 4px !important; /* Padding mínimo (0 vertical) */
-    font-size: 9px !important; /* Fonte bem pequena */
-    
-    /* Outros estilos mantidos de forma concisa */
-    border: 1px solid #c0c0c0; 
-    background-color: transparent; 
-    color: #333;
-    cursor: pointer;
-    border-radius: 2px;
-}
-
-/* Para o minimalismo e atenciosidade, sempre bom dar feedback visual */
-.botao-projeto:hover {
-    background-color: #f0f0f0; /* Cor suave ao passar o mouse */
-    border-color: #333;
-}
 
 /* Estilos para o novo layout de criação de vínculos */
-.vinculo-creator {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 15px;
-}
-/* Estilos para o novo layout de criação de vínculos */
-.vinculo-creator {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 15px;
-}
-
-/* Estilo para o nome da pessoa (fonte pequena e preta) */
 .vinculo-creator .vinculo-pessoa-nome {
     font-size: 12px;
-    color: #000; /* Cor preta, como solicitado */
-    font-weight: normal; /* Remove o negrito padrão */
-    position: relative; /* Permite o ajuste fino da posição */
-    top: 0.5rem; /* Desloca o texto para baixo (aprox. 4px) */
+    color: #000;
+    font-weight: normal;
+    position: relative; 
+    top: 0.5rem; 
 }
-
 /* Estilo para a imagem na tela de abertura */
 .imagem-abertura {
-    /* Mude de 100% para algo como 50% ou 60% */
-    max-width: 50%; /* Por exemplo, 50% da largura do contêiner */
-    height: auto; /* Mantém a proporção original da imagem */
-    display: block; /* Remove espaços extras abaixo da imagem */
-    margin: 20px auto; /* Centraliza a imagem e adiciona margem vertical */
-    border-radius: 10px; /* Bordas levemente arredondadas, se desejar */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para destacar */
+    max-width: 50%;
+    height: auto;
+    display: block; 
+    margin: 20px auto; 
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
-
 #secAbertura {
-    text-align: center; /* Centraliza a imagem e o container de botões */
+    text-align: center;
     padding: 20px;
 }
-
 /* Regra para a imagem (opcional, mas bom para garantir centralização) */
 .imagem-abertura {
     display: block; 
@@ -466,43 +488,31 @@ html, body {
     max-width: 100%;
     height: auto;
 }
-
 /* --- PADRONIZAÇÃO DO HUB DE BOTÕES --- */
-
 /* 1. Alinha os botões horizontalmente e os centraliza */
 #secAbertura #hub-botoes {
-    display: flex; /* CHAVE: Coloca os botões na mesma linha */
+    display: flex;
     flex-wrap: wrap; 
-    justify-content: center; /* Centraliza o grupo de botões horizontalmente */
-    
-    /* Centraliza o bloco de botões na tela */
+    justify-content: center;
     max-width: 800px;
     margin: 20px auto; 
 }
-
 /* 2. Aplica largura e altura fixas em todos os botões do hub */
 #secAbertura #hub-botoes button {
-    /* Define uma largura uniforme (250px é um bom tamanho padrão) */
-    width: 250px;  
+    width: 250px; 
     height: 60px;
-    
-    /* Espaçamento uniforme entre todos os botões */
     margin: 8px; 
-    
-    /* Garante que o conteúdo (texto e ícone) esteja centralizado e alinhado */
     display: flex; 
     align-items: center;
-    justify-content: flex-start; /* Alinha o texto na borda esquerda do botão */
+    justify-content: flex-start; 
     padding: 0 15px;
     font-size: 1.0em;
 }
-
 /* 3. Estiliza os ícones dentro dos botões (se estiver usando Material Icons) */
 #secAbertura #hub-botoes button .material-icons {
     margin-right: 10px;
     font-size: 1.2em;
 }
-/* --- ESTILOS DE BOTÕES DE AÇÃO ÚNICA (Controle Consciente) --- */
 
 /* Estilo para o Botão Principal [Concluir Edições] */
 .principal-button {
@@ -554,83 +564,4 @@ html, body {
 
 .secundario-button:hover {
     background-color: #d4d4d4;
-}
-/* arvore_style.css (Novos estilos para Edição de Vínculos) */
-
-/* 1. Estilo para a Linha de Criação de Vínculo (Organização Horizontal) */
-.vinculo-creator {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap; /* Garante responsividade em celular */
-    gap: 10px; /* Espaço entre os elementos */
-    margin-top: 15px;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-/* 2. Estilo para o Botão [Incluir] (Pequeno, Verde, Alinhado à Direita) */
-.botao-inclusao-vinculo {
-    background-color: #38a3a5;
-    color: white;
-    font-weight: bold;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    
-    /* CHAVE PARA O ALINHAMENTO: Empurra o botão para a direita */
-    margin-left: auto; 
-    
-    transition: background-color 0.2s;
-}
-
-.botao-inclusao-vinculo:hover {
-    background-color: #2299a9;
-}
-
-/* 3. Estilo para o Botão [Remover] (Pequeno e Vermelho) */
-.remover-vinculo-btn {
-    background-color: #e63946; /* Vermelho forte */
-    color: white;
-    font-weight: normal;
-    padding: 3px 8px; /* Mais compacto */
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85em; /* Fonte pequena */
-    margin-left: 15px; /* Separa o botão do nome */
-    transition: background-color 0.2s;
-}
-
-.remover-vinculo-btn:hover {
-    background-color: #cf2b39;
-}
-
-/* 4. Alinhamento dos itens de Vínculo com o botão [Remover] */
-#vinculosLista div {
-    display: flex;
-    justify-content: space-between; /* Espalha o nome para a esquerda e o botão para a direita */
-    align-items: center;
-    padding: 5px 0;
-    border-bottom: 1px dotted #eee;
-}
-/* arvore_style.css */
-
-/* Regras para os detalhes da pessoa central (Datas, Cidade) */
-.arvore-secao .detalhes {
-    font-size: 0.85em; /* Reduz o tamanho da fonte */
-    color: #555;
-    margin-top: 5px;
-    font-weight: normal; /* Sobrescreve negrito herdado */
-}
-
-/* Regras para as NOTAS (que usa a classe detalhes-notas) */
-.arvore-secao .detalhes-notas {
-    font-size: 0.85em; /* Garante o mesmo tamanho para as notas */
-    color: #555;
-    margin-top: 5px;
-    padding-top: 5px;
-    border-top: 1px dotted #ccc; /* Linha sutil para separar as notas */
-    font-weight: normal; /* Sobrescreve negrito herdado */
 }

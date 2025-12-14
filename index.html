@@ -18,14 +18,14 @@
 
         <nav>
             <button id="btnRefugio" style="display: none;">🏠 Início</button>
-            <!-- NOVO BOTÃO DE ACESSO RÁPIDO: Lista de Pessoas -->
+            <!-- BOTÃO DE ACESSO RÁPIDO: Lista de Pessoas -->
             <button id="btnListaPessoasVisu" style="display: none;">🔍 Lista/Pessoas</button>
         </nav>
         
         <section id="secAbertura">
             <img src="arvore_familia.png" alt="Árvore Genealógica da Família" class="imagem-abertura">
             
-            <!-- NOVO: Container que permite o alinhamento horizontal (FLEX) -->
+            <!-- Container que permite o alinhamento horizontal (FLEX) -->
             <div id="hub-botoes"> 
                 <button id="btnGerenciarHub" class="hub-button">📜🔍 - Lista de Pessoas</button>
                 <button id="btnNovaPessoaHub" class="hub-button">➕ Incluir Nova Pessoa</button>
@@ -53,9 +53,13 @@
                 <label>Cidade/País principal (opcional):</label>
                 <input type="text" id="cidade_pais">
                 
-                <!-- NOVO CAMPO NOTAS (Uso Pessoal) -->
+                <!-- CAMPO DA FOTO COM NOVA STRING DE INSTRUÇÃO -->
+                <label>Caminho da Foto (necessário enviar a foto para colocar na nuvem - Ex: arvore_fotos/nome.jpg):</label>
+                <input type="text" id="foto_path" placeholder="Ex: arvore_fotos/Albino.jpg">
+
+                <!-- CAMPO DE NOTAS -->
                 <label>NOTAS (Uso Pessoal):</label>
-                <textarea id="observacoes" rows="4"></textarea>
+                <textarea id="observacoes" rows="4" style="width: 100%;"></textarea>
 
                 <button type="submit">Salvar Registro</button>
                 <button type="button" id="btnCancelarInclusao">Cancelar</button>
@@ -66,7 +70,7 @@
         <section id="secGerenciar">
             <h2>Registros</h2>
             
-            <!-- NOVO CONTAINER: Agrupa os filtros em uma coluna (COM A ESTRUTURA CORRETA) -->
+            <!-- CONTAINER: Agrupa os filtros -->
             <div id="filtrosContainer">
                 
                 <div class="filtro-grupo">
@@ -88,7 +92,7 @@
             <div id="registrosLista"></div>
         </section>
         
-        <!-- O bloco secAniversariantes deve vir DEPOIS de secGerenciar -->
+        <!-- O bloco secAniversariantes -->
         <section id="secAniversariantes" style="display:none;">
             <h2>🎂 Aniversariantes do Mês: <span id="mesAtual"></span></h2>
             <div id="aniversariantesLista">
@@ -97,7 +101,7 @@
             </div>
         </section>
 
-<section id="secVisualizarArvore">
+        <section id="secVisualizarArvore">
             <h2 style="text-align: center;">Árvore Genealógica - Visualização</h2>
             <div class="form-group">
                 <label for="inputPessoaCentral">Buscar e selecionar a pessoa central da árvore:</label>
@@ -105,11 +109,8 @@
                 <datalist id="listaPessoas">
                     </datalist>
             </div>
-           <!-- NOVO CONTAINER PARA AS NOTAS DA PESSOA CENTRAL -->
-            <div id="notasVisualizacao" style="margin-top: 15px; padding: 15px; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 4px; display: none;">
-                <strong style="display: block; margin-bottom: 5px; font-size: 1.1em; color: #333;">NOTAS:</strong>
-                <p id="notasConteudo" style="white-space: pre-wrap;"></p>
-            </div>
+            <!-- REMOVIDO o div #notasVisualizacao que agora está integrado no JS -->
+            
             <button id="btnEditarNaArvore" style="display: none; margin-top: 10px; background-color: #ee9b00;">✏️ Editar Pessoa Central</button>
             <div id="arvoreContainer"></div>
         </section>
@@ -135,27 +136,19 @@
                 <label>Cidade/País principal:</label>
                 <input type="text" id="edit-cidade_pais">
                 
-                <!-- NOVO CAMPO NOTAS (Uso Pessoal) -->
+                <!-- CAMPO DA FOTO PARA EDIÇÃO COM NOVA STRING DE INSTRUÇÃO -->
+                <label>Caminho da Foto (necessário enviar a foto para colocar na nuvem):</label>
+                <input type="text" id="edit-foto_path">
+
+                <!-- CAMPO NOTAS -->
                 <label>NOTAS (Uso Pessoal):</label>
-                <textarea id="edit-observacoes" rows="4"></textarea>
-
-                <!-- BOTÕES DE AÇÃO NA EDIÇÃO (Controle Consciente) -->
-                <div style="margin-top: 30px; text-align: center;">
-                    <!-- PONTO ÚNICO DE SALVAMENTO NA MEMÓRIA -->
-                    <button type="button" id="btnConcluirEdicoes" class="principal-button">
-                        ✅ Concluir Edições
-                    </button>
-                    <!-- Excluir e Cancelar -->
-                    <button type="button" id="btnExcluirRegistro" class="secundario-button">
-                        Excluir Registro
-                    </button>
-                    <button type="button" id="btnCancelarEditar" class="secundario-button">
-                        Cancelar
-                    </button>
-                </div>
-
+                <textarea id="edit-observacoes" rows="4" style="width: 100%;"></textarea>
+                
+                <!-- Os campos de formulário acabam aqui -->
             </form>
-            <div id="vinculosSection" style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #ddd;">
+            
+
+            <div id="vinculosSection" style="margin-top: 10px; padding-top: 30px; border-top: 1px solid #ddd;">
                 <h3 id="labelNomePessoaEditada" class="vinculo-pessoa-nome">Editando Pessoa: [Nome]</h3>
                 <h3>Vínculos Atuais:</h3>
                 <div id="vinculosLista"></div>
@@ -172,13 +165,30 @@
                     <select id="selectPessoaVinculo">
                         <option value="">Selecione uma pessoa...</option>
                     </select>
-                    <!-- Botão pequeno e verde de INCLUIR VÍNCULO -->
+                    <!-- Botão de inclusão de vínculo, com a string CONFIRMAR -->
                     <button type="button" id="btnAdicionarVinculo" class="botao-inclusao-vinculo">
-                        [Incluir]
+                        CONFIRMAR
                     </button>
                 </div>
 
             </div>
+
+            <!-- REPOSICIONAMENTO DOS BOTÕES: AGORA ELES ESTÃO FORA DO FORMULÁRIO DE EDIÇÃO -->
+            <div style="margin-top: 30px; text-align: center; margin-bottom: 20px;">
+                <!-- PONTO ÚNICO DE SALVAMENTO NA MEMÓRIA -->
+                <button type="button" id="btnConcluirEdicoes" class="principal-button">
+                    ✅ Concluir Edições
+                </button>
+                <!-- Excluir e Cancelar -->
+                <button type="button" id="btnExcluirRegistro" class="secundario-button">
+                    Excluir Registro
+                </button>
+                <button type="button" id="btnCancelarEditar" class="secundario-button">
+                    Cancelar
+                </button>
+            </div>
+            <!-- FIM DO REPOSICIONAMENTO -->
+
         </section>
         
         <footer>
@@ -206,6 +216,8 @@
         </div>
     </div>
     
+    <!-- O MODAL DE FOTO FOI REMOVIDO DAQUI -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
