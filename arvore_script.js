@@ -229,48 +229,64 @@ document.addEventListener('DOMContentLoaded', () => {
     // LISTA DE DICAS E FUNCIONALIDADE DO MODAL (COM NAVEGAÇÃO)
     // ================================================================
     const dicas = [
-        "01. Clique em < e > para navegar (avançar e retroceder) as instruções numeradas desta janela.",
-        "02. Na lista de pessoas, os 3 números à direita do nome são: o numero de (c)ônjuges, (p)ais, e (f)ilhos vinculados. Isto auxilia a detectar pessoas e vínculos ainda não registrados.",
-        "03. Na visualização da família de alguém, ao notar erros, use o botão 'Editar' nesta tela.",
+        "01. Clique em ◀  e  ▶ para navegar (avançar e retroceder) as instruções numeradas desta janela.",
+        "02. Na lista de pessoas:  (c)ônjuges, (p)ais, e (f)ilhos vinculados. Isto auxilia a detectar pessoas e vínculos ainda não registrados.",
+        "03. Na visualização da família de alguém, ao notar erros, use o botão 'Editar' na mesma tela.",
         "04. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
-        "05 Ao vincular duas pessoas, o vínculo  é criado automaticamente nas duas pessoas.",
+        "05 Ao vincular duas pessoas, o vínculo  é criado automaticamente já nas duas pessoas.",
         "06. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
         "07. Não há restrição a filhos e pai/mãe 'não-biológicos' nem registros de seus parentes e vínculos.",
         "08. Registros podem ser colocados com dados mínimos (nome/apelido e vínculos) para complementação futura.",
         "09. Para criar um vínculo (paternidade, filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
         "10. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar.",
-        "11. Intercambie as atualizações com pessoas próximas, da família, através do arquivo salvo na pasta de Downloads.",
-        "12. Sem carregar nenhuma rede familiar a partir de um arquivo 'arvore.json', será iniciada uma nova."
+        "11. Intercambie dados com pessoas próximas, da família, através do Relatório salvo na pasta de Downloads.",
+        "12. O campo NOTAS é privado para você, e não é incluído no Relatório de Dados para intercâmbio.",
+        "13. Sem ter carregado nenhuma rede familiar a partir de um arquivo 'arvore.json', inicia uma nova, vazia."
     ];
 
+let dicaAtualIndex = 0;
+
     function mostrarDica(index) {
+        // Lógica de carrossel (loop infinito)
+        if (index < 0) index = dicas.length - 1;
+        if (index >= dicas.length) index = 0;
+        
         dicaAtualIndex = index;
-        if (dicaAtualIndex < 0) {
-            dicaAtualIndex = dicas.length - 1;
-        }
-        if (dicaAtualIndex >= dicas.length) {
-            dicaAtualIndex = 0;
-        }
-        dicaTexto.textContent = dicas[dicaAtualIndex];
-        dicaContador.textContent = `${dicaAtualIndex + 1} / ${dicas.length}`;
+        
+        const textoEl = document.getElementById('dicaTexto');
+        const contEl = document.getElementById('dicaContador');
+        
+        if(textoEl) textoEl.textContent = dicas[dicaAtualIndex];
+        if(contEl) contEl.textContent = `${dicaAtualIndex + 1} / ${dicas.length}`;
     }
-    // CORREÇÃO: Força a Dica a iniciar no índice 0 (Dica 01)
+
     const abrirDicaModal = () => {
-        mostrarDica(0); 
-        dicasModal.style.display = 'block';
+        mostrarDica(0);
+        // O SEGREDO ESTÁ AQUI: Força 'flex' para o CSS poder centralizar
+        if(dicasModal) dicasModal.style.display = 'flex'; 
     };
+
     const fecharDicaModal = () => {
-        dicasModal.style.display = 'none';
+        if(dicasModal) dicasModal.style.display = 'none';
     };
-    btnDicas.addEventListener('click', abrirDicaModal);
-    closeModalButton.addEventListener('click', fecharDicaModal);
-    btnDicaAnterior.addEventListener('click', () => mostrarDica(dicaAtualIndex - 1));
-    btnDicaProxima.addEventListener('click', () => mostrarDica(dicaAtualIndex + 1));
-    window.addEventListener('click', (event) => {
-        if (event.target == dicasModal) {
-            fecharDicaModal();
-        }
-    });
+
+    // Listeners (Garantia de funcionamento)
+    if(btnDicas) btnDicas.onclick = abrirDicaModal;
+    
+    // Fechar no X
+    const btnFecharX = document.querySelector('.close-button');
+    if(btnFecharX) btnFecharX.onclick = fecharDicaModal;
+
+    // Fechar clicando no fundo escuro
+    if(dicasModal) {
+        dicasModal.onclick = (e) => {
+            if (e.target === dicasModal) fecharDicaModal();
+        };
+    }
+
+    // Navegação
+    if(btnDicaAnterior) btnDicaAnterior.onclick = () => mostrarDica(dicaAtualIndex - 1);
+    if(btnDicaProxima) btnDicaProxima.onclick = () => mostrarDica(dicaAtualIndex + 1);
     // ================================================================
     // FUNÇÕES DE DADOS (localStorage e Utilitários)
     // ================================================================

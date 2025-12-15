@@ -5,14 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Árvore Genealógica</title>
     
-    <!-- SOLUÇÃO DEFINITIVA E SEGURA: BLOQUEIA A VISIBILIDADE DO MODAL ANTES DE TUDO -->
-    <!-- Esta regra é lida primeiro pelo navegador, impedindo o flicker do Modal de Dicas. -->
-    <style>
-        .modal {
-            display: none !important; /* Força o ocultamento imediato da classe modal */
-        }
-    </style>
-    
     <link rel="stylesheet" href="arvore_style.css">
     <!-- Removido o link do Tailwind CSS para manter seus estilos originais -->
     <script src="arvore_script.js" defer></script>
@@ -22,7 +14,8 @@
     <div class="container">
         <header>
             <h1>🌳 Árvore Genealógica</h1>
-            <p>Para configurar e lembrar a história da família</p>
+            <p>Para configurar e lembrar a história da família</br>
+            (os dados ficam somente no seu dispositivo)</p>
         </header>
 
         <nav>
@@ -97,7 +90,7 @@
             
             <div id="botoesAcaoGlobais">
                 <button id="btnVisualizarSelecionado">👨‍👩‍👦‍👦 Visualizar Família de: (assinalar)</button>
-                <button id="btnExportarSelecionadosMD">📝 Exportar Selecionados (MD)</button>
+                <button id="btnExportarSelecionadosMD">📝 Gerar Relatório de dados (MD)</button>
             </div>
             <div id="registrosLista"></div>
         </section>

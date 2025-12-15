@@ -1,6 +1,6 @@
 /* ================================================================
-   ESTILOS GERAIS E LAYOUT
-   ================================================================ */
+    ESTILOS GERAIS E LAYOUT
+    ================================================================ */
 :root {
     --cor-primaria: #005f73;
     --cor-secundaria: #0a9396;
@@ -61,8 +61,8 @@ footer {
     flex-wrap: wrap; /* Permite que os botões quebrem linha */
 }
 /* ================================================================
-   SEÇÃO DE ABERTURA (HUB) - NOVO
-   ================================================================ */
+    SEÇÃO DE ABERTURA (HUB) - NOVO
+    ================================================================ */
 #secAbertura {
     text-align: center;
     padding: 50px 20px;
@@ -88,8 +88,8 @@ footer {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 /* ================================================================
-   BOTÕES E NAVEGAÇÃO
-   ================================================================ */
+    BOTÕES E NAVEGAÇÃO
+    ================================================================ */
 nav {
     display: flex;
     justify-content: flex-end; /* Alinha o botão Início à direita: 'end' */
@@ -144,8 +144,8 @@ nav button.active {
 #btnDicas { background-color: transparent; color: var(--cor-destaque); font-size: 24px; padding: 5px 10px; border: none; flex-grow: 0; }
 #btnDicas:hover { background-color: #fefae0; transform: scale(1.1); }
 /* ================================================================
-   FORMULÁRIOS
-   ================================================================ */
+    FORMULÁRIOS
+    ================================================================ */
 form label {
     display: block;
     margin-top: 15px;
@@ -168,11 +168,11 @@ form button[type="submit"], form button[type="button"] {
     width: 100%; /* Botões de formulário com largura total */
 }
 /* ================================================================
-   SEÇÃO "GERENCIAR" E LISTA DE REGISTROS
-   ================================================================ */
+    SEÇÃO "GERENCIAR" E LISTA DE REGISTROS
+    ================================================================ */
 #botoesAcaoGlobais {
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;	
     gap: 10px;
     margin: 20px 0;
     flex-wrap: wrap; /* Permite que os botões quebrem linha */
@@ -193,23 +193,23 @@ form button[type="submit"], form button[type="button"] {
 .registro-item {
     display: flex;
     align-items: center; /* Garante o alinhamento vertical centralizado */
-    padding: 8px 5px;     /* Aumenta o espaço interno vertical */
+    padding: 8px 5px;	 	/* Aumenta o espaço interno vertical */
     border-bottom: 1px solid #eee;
-    gap: 5px;             /* AUMENTADO: Aumenta o afastamento horizontal */
+    gap: 5px;	 	 	 	/* AUMENTADO: Aumenta o afastamento horizontal */
 }
 
 .registro-item:hover { background-color: #f9f9f9; }
 /* Estilo para a checkbox, diferenciando do radio anterior */
-.registro-item input[type="checkbox"] { margin-right: 5px; transform: scale(1.2); accent-color: var(--cor-primaria); } 
+.registro-item input[type="checkbox"] { margin-right: 5px; transform: scale(1.2); accent-color: var(--cor-primaria); }	
 .registro-info { flex: 1; cursor: pointer; }
 .registro-nome { font-weight: bold; }
 .registro-detalhes { color: #777; font-size: 0.85em; }
 
 /* ================================================================
-   SEÇÃO DE EDIÇÃO E VÍNCULOS
-   ================================================================ */
+    SEÇÃO DE EDIÇÃO E VÍNCULOS
+    ================================================================ */
 #secEditarPessoa {
-    padding-bottom: 30px; 
+    padding-bottom: 30px;	
 }
 #vinculosSection { margin-top: 30px; padding-top: 30px; border-top: 1px solid #ddd; }
 .vinculo-container { background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 15px; }
@@ -219,8 +219,8 @@ form button[type="submit"], form button[type="button"] {
 #vinculosLista button:hover { background-color: #cc0000; }
 
 /* ================================================================
-   SEÇÃO VISUALIZAR ÁRVORE
-   ================================================================ */
+    SEÇÃO VISUALIZAR ÁRVORE
+    ================================================================ */
 #arvoreContainer { margin-top: 20px; padding: 15px; background-color: #fafafa; border-radius: 8px; border: 1px solid #eee; }
 
 /* --- NOVO ESTILO: CARTÃO DE IDENTIDADE (Pessoa Central) --- */
@@ -264,8 +264,8 @@ form button[type="submit"], form button[type="button"] {
 
 
 /* ================================================================
-   ESTILOS DE MINIATURA DE FOTO E SILHUETA (Corrigido)
-   ================================================================ */
+    ESTILOS DE MINIATURA DE FOTO E SILHUETA (Corrigido)
+    ================================================================ */
 /* Estilo base para a imagem e o fallback (div) */
 .miniatura-foto {
     /* Garante o formato circular e o tamanho fixo */
@@ -273,7 +273,7 @@ form button[type="submit"], form button[type="button"] {
     height: 100px;
     border-radius: 50%;
     border: 3px solid var(--cor-destaque);
-    flex-shrink: 0; 
+    flex-shrink: 0;	
     
     /* Configurações visuais para a imagem (para o img tag) */
     object-fit: cover;
@@ -283,8 +283,7 @@ form button[type="submit"], form button[type="button"] {
 /* NOVO: Estilo para o Fallback (quando a foto não existe) */
 .miniatura-foto.sem-foto {
     /* Injenta a silhueta no background */
-    /* CORREÇÃO DA BASE64: Utiliza uma codificação validada e corrigida */
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2EwYTBhMCI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCA1LjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPjwvc3ZnPg==');
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2EwYTBhMCI+PHBhdGggZD0gTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00cy0xLjc5LTQtNC00LTQgMS43OS00IDQgMS43OSA0IDQgNHptMCAyYy0yLjY3IDAtOCA1LjM0LTggNHYyaDE2di0yYzAtMi42Ni01LjMzLTQtOC00eiIvPjwvc3ZnPg==');
     background-size: 70%; /* Tamanho do ícone SVG dentro do círculo */
     background-repeat: no-repeat;
     background-position: center center;
@@ -295,14 +294,14 @@ form button[type="submit"], form button[type="button"] {
 
 /* Regras para os detalhes da pessoa central (Datas, Cidade) */
 .arvore-secao .detalhes {
-    font-size: 0.85em; 
+    font-size: 0.85em;	
     color: #555;
     margin-top: 5px;
     font-weight: normal;
 }
 /* Regras para as NOTAS (que usa a classe detalhes-notas) */
 .arvore-secao .detalhes-notas {
-    font-size: 0.85em; 
+    font-size: 0.85em;	
     color: #555;
     margin-top: 5px;
     padding-top: 5px;
@@ -310,32 +309,44 @@ form button[type="submit"], form button[type="button"] {
     font-weight: normal;
 }
 /* ================================================================
-   MODAL DE DICAS E LAYOUT DO MODAL
+   MODAL DE DICAS - CORREÇÃO DE ESTRUTURA E CURSOR
    ================================================================ */
-.modal { 
-    display: none; /* Mantido para o caso de o <style> no <head> ser ignorado */
-    position: fixed; 
-    z-index: 1000; 
-    left: 0; 
-    top: 0; 
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgba(0,0,0,0.6); 
+.modal {
+    /* Garante que o modal fique NA FRENTE de tudo e ocupe TODA a tela */
+    position: fixed;
+    z-index: 99999; /* Valor altíssimo para garantir prioridade */
+    left: 0;
+    top: 0;
+    width: 100vw; /* Largura total da viewport */
+    height: 100vh; /* Altura total da viewport */
+    background-color: rgba(0,0,0,0.6); /* Fundo escuro */
+    
+    /* Centralização (Funciona junto com o display: flex do JS) */
+    display: none; /* Começa invisível */
+    justify-content: center;
+    align-items: center;
+
+    /* CORREÇÃO DO CURSOR PISCANTE */
+    cursor: default; 
+    user-select: none; /* Impede seleção de texto acidental no fundo */
 }
 
-.modal-content { 
-    background-color: #fefefe; 
-    margin: 25% auto; /* Centralização tradicional */
-    padding: 25px; 
-    border: 1px solid #888; 
-    width: 90%; 
-    max-width: 500px; /* GARANTIA DE LARGURA MÁXIMA */
-    border-radius: 10px; 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
-    position: relative; 
-    animation: fadeIn 0.5s; 
-    padding-right: 25px; 
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    
+    /* Tamanho e comportamento */
+    width: 90%;
+    max-width: 500px;
+    margin: 0; /* Remove margens antigas que atrapalham o flex */
+    position: relative;
+    
+    /* Garante que o cursor funcione normal dentro da caixa */
+    cursor: default;
+    user-select: text; 
 }
 
 .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; position: absolute; top: 10px; right: 20px; }
@@ -381,7 +392,7 @@ form button[type="submit"], form button[type="button"] {
 }
 .dica-content-wrapper {
     text-align: center;
-    min-height: 50px; 
+    min-height: 50px;	
 }
 /* Estilo para a linha de criação de vínculo (ajustado para melhor responsividade) */
 .vinculo-creator {
@@ -434,8 +445,8 @@ form button[type="submit"], form button[type="button"] {
     border-bottom: 1px dotted #eee;
 }
 /* ================================================================
-   REGRAS DE RESPONSIVIDADE (MEDIA QUERIES)
-   ================================================================ */
+    REGRAS DE RESPONSIVIDADE (MEDIA QUERIES)
+    ================================================================ */
 @media only screen and (min-width: 600px) {
     body {
         padding: 20px;
@@ -452,9 +463,7 @@ form button[type="submit"], form button[type="button"] {
     .registro-info h4 {
         font-size: 1.1em;
     }
-    .modal-content {
-        margin: 15% auto; /* Ajusta a centralização para telas maiores */
-    }
+    /* Removido o ajuste de margin do modal aqui, pois o Flexbox resolveu */
     .hub-button {
         padding: 30px;
         font-size: 1.5em;
@@ -465,7 +474,7 @@ form button[type="submit"], form button[type="button"] {
         justify-content: center; /* Mantém tecla Início ao centro */
     }
     button, input[type="submit"] {
-        flex-grow: 0; 
+        flex-grow: 0;	
     }
 }
 html, body {
@@ -474,7 +483,7 @@ html, body {
 }
 .container {
     width: 100%;
-    box-sizing: border-box; 
+    box-sizing: border-box;	
     padding-left: 10px;
     padding-right: 10px;
 }
@@ -484,17 +493,17 @@ html, body {
     font-size: 12px;
     color: #000;
     font-weight: normal;
-    position: relative; 
-    top: 0.5rem; 
+    position: relative;	
+    top: 0.5rem;	
 }
 /* Estilo para a imagem na tela de abertura */
 .imagem-abertura {
     max-width: 50%;
     height: auto;
-    display: block; 
-    margin: 20px auto; 
+    display: block;	
+    margin: 20px auto;	
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);	
 }
 #secAbertura {
     text-align: center;
@@ -502,8 +511,8 @@ html, body {
 }
 /* Regra para a imagem (opcional, mas bom para garantir centralização) */
 .imagem-abertura {
-    display: block; 
-    margin: 0 auto 20px auto; 
+    display: block;	
+    margin: 0 auto 20px auto;	
     max-width: 100%;
     height: auto;
 }
@@ -511,19 +520,19 @@ html, body {
 /* 1. Alinha os botões horizontalmente e os centraliza */
 #secAbertura #hub-botoes {
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;	
     justify-content: center;
     max-width: 800px;
-    margin: 20px auto; 
+    margin: 20px auto;	
 }
 /* 2. Aplica largura e altura fixas em todos os botões do hub */
 #secAbertura #hub-botoes button {
-    width: 250px; 
+    width: 250px;	
     height: 60px;
-    margin: 8px; 
-    display: flex; 
+    margin: 8px;	
+    display: flex;	
     align-items: center;
-    justify-content: flex-start; 
+    justify-content: flex-start;	
     padding: 0 15px;
     font-size: 1.0em;
 }
