@@ -944,7 +944,7 @@ let dicaAtualIndex = 0;
             
             // IMPORTANTE: O campo 'observacoes' (Notas Pessoais) NÃO É INCLUÍDO
             
-            markdownContent += `\n---\n\n`;
+            markdownContent += `\n----------------------------------------\n\n`;
         });
         
         const dataStr = markdownContent;
