@@ -198,19 +198,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================================================================
     const dicas = [
         "01. Clique em ◀  e  ▶ para navegar (avançar e retroceder) as instruções numeradas desta janela.",
-        "02. Na lista de pessoas:  (c)ônjuges, (p)ais, e (f)ilhos vinculados. Isto auxilia a detectar pessoas e vínculos ainda não registrados.",
-        "03. Na visualização da família de alguém, ao notar erros, use o botão 'Editar' na mesma tela.",
+        "02. Na lista de pessoas há os dados:  (c) de cônjuges, (p) de pais, e (f) de filhos já vinculados.",
+        "03. Na visualização da família de alguém, se notar erros, use o botão 'Editar' na mesma tela.",
         "04. O ícone 🎂 ao lado de um nome indica que o aniversário da pessoa está próximo! (2 dias ou menos)",
-        "05 Ao vincular duas pessoas, o vínculo  é criado automaticamente já nas duas pessoas.",
+        "05 Ao vincular duas pessoas, o vínculo  é criado simultaneamente já nas duas pessoas.",
         "06. O sistema aceita multiplicidade de cônjuges, podendo incluir 'EX-' e falecidos.",
-        "07. Não há restrição a filhos e pai/mãe 'não-biológicos' nem registros de seus parentes e vínculos.",
+        "07. Não há restrição a filhos e pai/mãe 'não-biológicos' nem os registros de seus parentes e vínculos.",
         "08. Registros podem ser colocados com dados mínimos (nome/apelido e vínculos) para complementação futura.",
-        "09. Para criar um vínculo (paternidade, filiação ou de casal), edite uma das pessoas e use a seção 'Vínculos Atuais'.",
+        "09. Para criar um vínculo (paternidade, filiação ou de casal), edite 1 das pessoas na seção 'Novo Vínculo'. No final, CONFIRME!",
         "10. No celular, o aparecimento do teclado pode encobrir parcialmente o conteúdo da página. Arraste a tela para cima para visualizar.",
-        "11. Intercambie dados com pessoas próximas, da família, através do Relatório salvo na pasta de Downloads.",
-        "12. O campo NOTAS é privado para você, e não é incluído no Relatório de Dados para intercâmbio.",
-        "13. O nome da pessoa deve coincidir com o nome do arquivo da foto (.jpg), ou vazio, para que esta apareça.",
-        "14. Sem ter carregado nenhuma rede familiar a partir de um arquivo 'arvore.json', inicia uma nova, vazia."
+        "11.  Após fazer modificações nos dados, é aconselhavel SALVAR DADOS, pois a memória do celular às vezes apaga sem querermos.",
+        "12. Intercambie dados com pessoas da família através do Relatório salvo na pasta de Downloads.",
+        "13. O campo NOTAS é privado para você, e não é incluído no Relatório de Dados para intercâmbio.",
+        "14. O arquivo da foto tem o nome (presumido) da pessoa. Registre-a com o nome correto (presumido) para poder vê-la.",
+        "15. Se estrear o aplicativo sem ter carregado um arquivo 'arvore.json', você estará iniciando uma nova base, vazia.",
+        "16. Se carregar um arquivo 'arvore.json', vai substituir todos os dados da memória pelos do arquivo."
     ];
 
     function mostrarDica(index) {
