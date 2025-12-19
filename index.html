@@ -101,15 +101,22 @@
             </div>
         </section>
 
-        <section id="secVisualizarArvore">
-            <h2 style="text-align: center;">Árvore Genealógica - Visualização</h2>
-            <div class="form-group">
-                <label for="inputPessoaCentral">Buscar e selecionar a pessoa central da árvore:</label>
+<section id="secVisualizarArvore">
+    <h2 style="text-align: center;">Árvore Genealógica - Visualização</h2>
+    
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button onclick="abrirAlbum()" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 8px;">
+            📸 Ver Fotos de Grupos
+        </button>
+    </div>
+
+    <div class="form-group">
+        <label for="inputPessoaCentral">Buscar e selecionar a pessoa central da árvore:</label>
                 <input type="text" id="inputPessoaCentral" list="listaPessoas" class="form-control" placeholder="Digite um nome para buscar...">
                 <datalist id="listaPessoas">
                     </datalist>
             </div>
-            <!-- REMOVIDO o div #notasVisualizacao que agora está integrado no JS -->
+
             
             <button id="btnEditarNaArvore" style="display: none; margin-top: 10px; background-color: #ee9b00;">✏️ Editar Pessoa Central</button>
             <div id="arvoreContainer"></div>
@@ -213,6 +220,13 @@
             </div>
         </div>
     </div>
-   
+
+<script>
+function abrirAlbum() {
+    // Redireciona para o arquivo do álbum na mesma pasta
+    window.location.href = 'album_grupos.html';
+}
+</script>
+
 </body>
 </html>
