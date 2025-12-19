@@ -27,7 +27,7 @@
 <body>
 <div id="app">
     <div class="ctrl">
-        <input type="text" id="busca" placeholder="🔍 Tente: ELIANA ou SILVIO 52" oninput="filtrar()">
+        <input type="text" id="busca" placeholder="Coloque o nome aqui" oninput="filtrar()">
         <div style="font-size: 13px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <strong>Filtro:</strong> <span id="cont">(0)</span>
             <label><input type="radio" name="m" value="OR" checked onchange="filtrar()"> Aberto</label>
@@ -43,7 +43,14 @@ const fotos = [
     "HILDA_BISAVÓ_EDITH_DIONE_ELIANA.jpg",
     "MARIA_DIONE_EDITH_DAUDT.jpg",
     "SANDRA_CHRYSTIAN_CHRISTIAN.jpg",
-    "SILVIO_52_ANOS_SANDRA_CRISTINA_SILVANA.jpg"
+    "SILVIO_52_ANOS_SANDRA_CRISTINA_SILVANA.jpg",
+    "CALINHOS_DIONE_LEANDRO.jpg",
+    "CARM_DIONE_CARLINHOS.jpg",
+    "DELVIRA_HILDA_SYLVIO_SIRLEI_EDITH_IVONE_RONNEY.jpg",
+    "DIONE_RAFAEL.jpg",
+    "ELIANA_DIONE_CARLINHOS_RAFAEL.jpg",
+    "PRAIA_INGLESES_AURICH_VERNEY_CECILIA.jpg",
+    "RAFAEL_DIONE.jpg"
 ];
 
 function buscarPorNick(n) { document.getElementById('busca').value = n; filtrar(); }
@@ -64,11 +71,18 @@ function filtrar() {
     });
 
     cont.innerText = `(${res.length} foto${res.length !== 1 ? 's' : ''} encontrada${res.length !== 1 ? 's' : ''})`;
-    gal.innerHTML = res.map(f => {
-        const nicks = f.replace(".jpg","").split("_");
-        const tags = nicks.map(n => `<span class="tag" onclick="buscarPorNick('${n}')">${n}</span>`).join("");
-        return `<div class="card"><img src="fotos_grupos/${f}" onerror="this.src='https://via.placeholder.com/150?text=Erro'"><div style="padding:5px">${tags}</div></div>`;
-    }).join("");
+gal.innerHTML = res.map(f => {
+    const nicks = f.replace(".jpg","").split("_");
+    const tags = nicks.map(n => `<span class="tag" onclick="buscarPorNick('${n}')">${n}</span>`).join("");
+    
+    return `
+        <div class="card">
+            <img src="fotos_grupos/${f}" onerror="this.src='https://via.placeholder.com/150?text=Erro'">
+            <div style="padding:8px; text-align: left; font-size: 11px;">
+                <strong style="color: #555;">Nomes aqui:</strong> ${tags}
+            </div>
+        </div>`;
+}).join("");
 }
 </script>
 </body>
