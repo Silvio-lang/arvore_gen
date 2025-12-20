@@ -9,6 +9,44 @@
     <!-- Removido o link do Tailwind CSS para manter seus estilos originais -->
     <script src="arvore_script.js" defer></script>
 </head>
+<div id="welcomeOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-family:serif;">
+    <h2 style="color: #2d5a27;">🌳 Bem-vindo à nossa História</h2>
+    <p id="welcomeText" style="font-size: 1.2em; color: #555;">Carregando os vínculos e memórias da Família...</p>
+    <div style="margin-top:20px; color:#888;">Aguarde um instante...</div>
+</div>
+
+<script src="dados_iniciais.js"></script>
+
+<script>
+function verificarCargaInicial() {
+    const CHAVE = 'arvoreGenealogica';
+    const rawData = localStorage.getItem(CHAVE);
+    const overlay = document.getElementById('welcomeOverlay');
+
+    // CONDIÇÃO BLINDADA: Só entra se for null, undefined ou um array vazio "[]"
+    const estaVazio = !rawData || rawData === "[]" || rawData === "undefined";
+
+    if (estaVazio && typeof SEED_DA_FAMILIA !== 'undefined' && SEED_DA_FAMILIA.length > 0) {
+        
+        // Trava de segurança: verificamos se já tentamos carregar nesta sessão
+        if (sessionStorage.getItem('jaTentouCarregar')) return;
+        sessionStorage.setItem('jaTentouCarregar', 'true');
+
+        overlay.style.display = 'flex';
+        localStorage.setItem(CHAVE, JSON.stringify(SEED_DA_FAMILIA));
+
+        // Seus 2000 mSeg (2 segundos) de cortesia
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            location.reload();
+        }, 2000);
+    }
+}
+
+// Inicia a verificação assim que a página carregar
+window.addEventListener('load', verificarCargaInicial);
+</script>
+
 <body>
     <div id="loadingMessage" style="display:none; position:fixed; top:0; left:0; width:100%; background:#fff3cd; color:#664d03; font-weight:bold; text-align:center; padding:1em; z-index:1000; border-bottom: 1px solid #ffc107;">Carregando...</div>
     <div class="container">
