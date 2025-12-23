@@ -1,0 +1,2078 @@
+[
+  {
+    "id": "954.330.187",
+    "nome": "ALBINO FRITSCH",
+    "sexo": "M",
+    "nascimento": "1896",
+    "falecimento": "1963",
+    "profissao": "bancário",
+    "cidade_pais_principal": "RIO PARDO/BR",
+    "pais": [],
+    "filhos": [
+      "605.402.832",
+      "tvc3wcjii",
+      "rzt072ao2"
+    ],
+    "conjuge": [
+      "316.275.782"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-11-02T17:38:23.937954+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "observacoes": "Foi bancário. Gostava de música orquestrada, oque ouvia em casa. Era brincalhão a nosso ver como crianças.",
+    "foto_path": "fotos/albino_fritsch.jpg"
+  },
+  {
+    "id": "2i0yclpmy",
+    "nome": "ALICE PANERAI",
+    "sexo": "F",
+    "nascimento": "01/01/1980",
+    "falecimento": "",
+    "profissao": "do lar",
+    "cidade_pais_principal": "LEICESTER/UK",
+    "pais": [
+      "620.399.264",
+      "902.190.461"
+    ],
+    "filhos": [
+      "5jzk36rov",
+      "fbhhku0dg"
+    ],
+    "conjuge": [
+      "sba9l0wxz"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "4w1p9pq8g",
+    "nome": "ALMIRA ISSA FARINON",
+    "sexo": "F",
+    "nascimento": "17/08/1924",
+    "falecimento": "12/11/2007",
+    "profissao": "comerciante e depois do lar",
+    "cidade_pais_principal": "FARROUPILHA/RS/BR",
+    "pais": [],
+    "filhos": [
+      "211.651.463",
+      "3obo044i6",
+      "y3b5r4tdm"
+    ],
+    "conjuge": [
+      "uyxoy9pgh"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "253.577.532",
+    "nome": "ANA DELVIRA KONRACH",
+    "sexo": "F",
+    "nascimento": "1900-01-01",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "PORTO ALEGRE/BR",
+    "pais": [],
+    "filhos": [
+      "934.542.725",
+      "svdhwxsue",
+      "3iaxlyb4c"
+    ],
+    "conjuge": [
+      "160.298.411"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/ana_delvira_konrach.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "211.651.463",
+    "nome": "ANETE FARINON AURICH",
+    "sexo": "F",
+    "nascimento": "1953-01-30",
+    "falecimento": "",
+    "profissao": "corretora de imóveis, do lar",
+    "cidade_pais_principal": "FLORIANÓPOLIS/BRASIL",
+    "pais": [
+      "uyxoy9pgh",
+      "4w1p9pq8g"
+    ],
+    "filhos": [
+      "215.443.757",
+      "244.212.495",
+      "573.874.830"
+    ],
+    "conjuge": [
+      "870.829.348"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "uyxoy9pgh",
+    "nome": "ANGELO JAYME FARINON",
+    "sexo": "M",
+    "nascimento": "13/11/1923",
+    "falecimento": "11/2/1984",
+    "profissao": "feirante CEASA",
+    "cidade_pais_principal": "FARROUPILHA/RS/BR",
+    "pais": [],
+    "filhos": [
+      "211.651.463",
+      "3obo044i6",
+      "y3b5r4tdm"
+    ],
+    "conjuge": [
+      "4w1p9pq8g"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "7hurtb1gx",
+    "nome": "BENICIO STEIL",
+    "sexo": "M",
+    "nascimento": "05/11/2012",
+    "falecimento": "2020",
+    "profissao": "",
+    "cidade_pais_principal": "ITAPEMA/SC/BR",
+    "pais": [
+      "jlxq092hb",
+      "6thvd37d7"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "g31fesx7q",
+    "nome": "CAEL BARRAMACHER",
+    "sexo": "M",
+    "nascimento": "05/02/2011",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "ITAPEMA/SC/BR",
+    "pais": [
+      "ypyq4tiy9"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "889.533.695",
+    "nome": "CARLOS GERMANO BIERMAN MENEZES",
+    "sexo": "M",
+    "nascimento": "1950-01-01",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [],
+    "filhos": [
+      "mj1ms7jjm",
+      "ba1yixd74"
+    ],
+    "conjuge": [
+      "882.481.344"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 2,
+    "foto_path": "fotos/carlos_germano_bierman_menezes.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "ztqqd2r74",
+    "nome": "CARLOS MENEZES MARQUES",
+    "sexo": "M",
+    "nascimento": "17/05/2000",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "mj1ms7jjm"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/carlos_menezes_marques.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "tvc3wcjii",
+    "nome": "CECILIA FRITSCH VERNEY",
+    "sexo": "F",
+    "nascimento": "",
+    "falecimento": "2023",
+    "profissao": "Do lar",
+    "cidade_pais_principal": "PORTO ALEGRE",
+    "pais": [
+      "954.330.187",
+      "316.275.782"
+    ],
+    "filhos": [
+      "hbhtg6sfh",
+      "5cxnq9jak",
+      "a67ahcj5w",
+      "7g39g75bx"
+    ],
+    "conjuge": [
+      "ktaruc13p"
+    ],
+    "created_at": null,
+    "updated_at": "2025-11-02T15:53:03.101929+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/cecilia_fritsch_verney.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "7a3qcxzy3",
+    "nome": "CHRISTIAN AURICH ZANETINI MARTINS",
+    "sexo": "M",
+    "nascimento": "29/04/1999",
+    "falecimento": "",
+    "profissao": "computação",
+    "cidade_pais_principal": "FLORIANÓPOLIS/SC/BR",
+    "pais": [
+      "215.443.757"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "xetp3sii1",
+    "nome": "CLÁUDIA AURICH KAMMER",
+    "sexo": "F",
+    "nascimento": "10/05/1970",
+    "falecimento": "",
+    "profissao": "do lar",
+    "cidade_pais_principal": "USA",
+    "pais": [
+      "655.943.418",
+      "843.756.212"
+    ],
+    "filhos": [
+      "c9g3bylgl",
+      "haacl815m"
+    ],
+    "conjuge": [
+      "mvpbw0rii"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "y1ux885xd",
+    "nome": "CLÁUDIA DA COSTA FARINON",
+    "sexo": "F",
+    "nascimento": "14/05/1957",
+    "falecimento": "",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR  FARROUPILHA/RS/BR",
+    "pais": [],
+    "filhos": [],
+    "conjuge": [
+      "y3b5r4tdm"
+    ],
+    "versão": 0,
+    "user_id": "LOCAL_USER"
+  },
+  {
+    "id": "573.874.830",
+    "nome": "CRISTINA AURICH",
+    "sexo": "F",
+    "nascimento": "1987-09-10",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "Florianópolis/Brasil",
+    "pais": [
+      "870.829.348",
+      "211.651.463"
+    ],
+    "filhos": [
+      "312.619.806"
+    ],
+    "conjuge": [
+      "kmn0mdo6w"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "cp8z1nrzs",
+    "nome": "DAN",
+    "sexo": "M",
+    "nascimento": "21/12/1976",
+    "falecimento": "",
+    "profissao": "empresario",
+    "cidade_pais_principal": "LEICESTER/UK",
+    "pais": [],
+    "filhos": [
+      "21i0ji8oh",
+      "82jqvnx41"
+    ],
+    "conjuge": [
+      "zeww9wkzd"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "w7f5y9loo",
+    "nome": "DANIELA AURICH",
+    "sexo": "F",
+    "nascimento": "30/07/2015",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "FLORIANÓPOLIS/SC/BR",
+    "pais": [
+      "4int94w1j",
+      "nq6vdb3xe"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "zndvq27wm",
+    "nome": "DANILO GARTNER AURICH",
+    "sexo": "M",
+    "nascimento": "07/04/1999",
+    "falecimento": "",
+    "profissao": "engenheiro",
+    "cidade_pais_principal": "GER",
+    "pais": [
+      "4int94w1j",
+      "belwxyuq2"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "655.943.418",
+    "nome": "DANILO SILVIO AURICH",
+    "sexo": "M",
+    "nascimento": "03/04/1941",
+    "falecimento": "",
+    "profissao": "engenheiro, escritor romancista",
+    "cidade_pais_principal": "FLORIANÓPOLIS/SC/BR",
+    "pais": [
+      "934.542.725",
+      "605.402.832"
+    ],
+    "filhos": [
+      "4int94w1j",
+      "xetp3sii1",
+      "jtjn8u86h"
+    ],
+    "conjuge": [
+      "843.756.212"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/danilo_silvio_aurich.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "882.481.344",
+    "nome": "DIONE EDITE AURICH",
+    "sexo": "F",
+    "nascimento": "1943-09-29",
+    "falecimento": "",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/BR",
+    "pais": [
+      "934.542.725",
+      "605.402.832"
+    ],
+    "filhos": [
+      "mj1ms7jjm",
+      "ba1yixd74"
+    ],
+    "conjuge": [
+      "889.533.695"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/dione_edite_aurich.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "605.402.832",
+    "nome": "EDITH FRITSCH AURICH",
+    "sexo": "F",
+    "nascimento": "1923-09-09",
+    "falecimento": "1987",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "954.330.187",
+      "316.275.782"
+    ],
+    "filhos": [
+      "870.829.348",
+      "655.943.418",
+      "882.481.344",
+      "620.399.264",
+      "558.177.498",
+      "539.729.801",
+      "954.330.187"
+    ],
+    "conjuge": [
+      "934.542.725"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-11-04T01:46:28.208744+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "observacoes": "Mãe. Faleceu com 64 anos, um ano após falecimento do pai, Sylvio Aurich",
+    "foto_path": "fotos/edith_fritsch_aurich.jpg"
+  },
+  {
+    "id": "mj1ms7jjm",
+    "nome": "ELIANA MENEZES",
+    "sexo": "F",
+    "nascimento": "08/07/1969",
+    "falecimento": "",
+    "profissao": "veterinária",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "889.533.695",
+      "882.481.344"
+    ],
+    "filhos": [
+      "ztqqd2r74"
+    ],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "lvnfhtcmt",
+    "nome": "ELISA PANERAI",
+    "sexo": "F",
+    "nascimento": "09/10/1974",
+    "falecimento": "",
+    "profissao": "atriz",
+    "cidade_pais_principal": "LEICESTER/UK",
+    "pais": [
+      "620.399.264",
+      "902.190.461"
+    ],
+    "filhos": [
+      "p3oksgur6"
+    ],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/elisa_panerai.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "qd7v541wf",
+    "nome": "ENEIDA FRITSCH",
+    "sexo": "F",
+    "nascimento": "01/01/1945",
+    "falecimento": "",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "rzt072ao2"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "versão": 0,
+    "foto_path": "fotos/eneida_fritsch.jpg",
+    "observacoes": "",
+    "user_id": "LOCAL_USER"
+  },
+  {
+    "id": "3iaxlyb4c",
+    "nome": "EULÁLIA AURICH PINTO",
+    "sexo": "F",
+    "nascimento": "23/10/1919",
+    "falecimento": "15/06/2010",
+    "profissao": "Industriária/costureira",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "253.577.532",
+      "160.298.411"
+    ],
+    "filhos": [
+      "e6eeo3ymi",
+      "x2sayxpit"
+    ],
+    "conjuge": [
+      "k2mh667m6"
+    ],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "svdhwxsue",
+    "nome": "FLÁVIO TERMANN",
+    "sexo": "M",
+    "nascimento": "01/01/1923",
+    "falecimento": "1999",
+    "profissao": "Industriário",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "253.577.532"
+    ],
+    "filhos": [
+      "dewizd2bw",
+      "vk3c5c4iz"
+    ],
+    "conjuge": [
+      "ilezvzc91"
+    ],
+    "user_id": "Silvio Aurich Filho",
+    "versão": 0
+  },
+  {
+    "id": "nq6vdb3xe",
+    "nome": "FRANCIELLE ARNDT",
+    "sexo": "F",
+    "nascimento": "",
+    "falecimento": "",
+    "profissao": "engenheira mecânica",
+    "cidade_pais_principal": "FLORIANOPOLIS/SC/BR",
+    "pais": [],
+    "filhos": [
+      "w7f5y9loo"
+    ],
+    "conjuge": [
+      "4int94w1j"
+    ],
+    "created_at": "2025-10-30T12:33:33.594872+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "413.216.597",
+    "nome": "FREDERICO REBELATO",
+    "sexo": "M",
+    "nascimento": "1922-06-08",
+    "falecimento": "26/08/1983",
+    "profissao": "Industriário (Souza Cruz)",
+    "cidade_pais_principal": "CRUZ ALTA/RS/BR",
+    "pais": [],
+    "filhos": [
+      "241.818.576",
+      "925.482.866"
+    ],
+    "conjuge": [
+      "339.170.728"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "c9g3bylgl",
+    "nome": "GABRIEL KAMMER",
+    "sexo": "M",
+    "nascimento": "20/06/2000",
+    "falecimento": "",
+    "profissao": "estudante",
+    "cidade_pais_principal": "USA",
+    "pais": [
+      "xetp3sii1",
+      "mvpbw0rii"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T20:13:23.979783+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "781uv9oys",
+    "nome": "GABRIEL ZIANI",
+    "sexo": "M",
+    "nascimento": "06/03/2011",
+    "falecimento": "",
+    "profissao": "estudante",
+    "cidade_pais_principal": "SÃO MIGUEL DO OESTE/SC/BR",
+    "pais": [
+      "244.212.495",
+      "gj6hfbjp7"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "jlxq092hb",
+    "nome": "GABRIELA BARRAMACHER STEIL",
+    "sexo": "F",
+    "nascimento": "29/05/1983",
+    "falecimento": "",
+    "profissao": "radialista",
+    "cidade_pais_principal": "ITAPEMA/SC/BR",
+    "pais": [
+      "434.188.796",
+      "539.729.801"
+    ],
+    "filhos": [
+      "tkwapghhc",
+      "7hurtb1gx"
+    ],
+    "conjuge": [
+      "6thvd37d7"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "21i0ji8oh",
+    "nome": "GEORGE",
+    "sexo": "M",
+    "nascimento": "10/09/2007",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "UK",
+    "pais": [
+      "zeww9wkzd",
+      "cp8z1nrzs"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "160.298.411",
+    "nome": "GERMANO AURICH",
+    "sexo": "M",
+    "nascimento": "1900-01-01",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "PORTO ALEGRE/BR",
+    "pais": [],
+    "filhos": [
+      "934.542.725",
+      "s6e880u8e",
+      "3iaxlyb4c"
+    ],
+    "conjuge": [
+      "253.577.532"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "ilezvzc91",
+    "nome": "GESSY TERMANN",
+    "sexo": "F",
+    "nascimento": "01/01/1036",
+    "falecimento": "1995",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [],
+    "filhos": [
+      "dewizd2bw",
+      "vk3c5c4iz"
+    ],
+    "conjuge": [
+      "svdhwxsue"
+    ],
+    "versão": 0
+  },
+  {
+    "id": "434.188.796",
+    "nome": "GILBERTO BARRAMACHER",
+    "sexo": "M",
+    "nascimento": "1950-01-01",
+    "falecimento": "",
+    "profissao": "comerciante motocicletas",
+    "cidade_pais_principal": "SANTOS/SP/BR",
+    "pais": [],
+    "filhos": [
+      "ypyq4tiy9",
+      "jlxq092hb"
+    ],
+    "conjuge": [
+      "539.729.801"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "925.482.866",
+    "nome": "HELENA REBELATO DO ESPIRITO SANTO",
+    "sexo": "F",
+    "nascimento": "1955-03-21",
+    "falecimento": "19/03/2024",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "339.170.728",
+      "413.216.597"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "s6e880u8e",
+    "nome": "HÉLIO AURICH",
+    "sexo": "M",
+    "nascimento": "01/01/1925",
+    "falecimento": "",
+    "profissao": "aeroviário",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "160.298.411"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "versão": 0
+  },
+  {
+    "id": "339.170.728",
+    "nome": "HELMA PFÜTZENREUTER REBELATO",
+    "sexo": "F",
+    "nascimento": "1924-07-05",
+    "falecimento": "20/07/2018",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [],
+    "filhos": [
+      "241.818.576",
+      "925.482.866"
+    ],
+    "conjuge": [
+      "413.216.597"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "316.275.782",
+    "nome": "HILDA MARIA DAUDT FRITSCH",
+    "sexo": "F",
+    "nascimento": "1899",
+    "falecimento": "1982",
+    "profissao": "do lar",
+    "cidade_pais_principal": "RIO PARDO/BR",
+    "pais": [
+      "b26ktcw8x",
+      "gj4uu2d5n"
+    ],
+    "filhos": [
+      "605.402.832",
+      "tvc3wcjii",
+      "rzt072ao2"
+    ],
+    "conjuge": [
+      "954.330.187"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "observacoes": "faleceu com 83 anos. Eu morava em São Valentim RS",
+    "foto_path": "fotos/hilda_maria_daudt_fritsch.jpg"
+  },
+  {
+    "id": "3obo044i6",
+    "nome": "HIRAN FARINON",
+    "sexo": "M",
+    "nascimento": "10/03/1957",
+    "falecimento": "",
+    "profissao": "Empresário-Malharia Itaipu",
+    "cidade_pais_principal": "FARROUPILHA/RS/BR",
+    "pais": [
+      "4w1p9pq8g",
+      "uyxoy9pgh"
+    ],
+    "filhos": [],
+    "conjuge": [
+      "istkjd4u2"
+    ],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "7g39g75bx",
+    "nome": "IVELISE FRITSCH VERNEY",
+    "sexo": "F",
+    "nascimento": "",
+    "falecimento": "",
+    "profissao": "médica",
+    "cidade_pais_principal": "GRÉCIA",
+    "pais": [
+      "tvc3wcjii",
+      "ktaruc13p"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/ivelise_fritsch_verney.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "620.399.264",
+    "nome": "IVONE LUCI AURICH PANERAI",
+    "sexo": "F",
+    "nascimento": "1948-02-15",
+    "falecimento": "",
+    "profissao": "psicologyst",
+    "cidade_pais_principal": "LEICESTER/UK",
+    "pais": [
+      "934.542.725",
+      "605.402.832"
+    ],
+    "filhos": [
+      "lvnfhtcmt",
+      "zeww9wkzd",
+      "2i0yclpmy"
+    ],
+    "conjuge": [
+      "902.190.461"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/ivone_luci_aurich_panerai.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "o173n8i3z",
+    "nome": "IVONE ZANDONAI LEMOS PINTO",
+    "sexo": "F",
+    "nascimento": "1942",
+    "falecimento": "2000",
+    "profissao": "do",
+    "cidade_pais_principal": "FLORIANÓPOLIS/SC/BR",
+    "pais": [],
+    "filhos": [],
+    "conjuge": [
+      "x2sayxpit"
+    ],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "e6eeo3ymi",
+    "nome": "JANE NELCI AURICH PINTO",
+    "sexo": "F",
+    "nascimento": "01/01/1951",
+    "falecimento": "",
+    "profissao": "funcionária pública",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "3iaxlyb4c"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "ktaruc13p",
+    "nome": "JOAO LUIZ ARTUR VERNEY",
+    "sexo": "M",
+    "nascimento": "",
+    "falecimento": "2002",
+    "profissao": "coronel do exército",
+    "cidade_pais_principal": "FLORIANÓPOLIS/SC/BR",
+    "foto_path": "fotos/joao_luiz_artur_verney.jpg",
+    "observacoes": "",
+    "pais": [],
+    "filhos": [
+      "a67ahcj5w",
+      "5cxnq9jak",
+      "7g39g75bx",
+      "hbhtg6sfh"
+    ],
+    "conjuge": [
+      "tvc3wcjii"
+    ],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "5cxnq9jak",
+    "nome": "JOÃO LUIZ FRITSCH VERNEY",
+    "sexo": "M",
+    "nascimento": "01/01/1955",
+    "falecimento": "20012",
+    "profissao": "Engenheiro EletroSul",
+    "cidade_pais_principal": "FLORIANOPOLIS/SC/BR",
+    "pais": [
+      "tvc3wcjii",
+      "ktaruc13p"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "versão": 0,
+    "user_id": "LOCAL_USER",
+    "observacoes": "",
+    "foto_path": "fotos/joao_luiz_fritsch_verney.jpg"
+  },
+  {
+    "id": "y5i8me2vj",
+    "nome": "JOÃO ULRICH DE ALENCASTRO",
+    "sexo": "M",
+    "nascimento": "18/09/1975",
+    "falecimento": "",
+    "profissao": "arquiteto",
+    "cidade_pais_principal": "UK",
+    "pais": [],
+    "filhos": [
+      "ixyl9vyus",
+      "mtrtfk50n"
+    ],
+    "conjuge": [
+      "jtjn8u86h"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-11-01T22:44:18.23358+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "gj6hfbjp7",
+    "nome": "JOAREZ PAULO ZIANI",
+    "sexo": "M",
+    "nascimento": "25/01/1983",
+    "falecimento": "",
+    "profissao": "administrador, industriário, mercado financeiro",
+    "cidade_pais_principal": "SÃO MIGUEL DO OESTE/SC/BR",
+    "pais": [],
+    "filhos": [
+      "781uv9oys",
+      "ee405vqc3",
+      "1axy38m65"
+    ],
+    "conjuge": [
+      "244.212.495"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "g4yjfbet3",
+    "nome": "JUDITE DA SILVA FRITSCH",
+    "sexo": "F",
+    "nascimento": "01/01/1930",
+    "falecimento": "1992",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [],
+    "filhos": [],
+    "conjuge": [
+      "rzt072ao2"
+    ],
+    "user_id": "Silvio Aurich Filho",
+    "versão": 0
+  },
+  {
+    "id": "mtrtfk50n",
+    "nome": "JULIA AURICH DE ALENCASTRO",
+    "sexo": "F",
+    "nascimento": "13/12/2008",
+    "falecimento": "",
+    "profissao": "estudante",
+    "cidade_pais_principal": "UK",
+    "pais": [
+      "jtjn8u86h",
+      "y5i8me2vj"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-11-01T22:43:49.855033+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Maria do Carmo",
+    "versão": 0
+  },
+  {
+    "id": "ba1yixd74",
+    "nome": "LEANDRO MENEZES",
+    "sexo": "M",
+    "nascimento": "",
+    "falecimento": "",
+    "profissao": "vendas",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "889.533.695",
+      "882.481.344"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "ee405vqc3",
+    "nome": "LEONARDO AURICH ZIANI",
+    "sexo": "M",
+    "nascimento": "04/03/2016",
+    "falecimento": "",
+    "profissao": "estudante",
+    "cidade_pais_principal": "SÃO MIGUEL DO OESTE/SC/BR",
+    "pais": [
+      "244.212.495",
+      "gj6hfbjp7"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "ypyq4tiy9",
+    "nome": "LEONARDO BARRAMACHER",
+    "sexo": "M",
+    "nascimento": "30/08/1979",
+    "falecimento": "",
+    "profissao": "empresário, piloto f.truck",
+    "cidade_pais_principal": "ITAPEMA/SC/BR",
+    "pais": [
+      "434.188.796",
+      "539.729.801"
+    ],
+    "filhos": [
+      "g31fesx7q"
+    ],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "mvpbw0rii",
+    "nome": "LEONARDO KAMMER",
+    "sexo": "M",
+    "nascimento": "04/09/1968",
+    "falecimento": "",
+    "profissao": "engenharia automação",
+    "cidade_pais_principal": "",
+    "pais": [],
+    "filhos": [
+      "c9g3bylgl",
+      "haacl815m"
+    ],
+    "conjuge": [
+      "xetp3sii1"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-11-02T16:04:06.210066+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "6thvd37d7",
+    "nome": "LEONARDO STEIL",
+    "sexo": "M",
+    "nascimento": "",
+    "falecimento": "2023",
+    "profissao": "funcionário público",
+    "cidade_pais_principal": "ITAPEMA/SC/BR",
+    "pais": [],
+    "filhos": [
+      "7hurtb1gx",
+      "tkwapghhc"
+    ],
+    "conjuge": [
+      "jlxq092hb"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "241.818.576",
+    "nome": "LIONI TERESINHA REBELATO",
+    "sexo": "F",
+    "nascimento": "1961-09-28",
+    "falecimento": "",
+    "profissao": "Aux.Administração, do lar",
+    "cidade_pais_principal": "Florianópolis/Brasil",
+    "pais": [
+      "339.170.728",
+      "413.216.597"
+    ],
+    "filhos": [],
+    "conjuge": [
+      "870.829.348"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "5jzk36rov",
+    "nome": "LORENZO",
+    "sexo": "M",
+    "nascimento": "19/08/2019",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "UK",
+    "pais": [
+      "2i0yclpmy",
+      "sba9l0wxz"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "fbhhku0dg",
+    "nome": "LUCA",
+    "sexo": "M",
+    "nascimento": "01/09/2016",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "UK",
+    "pais": [
+      "2i0yclpmy",
+      "sba9l0wxz"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "haacl815m",
+    "nome": "LUCAS KAMMER",
+    "sexo": "M",
+    "nascimento": "04/10/2002",
+    "falecimento": "",
+    "profissao": "estudante",
+    "cidade_pais_principal": "USA",
+    "pais": [
+      "xetp3sii1",
+      "mvpbw0rii"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T20:17:01.072463+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "a67ahcj5w",
+    "nome": "LUIS ARTUR FRITSCH VERNEY",
+    "sexo": "M",
+    "nascimento": "01/01/1953",
+    "falecimento": "",
+    "profissao": "Engenheiro - Celesc",
+    "cidade_pais_principal": "FLORIANOPOLIS/SC/BR",
+    "pais": [
+      "tvc3wcjii",
+      "ktaruc13p"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "versão": 0,
+    "user_id": "LOCAL_USER",
+    "observacoes": "acertar data de nascimento",
+    "foto_path": "fotos/luis_artur_fritsch_verney.jpg"
+  },
+  {
+    "id": "4int94w1j",
+    "nome": "MARCELO AURICH",
+    "sexo": "M",
+    "nascimento": "13/04/1968",
+    "falecimento": "",
+    "profissao": "computação",
+    "cidade_pais_principal": "FLORIANÓPOLIS/SC/BR",
+    "pais": [
+      "655.943.418",
+      "843.756.212"
+    ],
+    "filhos": [
+      "w7f5y9loo",
+      "zndvq27wm"
+    ],
+    "conjuge": [
+      "nq6vdb3xe",
+      "belwxyuq2"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "belwxyuq2",
+    "nome": "MARCIA GRACIELA GARTNER AURICH",
+    "sexo": "F",
+    "nascimento": "",
+    "falecimento": "",
+    "profissao": "empresária de alimentos",
+    "cidade_pais_principal": "FLORIANOPOLIS/SC",
+    "pais": [],
+    "filhos": [
+      "zndvq27wm"
+    ],
+    "conjuge": [
+      "4int94w1j"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "zeww9wkzd",
+    "nome": "MARCIA PANERAI",
+    "sexo": "F",
+    "nascimento": "13/09/1976",
+    "falecimento": "",
+    "profissao": "do lar",
+    "cidade_pais_principal": "LEICESTER/UK",
+    "pais": [
+      "620.399.264",
+      "902.190.461"
+    ],
+    "filhos": [
+      "82jqvnx41",
+      "21i0ji8oh"
+    ],
+    "conjuge": [
+      "cp8z1nrzs"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "nydk6a672",
+    "nome": "MARIA DE LURDES FRITSCH",
+    "sexo": "F",
+    "nascimento": "01/01/1954",
+    "falecimento": "2005",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "rzt072ao2"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "versão": 0
+  },
+  {
+    "id": "843.756.212",
+    "nome": "MARIA DO CARMO DUS AURICH",
+    "sexo": "F",
+    "nascimento": "1950-01-01",
+    "falecimento": "",
+    "profissao": "do lar",
+    "cidade_pais_principal": "FLORIANÓPOLIS/SC/BR",
+    "pais": [],
+    "filhos": [
+      "4int94w1j",
+      "xetp3sii1",
+      "jtjn8u86h"
+    ],
+    "conjuge": [
+      "655.943.418"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/maria_do_carmo_dus_aurich.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "b26ktcw8x",
+    "nome": "MARIA THIESEN",
+    "sexo": "F",
+    "nascimento": "1875",
+    "falecimento": "1978",
+    "profissao": "do lar",
+    "cidade_pais_principal": "RIO PARDO/RS",
+    "observacoes": "Minha bisavó. A vi pouquíssimas vezes.Faleceu com 103 anos.",
+    "pais": [],
+    "filhos": [
+      "316.275.782"
+    ],
+    "conjuge": [
+      "gj4uu2d5n"
+    ],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "rzt072ao2",
+    "nome": "MÁRIO FRITSCH",
+    "sexo": "M",
+    "nascimento": "01/01/1920",
+    "falecimento": "1965",
+    "profissao": "bancário",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "954.330.187",
+      "316.275.782"
+    ],
+    "filhos": [
+      "nydk6a672",
+      "yz94g6cu7",
+      "qd7v541wf"
+    ],
+    "conjuge": [
+      "g4yjfbet3"
+    ],
+    "created_at": null,
+    "updated_at": "2025-11-02T16:01:49.73412+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/mario_fritsch.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "yz94g6cu7",
+    "nome": "MARIO LUIZ FRITSCH",
+    "sexo": "M",
+    "nascimento": "01/01/1949",
+    "falecimento": "1987",
+    "profissao": "",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "rzt072ao2"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "versão": 0
+  },
+  {
+    "id": "ixyl9vyus",
+    "nome": "MARTINA AURICH DE ALENCASTRO",
+    "sexo": "F",
+    "nascimento": "17/12/2010",
+    "falecimento": "",
+    "profissao": "estudante",
+    "cidade_pais_principal": "UK",
+    "pais": [
+      "jtjn8u86h",
+      "y5i8me2vj"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-11-01T22:43:05.08717+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Maria do Carmo",
+    "versão": 0
+  },
+  {
+    "id": "347.171.520",
+    "nome": "NEIRY AURICH",
+    "sexo": "F",
+    "nascimento": "1960-01-01",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "BAURU/SP/BR",
+    "pais": [],
+    "filhos": [],
+    "conjuge": [
+      "558.177.498"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "gj4uu2d5n",
+    "nome": "NICOLAU EMILIO DAUDT",
+    "sexo": "M",
+    "nascimento": "1878",
+    "falecimento": "1952",
+    "profissao": "",
+    "cidade_pais_principal": "RIO PARDO/RS",
+    "observacoes": "meu bisavô por parte de mãe. Não o conheci.",
+    "pais": [],
+    "filhos": [
+      "316.275.782"
+    ],
+    "conjuge": [
+      "b26ktcw8x"
+    ],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "k2mh667m6",
+    "nome": "OTAVIANO PODALIRIO LEMOS PINTO",
+    "sexo": "M",
+    "nascimento": "1915",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [],
+    "filhos": [
+      "x2sayxpit"
+    ],
+    "conjuge": [
+      "3iaxlyb4c"
+    ],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "tkwapghhc",
+    "nome": "PIETRO STEIL",
+    "sexo": "M",
+    "nascimento": "16/12/2013",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "ITAPEMA/SC/BR",
+    "pais": [
+      "jlxq092hb",
+      "6thvd37d7"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "y3b5r4tdm",
+    "nome": "RENAN FARINON",
+    "sexo": "M",
+    "nascimento": "21/07/1950",
+    "falecimento": "2010",
+    "profissao": "Engenheiro e Empresário ",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "4w1p9pq8g",
+      "uyxoy9pgh"
+    ],
+    "filhos": [],
+    "conjuge": [
+      "y1ux885xd"
+    ],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "sba9l0wxz",
+    "nome": "ROB",
+    "sexo": "M",
+    "nascimento": "27/06/1980",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "LEICESTER/UK",
+    "pais": [],
+    "filhos": [
+      "5jzk36rov",
+      "fbhhku0dg"
+    ],
+    "conjuge": [
+      "2i0yclpmy"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "kmn0mdo6w",
+    "nome": "RODRIGO POLI",
+    "sexo": "M",
+    "nascimento": "",
+    "falecimento": "",
+    "profissao": "advogado",
+    "cidade_pais_principal": "FLORIANOPOLIS/SC/BR",
+    "pais": [],
+    "filhos": [],
+    "conjuge": [
+      "573.874.830"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "902.190.461",
+    "nome": "RONEI BERNARDES PANERAI",
+    "sexo": "M",
+    "nascimento": "1950-01-01",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "LEICESTER/UK",
+    "pais": [],
+    "filhos": [
+      "2i0yclpmy",
+      "lvnfhtcmt",
+      "zeww9wkzd"
+    ],
+    "conjuge": [
+      "620.399.264"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "hbhtg6sfh",
+    "nome": "ROSAMARIA FRITSCH VERNEY",
+    "sexo": "F",
+    "nascimento": "",
+    "falecimento": "",
+    "profissao": "Dentista",
+    "cidade_pais_principal": "FLORIANOPOLIS/SC",
+    "pais": [
+      "ktaruc13p"
+    ],
+    "filhos": [
+      "tvc3wcjii"
+    ],
+    "conjuge": [],
+    "created_at": null,
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/rosamaria_fritsch_verney.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "dewizd2bw",
+    "nome": "ROSANE TERMANN",
+    "sexo": "F",
+    "nascimento": "01/01/1956",
+    "falecimento": "",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "svdhwxsue",
+      "ilezvzc91"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "user_id": "Silvio Aurich Filho",
+    "versão": 0
+  },
+  {
+    "id": "vk3c5c4iz",
+    "nome": "ROSAURA TERMANN",
+    "sexo": "F",
+    "nascimento": "01/01/1958",
+    "falecimento": "",
+    "profissao": "do lar",
+    "cidade_pais_principal": "PORTO ALEGRE/RS/BR",
+    "pais": [
+      "svdhwxsue",
+      "ilezvzc91"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "user_id": "Silvio Aurich Filho",
+    "versão": 0
+  },
+  {
+    "id": "215.443.757",
+    "nome": "SANDRA AURICH",
+    "sexo": "F",
+    "nascimento": "1979-07-15",
+    "falecimento": "",
+    "profissao": "profissional de marketing",
+    "cidade_pais_principal": "FLORIANOPOLIS/SC/BR",
+    "pais": [
+      "870.829.348",
+      "211.651.463"
+    ],
+    "filhos": [
+      "7a3qcxzy3"
+    ],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "558.177.498",
+    "nome": "SERGIO ALBINO AURICH",
+    "sexo": "M",
+    "nascimento": "17/10/1953",
+    "falecimento": "08/10/2015",
+    "profissao": "vendas",
+    "cidade_pais_principal": "BAURU/BR",
+    "pais": [
+      "934.542.725",
+      "605.402.832"
+    ],
+    "filhos": [],
+    "conjuge": [
+      "347.171.520"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/sergio_albino_aurich.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "244.212.495",
+    "nome": "SILVANA AURICH",
+    "sexo": "F",
+    "nascimento": "1984-08-24",
+    "falecimento": "",
+    "profissao": "engenharia alimentos",
+    "cidade_pais_principal": "FLORIANOPOLIS E SÃO MIGUEL DO OESTE/SC/BR",
+    "pais": [
+      "870.829.348",
+      "211.651.463"
+    ],
+    "filhos": [
+      "781uv9oys",
+      "ee405vqc3",
+      "1axy38m65"
+    ],
+    "conjuge": [
+      "gj6hfbjp7"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "870.829.348",
+    "nome": "SILVIO AURICH FILHO",
+    "sexo": "M",
+    "nascimento": "29/07/1951",
+    "falecimento": "",
+    "profissao": "engenheiro eletricista, usinas hidroelétricas(muito), mercado financeiro",
+    "cidade_pais_principal": "FLORIANÓPOLIS/BRASIL",
+    "pais": [
+      "934.542.725",
+      "605.402.832"
+    ],
+    "filhos": [
+      "215.443.757",
+      "244.212.495",
+      "573.874.830"
+    ],
+    "conjuge": [
+      "211.651.463",
+      "241.818.576"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "foto_path": "fotos/silvio_aurich_filho.jpg",
+    "observacoes": ""
+  },
+  {
+    "id": "jtjn8u86h",
+    "nome": "SIMONE AURICH DE ALENCASTRO",
+    "sexo": "F",
+    "nascimento": "23/11/1977",
+    "falecimento": "",
+    "profissao": "arquiteta",
+    "cidade_pais_principal": "UK",
+    "pais": [
+      "655.943.418",
+      "843.756.212"
+    ],
+    "filhos": [
+      "mtrtfk50n",
+      "ixyl9vyus"
+    ],
+    "conjuge": [
+      "y5i8me2vj"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-11-02T18:46:43.279549+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "539.729.801",
+    "nome": "SIRLEI TEREZINHA AURICH",
+    "sexo": "F",
+    "nascimento": "1958-08-03",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "ITAPEMA/SC/BR",
+    "pais": [
+      "934.542.725",
+      "605.402.832"
+    ],
+    "filhos": [
+      "ypyq4tiy9",
+      "jlxq092hb"
+    ],
+    "conjuge": [
+      "434.188.796"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "p3oksgur6",
+    "nome": "SOFIA",
+    "sexo": "F",
+    "nascimento": "02/08/2005",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "LEICESTER/UK",
+    "pais": [
+      "lvnfhtcmt"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "934.542.725",
+    "nome": "SYLVIO AURICH",
+    "sexo": "M",
+    "nascimento": "1921-12-21",
+    "falecimento": "1986",
+    "profissao": "Contador",
+    "cidade_pais_principal": "PORTO ALEGRE/BR",
+    "pais": [
+      "160.298.411",
+      "253.577.532"
+    ],
+    "filhos": [
+      "870.829.348",
+      "655.943.418",
+      "882.481.344",
+      "620.399.264",
+      "558.177.498",
+      "539.729.801"
+    ],
+    "conjuge": [
+      "605.402.832"
+    ],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "LOCAL_USER",
+    "versão": 0,
+    "observacoes": "Pai. Faleceu com 65 anos, com câncer iniciado no estômago. Seis meses de evolução da doença."
+  },
+  {
+    "id": "istkjd4u2",
+    "nome": "TANIA EMER FARINON",
+    "sexo": "F",
+    "nascimento": "25/05/1957",
+    "falecimento": "",
+    "profissao": "Empresaria - Confecções Itaipu",
+    "cidade_pais_principal": "FARTOUPILHA/RS/BR",
+    "pais": [],
+    "filhos": [],
+    "conjuge": [
+      "3obo044i6"
+    ],
+    "user_id": "LOCAL_USER",
+    "versão": 0
+  },
+  {
+    "id": "312.619.806",
+    "nome": "THÉO AURICH POLI",
+    "sexo": "M",
+    "nascimento": "2021-08-18",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "FLORIANÓPOLIS/SC/BR",
+    "pais": [
+      "573.874.830"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "1axy38m65",
+    "nome": "THOMAS AURICH ZIANI",
+    "sexo": "M",
+    "nascimento": "25/11/2020",
+    "falecimento": "",
+    "profissao": "estudante",
+    "cidade_pais_principal": "SÃO MIGUEL DO OESTE/SC/BR",
+    "pais": [
+      "244.212.495",
+      "gj6hfbjp7"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  },
+  {
+    "id": "x2sayxpit",
+    "nome": "VALDIR PODALIRIO LEMOS PINTO",
+    "sexo": "M",
+    "nascimento": "01/01/1940",
+    "falecimento": "2000",
+    "profissao": "militar/comerciante",
+    "cidade_pais_principal": "FLORIANÓPOLIS/SC/BR",
+    "pais": [
+      "3iaxlyb4c",
+      "k2mh667m6"
+    ],
+    "filhos": [],
+    "conjuge": [
+      "o173n8i3z"
+    ],
+    "versão": 0
+  },
+  {
+    "id": "82jqvnx41",
+    "nome": "WILLIAM",
+    "sexo": "M",
+    "nascimento": "11/05/2005",
+    "falecimento": "",
+    "profissao": "",
+    "cidade_pais_principal": "LEICESTER/UK",
+    "pais": [
+      "zeww9wkzd",
+      "cp8z1nrzs"
+    ],
+    "filhos": [],
+    "conjuge": [],
+    "created_at": "2025-10-29T21:04:03.235228+00:00",
+    "updated_at": "2025-10-31T19:56:46.979935+00:00",
+    "created_by": null,
+    "updated_by": null,
+    "user_id": "Silvio Aurich",
+    "versão": 0
+  }
+]
