@@ -195,7 +195,7 @@ const SEED_DA_FAMILIA = [
   },
   {
     "id": "889.533.695",
-    "nome": "CARLOS GERMANDO BIERMANN MENEZES",
+    "nome": "CARLOS GERMANO BIERMAN MENEZES",
     "sexo": "M",
     "nascimento": "1950-01-01",
     "falecimento": "",
@@ -357,11 +357,11 @@ const SEED_DA_FAMILIA = [
   },
   {
     "id": "cp8z1nrzs",
-    "nome": "DAN",
+    "nome": "DANIEL",
     "sexo": "M",
     "nascimento": "21/12/1976",
     "falecimento": "",
-    "profissao": "empresario",
+    "profissao": "empresário",
     "cidade_pais_principal": "LEICESTER/UK",
     "pais": [],
     "filhos": [
@@ -451,7 +451,7 @@ const SEED_DA_FAMILIA = [
   },
   {
     "id": "882.481.344",
-    "nome": "DIONE EDITE AURICH",
+    "nome": "DIONE EDITH AURICH",
     "sexo": "F",
     "nascimento": "1943-09-29",
     "falecimento": "",
