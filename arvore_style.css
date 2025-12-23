@@ -593,3 +593,65 @@ html, body {
 .secundario-button:hover {
     background-color: #d4d4d4;
 }
+
+/*=======================================================================*/
+/* --- Estilos para o Botão Sobreposto --- */
+
+/* 1. O container que segura tudo junto */
+.destaque-container {
+    position: relative; /* Essencial: define o ponto de referência */
+    display: inline-block; /* Ajusta o container ao tamanho da imagem */
+    max-width: 100%; /* Garante responsividade */
+    /* Se sua imagem for centralizada, adicione: margin: 0 auto; */
+}
+
+/* Garante que a imagem não quebre o layout */
+.imagem-destaque {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* 2. O estilo base do botão (cor, forma, etc.) */
+.botao-flutuante {
+    position: absolute; /* Permite que ele flutue sobre a imagem */
+    z-index: 10; /* Garante que fique por cima da imagem */
+
+    /* Estilo visual para combinar com os botões inferiores */
+    background-color: #138A8A; /* Cor verde-azulado dos seus botões */
+    color: white;
+    text-decoration: none; /* Remove o sublinhado de link */
+    padding: 12px 24px; /* Tamanho do botão */
+    border-radius: 5px; /* Bordas arredondadas */
+    font-weight: bold;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.4); /* Uma sombra para dar destaque */
+    transition: background-color 0.3s ease; /* Suaviza a mudança de cor ao passar o mouse */
+}
+
+/* Efeito ao passar o mouse */
+.botao-flutuante:hover {
+    background-color: #0e6b6b; /* Um tom ligeiramente mais escuro */
+}
+
+/* 3. O Posicionamento Específico do botão ÁLBUM */
+.botao-album {
+    /* Ajuste Vertical: */
+    top: 58%; /* Desce o botão para 58% da altura da imagem (perto da mão) */
+    transform: translateY(-50%); /* Centraliza o botão verticalmente nesse ponto */
+
+    /* Ajuste Horizontal: */
+    right: 20px; /* Fica a 20 pixels da margem direita (quase tocando) */
+}
+
+/* Ajuste para telas menores (celulares) se necessário */
+@media (max-width: 600px) {
+    .botao-flutuante {
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+    .botao-album {
+        right: 10px; /* Fica ainda mais perto da borda em telas pequenas */
+    }
+}
