@@ -638,8 +638,8 @@ html, body {
 /* 3. O Posicionamento Específico do botão ÁLBUM */
 .botao-album {
     /* Ajuste Vertical: */
-    top: 58%; /* Desce o botão para 58% da altura da imagem (perto da mão) */
-    transform: translateY(-50%); /* Centraliza o botão verticalmente nesse ponto */
+    top: 65%; /* Desce o botão para 58% da altura da imagem (perto da mão) */
+    transform: translateY(-65%); /* Centraliza o botão verticalmente nesse ponto */
 
     /* Ajuste Horizontal: */
     right: 20px; /* Fica a 20 pixels da margem direita (quase tocando) */
@@ -654,4 +654,5 @@ html, body {
     .botao-album {
         right: 10px; /* Fica ainda mais perto da borda em telas pequenas */
     }
+
 }
