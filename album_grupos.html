@@ -46,7 +46,7 @@
     <h1>🌳 Galeria de Grupos da Família</h1>
     
     <div id="painel-controle">
-        <input type="text" id="campoBusca" onkeyup="filtrarFotos()" placeholder="🔍 Digite pelo menos 2 letras para buscar...">
+        <input type="text" id="campoBusca" onkeyup="filtrarFotos()" placeholder="🔍 Digite pelo menos 2 letras do nome a buscar...">
         <div id="contador">Aguardando busca...</div>
     </div>
 
@@ -63,12 +63,12 @@
                 "ALBINO_HILDA_APOSENTADORIA.jpg",
                 "ANETE_CRISTINA.jpg",
                 "CARLINHOS_DIONE_LEANDRO.jpg",
-                "CARM_DIONE_CARLINHOS.jpg",
+                "CARMEM_DIONE_CARLINHOS.jpg",
                 "CECILIA_JOAO_SIRLEI.jpg",
                 "CRISTINA_SILVIO_SANDRA_SILVANA.jpg",
                 "DANILO_DIONE_VALDIR.jpg",
                 "DANILO_SERGIO_EDITH_SIRLEI_SYLVIO_SILVIO_IVONE.jpg",
-                "DIONE_SIRLEI_DANILO_LIONI_CARM_SILVIO.jpg",
+                "DIONE_SIRLEI_DANILO_LIONI_CARMEM_SILVIO.jpg",
                 "DIONE_CARLOS_EDITH_LEANDRO_SYLVIO.jpg",
                 "DELVIRA_ELIANA.jpg",
                 "DELVIRA_HILDA_SYLVIO_SIRLEI_EDITH_IVONE_RONNEY.jpg",
@@ -78,7 +78,7 @@
                 "GABRIEL_JOAREZ_SILVANA_LIONI_SILVIO_CRISTINA_LEONARDO_ZIANI.jpg",
                 "GABRI_LEO_THOMAS_SILVANA_JOAREZ.jpg",
                 "HILDA_BISAVÓ_EDITH_DIONE_ELIANA.jpg",
-                "LEONARDO_NEIRY_ANETE_RONNEY_RAFAEL_CARM.jpg",
+                "LEONARDO_NEIRY_ANETE_RONNEY_RAFAEL_CARMEM.jpg",
                 "LEANDRO_MARCIA_ELIANA_ELISA_ALICE_INGLESES.jpg",
                 "LEONARDO_THOMAS_THÉO.jpg",
                 "MARIA_DIONE_EDITH_DAUDT.jpg",
@@ -120,18 +120,29 @@
             filtrarFotos();
         }
 
-        function filtrarFotos() {
-            const termo = document.getElementById('campoBusca').value.toLowerCase();
+function filtrarFotos() {
+            const termo = document.getElementById('campoBusca').value.toLowerCase().trim();
             const elContador = document.getElementById('contador');
-            if (termo.length < 2) {
-                renderizarGaleria([]);
-                elContador.innerText = "Digite pelo menos 2 letras para iniciar a busca...";
+            
+            // Se estiver vazio, mostra TUDO (ideal para quando abre pela tela inicial)
+            if (termo.length === 0) {
+                elContador.innerText = `Exibindo todas as ${FOTOS_BASE.length} fotos da galeria`;
+                renderizarGaleria(FOTOS_BASE);
                 return;
             }
+
+            // Se digitou apenas 1 letra, pede mais uma (evita buscas muito genéricas)
+            if (termo.length < 2) {
+                renderizarGaleria([]);
+                elContador.innerText = "Digite pelo menos 2 letras para filtrar...";
+                return;
+            }
+
             const resultados = FOTOS_BASE.filter(nome => nome.toLowerCase().includes(termo));
             elContador.innerText = `Exibindo ${resultados.length} de ${FOTOS_BASE.length} fotos encontradas`;
             renderizarGaleria(resultados);
         }
+
 
         function abrirModal(elemento) {
             document.getElementById("fotoModal").style.display = "flex";
@@ -148,9 +159,22 @@
             if (e.key === "Escape") document.getElementById("fotoModal").style.display = "none";
         });
 
+        // NOVA LÓGICA DE INICIALIZAÇÃO
         window.onload = () => {
-            document.getElementById('contador').innerText = "Aguardando busca (mínimo 2 letras)...";
+            // 1. Verifica se existe um nome enviado pela URL (ex: ?busca=NOME)
+            const urlParams = new URLSearchParams(window.location.search);
+            const buscaInicial = urlParams.get('busca');
+
+            if (buscaInicial) {
+                // Se veio da Árvore com um nome, preenche o campo e filtra
+                document.getElementById('campoBusca').value = buscaInicial;
+                filtrarFotos();
+            } else {
+                // Se abriu direto do Hub, mostra todas as fotos por padrão
+                filtrarFotos(); 
+            }
         };
+
     </script>
 </body>
 </html>
