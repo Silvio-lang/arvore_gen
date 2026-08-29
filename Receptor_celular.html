@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receptor_celular - Sinal 4500 Hz</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #58a6ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #00ff66;
+            margin-bottom: 2px;
+            font-size: 1.8rem;
+            text-shadow: 0 0 12px rgba(0, 255, 102, 0.4);
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .subtitulo {
+            color: #8b949e;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        #painel-principal {
+            background-color: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+
+        canvas {
+            background-color: #000000;
+            border: 2px solid #00ff66;
+            border-radius: 6px;
+            box-shadow: inset 0 0 15px rgba(0, 255, 102, 0.15);
+            width: 100%;
+            height: auto;
+        }
+
+        /* Ajuste responsivo dos controles de limite */
+        .painel-sliders {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            width: 100%;
+            margin-top: 15px;
+            background-color: #21262d;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            box-sizing: border-box;
+        }
+
+        .controle-slider {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .controle-slider label {
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .controle-slider.l1 label { color: #ffcc00; }
+        .controle-slider.l2 label { color: #ff3366; }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: #00ff66;
+        }
+
+        .grid-medidores {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .card-medidor {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 10px 5px;
+            text-align: center;
+        }
+
+        .card-medidor .rotulo {
+            font-size: 0.75rem;
+            color: #8b949e;
+            text-transform: uppercase;
+        }
+
+        .card-medidor .valor {
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: monospace;
+            color: #ffffff;
+            margin-top: 5px;
+        }
+
+        #card-estado { border-color: #00ff66; }
+        #valEstado { color: #8b949e; }
+
+        .controles-top { margin-bottom: 12px; }
+
+        button {
+            background-color: #238636;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover { background-color: #2ea043; }
+
+        /* Adaptação para telas estreitas de celular */
+        @media (max-width: 480px) {
+            .painel-sliders {
+                flex-direction: column;
+            }
+            .card-medidor .valor {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Receptor_celular</h1>
+    <div class="subtitulo">Medidor de Amplitude & Osciloscópio (4500 Hz)</div>
+
+    <div class="controles-top">
+        <button id="btnIniciar">Ligar Entrada de Áudio</button>
+    </div>
+
+    <div id="painel-principal">
+        <canvas id="telaOsciloscopio" width="570" height="250"></canvas>
+        
+        <div class="painel-sliders">
+            <div class="controle-slider l1">
+                <label for="sliderL1">Limite L1 - Pulsante (Amarelo): <span id="txtL1">0.08</span></label>
+                <input type="range" id="sliderL1" min="0.01" max="0.5" step="0.01" value="0.08">
+            </div>
+            <div class="controle-slider l2">
+                <label for="sliderL2">Limite L2 - Contínuo (Vermelho): <span id="txtL2">0.25</span></label>
+                <input type="range" id="sliderL2" min="0.05" max="0.9" step="0.01" value="0.25">
+            </div>
+        </div>
+
+        <div class="grid-medidores">
+            <div class="card-medidor">
+                <div class="rotulo">Amplitude RMS</div>
+                <div class="valor" id="valRMS">0.0000</div>
+            </div>
+            <div class="card-medidor">
+                <div class="rotulo">Valor de Pico</div>
+                <div class="valor" id="valPico">0.0000</div>
+            </div>
+            <div class="card-medidor" id="card-estado">
+                <div class="rotulo">Modo Vibracall</div>
+                <div class="valor" id="valEstado">OFF</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioContext;
+        let analisador;
+        let canvas, canvasCtx;
+        let emExecucao = false;
+
+        let limiteL1 = 0.08;
+        let limiteL2 = 0.25;
+
+        let estadoVibracall = "OFF";
+        let temporizadorPulsacao = null;
+
+        document.getElementById('sliderL1').addEventListener('input', (e) => {
+            limiteL1 = parseFloat(e.target.value);
+            document.getElementById('txtL1').textContent = limiteL1.toFixed(2);
+        });
+
+        document.getElementById('sliderL2').addEventListener('input', (e) => {
+            limiteL2 = parseFloat(e.target.value);
+            document.getElementById('txtL2').textContent = limiteL2.toFixed(2);
+        });
+
+        document.getElementById('btnIniciar').addEventListener('click', async () => {
+            if (emExecucao) return;
+
+            canvas = document.getElementById('telaOsciloscopio');
+            canvasCtx = canvas.getContext('2d');
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+                    video: false
+                });
+
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const fonteMicrofone = audioContext.createMediaStreamSource(stream);
+
+                analisador = audioContext.createAnalyser();
+                analisador.fftSize = 1024;
+
+                fonteMicrofone.connect(analisador);
+
+                emExecucao = true;
+                document.getElementById('btnIniciar').textContent = "Receptor Ativo";
+                document.getElementById('btnIniciar').style.backgroundColor = "#1f6feb";
+
+                renderizar();
+
+            } catch (erro) {
+                alert("Erro ao acessar a entrada de áudio: " + erro.message);
+            }
+        });
+
+        function renderizar() {
+            if (!emExecucao) return;
+
+            requestAnimationFrame(renderizar);
+
+            const tamanhoBuffer = analisador.fftSize;
+            const dadosFormaOnda = new Uint8Array(tamanhoBuffer);
+            analisador.getByteTimeDomainData(dadosFormaOnda);
+
+            canvasCtx.fillStyle = '#000000';
+            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Retículo Central
+            canvasCtx.lineWidth = 1;
+            canvasCtx.strokeStyle = '#113311';
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(0, canvas.height / 2);
+            canvasCtx.lineTo(canvas.width, canvas.height / 2);
+            canvasCtx.stroke();
+
+            // Tracejados de Setpoint L1 e L2
+            desenharLinhaSetpoint(limiteL1, '#ffcc00');
+            desenharLinhaSetpoint(limiteL2, '#ff3366');
+
+            // Sinal do Sensor
+            canvasCtx.lineWidth = 2;
+            canvasCtx.strokeStyle = '#00ff66';
+            canvasCtx.beginPath();
+
+            const larguraFatia = canvas.width * 1.0 / tamanhoBuffer;
+            let x = 0;
+            let somaQuadrados = 0;
+            let valorPico = 0;
+
+            for (let i = 0; i < tamanhoBuffer; i++) {
+                const v = (dadosFormaOnda[i] - 128) / 128.0;
+                const y = (v * canvas.height / 2) + (canvas.height / 2);
+
+                if (i === 0) canvasCtx.moveTo(x, y);
+                else canvasCtx.lineTo(x, y);
+
+                x += larguraFatia;
+
+                const absV = Math.abs(v);
+                if (absV > valorPico) valorPico = absV;
+                somaQuadrados += v * v;
+            }
+
+            canvasCtx.stroke();
+
+            const rms = Math.sqrt(somaQuadrados / tamanhoBuffer);
+            document.getElementById('valRMS').textContent = rms.toFixed(4);
+            document.getElementById('valPico').textContent = valorPico.toFixed(4);
+
+            atualizarLogicaVibracall(rms);
+        }
+
+        function desenharLinhaSetpoint(limite, cor) {
+            const ySuperior = (canvas.height / 2) - (limite * canvas.height / 2);
+            const yInferior = (canvas.height / 2) + (limite * canvas.height / 2);
+
+            canvasCtx.lineWidth = 1;
+            canvasCtx.strokeStyle = cor;
+            canvasCtx.setLineDash([5, 5]);
+
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(0, ySuperior);
+            canvasCtx.lineTo(canvas.width, ySuperior);
+            canvasCtx.moveTo(0, yInferior);
+            canvasCtx.lineTo(canvas.width, yInferior);
+            canvasCtx.stroke();
+
+            canvasCtx.setLineDash([]);
+        }
+
+        function atualizarLogicaVibracall(rms) {
+            const elEstado = document.getElementById('valEstado');
+
+            if (rms >= limiteL2) {
+                if (estadoVibracall !== "CONTÍNUO") {
+                    estadoVibracall = "CONTÍNUO";
+                    elEstado.textContent = "CONTÍNUO";
+                    elEstado.style.color = "#ff3366";
+                    acionarVibracallHardware(true);
+                }
+            } else if (rms >= limiteL1) {
+                if (estadoVibracall !== "PULSANTE") {
+                    estadoVibracall = "PULSANTE";
+                    elEstado.textContent = "PULSANTE";
+                    elEstado.style.color = "#ffcc00";
+                    iniciarPulsacao();
+                }
+            } else {
+                if (estadoVibracall !== "OFF") {
+                    estadoVibracall = "OFF";
+                    elEstado.textContent = "OFF";
+                    elEstado.style.color = "#8b949e";
+                    pararPulsacao();
+                    acionarVibracallHardware(false);
+                }
+            }
+        }
+
+        function iniciarPulsacao() {
+            pararPulsacao();
+            let estado = false;
+            temporizadorPulsacao = setInterval(() => {
+                estado = !estado;
+                acionarVibracallHardware(estado);
+            }, 200);
+        }
+
+        function pararPulsacao() {
+            if (temporizadorPulsacao) {
+                clearInterval(temporizadorPulsacao);
+                temporizadorPulsacao = null;
+            }
+        }
+
+        function acionarVibracallHardware(ligar) {
+            if ("vibrate" in navigator) {
+                if (ligar) navigator.vibrate(500);
+                else navigator.vibrate(0);
+            }
+        }
+    </script>
+</body>
+</html>
