@@ -58,7 +58,6 @@
             height: auto;
         }
 
-        /* Ajuste responsivo dos controles de limite */
         .painel-sliders {
             display: flex;
             flex-direction: row;
@@ -125,14 +124,18 @@
         #card-estado { border-color: #00ff66; }
         #valEstado { color: #8b949e; }
 
-        .controles-top { margin-bottom: 12px; }
+        .controles-top {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
 
         button {
             background-color: #238636;
             color: #ffffff;
             border: none;
-            padding: 10px 20px;
-            font-size: 0.95rem;
+            padding: 10px 16px;
+            font-size: 0.9rem;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -141,14 +144,18 @@
 
         button:hover { background-color: #2ea043; }
 
-        /* Adaptação para telas estreitas de celular */
+        #btnCongelar {
+            background-color: #8b949e;
+        }
+
+        #btnCongelar.ativo {
+            background-color: #d97706;
+        }
+
         @media (max-width: 480px) {
-            .painel-sliders {
-                flex-direction: column;
-            }
-            .card-medidor .valor {
-                font-size: 1rem;
-            }
+            .painel-sliders { flex-direction: column; }
+            .card-medidor .valor { font-size: 1rem; }
+            .controles-top { flex-direction: column; width: 100%; }
         }
     </style>
 </head>
@@ -159,6 +166,7 @@
 
     <div class="controles-top">
         <button id="btnIniciar">Ligar Entrada de Áudio</button>
+        <button id="btnCongelar">Congelar Tela (Hold)</button>
     </div>
 
     <div id="painel-principal">
@@ -196,12 +204,18 @@
         let analisador;
         let canvas, canvasCtx;
         let emExecucao = false;
+        let telaCongelada = false;
+
+        // Janela total de visualização na largura da tela (em milissegundos)
+        // 2.0 ms permite visualizar aproximadamente 9 ciclos da senoide de 4500 Hz
+        const tempoTotalMs = 2.0;
 
         let limiteL1 = 0.08;
         let limiteL2 = 0.25;
 
         let estadoVibracall = "OFF";
         let temporizadorPulsacao = null;
+        let temporizadorContinuo = null;
 
         document.getElementById('sliderL1').addEventListener('input', (e) => {
             limiteL1 = parseFloat(e.target.value);
@@ -213,6 +227,18 @@
             document.getElementById('txtL2').textContent = limiteL2.toFixed(2);
         });
 
+        document.getElementById('btnCongelar').addEventListener('click', () => {
+            telaCongelada = !telaCongelada;
+            const btn = document.getElementById('btnCongelar');
+            if (telaCongelada) {
+                btn.textContent = "Tela Congelada (Pausado)";
+                btn.classList.add('ativo');
+            } else {
+                btn.textContent = "Congelar Tela (Hold)";
+                btn.classList.remove('ativo');
+            }
+        });
+
         document.getElementById('btnIniciar').addEventListener('click', async () => {
             if (emExecucao) return;
 
@@ -220,8 +246,13 @@
             canvasCtx = canvas.getContext('2d');
 
             try {
+                // Configuração com AGC desativado para evitar amplificação de ruído no silêncio
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+                    audio: { 
+                        echoCancellation: false, 
+                        noiseSuppression: false, 
+                        autoGainControl: false 
+                    },
                     video: false
                 });
 
@@ -229,7 +260,7 @@
                 const fonteMicrofone = audioContext.createMediaStreamSource(stream);
 
                 analisador = audioContext.createAnalyser();
-                analisador.fftSize = 1024;
+                analisador.fftSize = 2048;
 
                 fonteMicrofone.connect(analisador);
 
@@ -249,6 +280,9 @@
 
             requestAnimationFrame(renderizar);
 
+            // Se a tela estiver congelada pelo botão Hold, pula a atualização gráfica
+            if (telaCongelada) return;
+
             const tamanhoBuffer = analisador.fftSize;
             const dadosFormaOnda = new Uint8Array(tamanhoBuffer);
             analisador.getByteTimeDomainData(dadosFormaOnda);
@@ -256,29 +290,30 @@
             canvasCtx.fillStyle = '#000000';
             canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Retículo Central
-            canvasCtx.lineWidth = 1;
-            canvasCtx.strokeStyle = '#113311';
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(0, canvas.height / 2);
-            canvasCtx.lineTo(canvas.width, canvas.height / 2);
-            canvasCtx.stroke();
+            // Desenho da Grade Quadriculada (Retícula de Osciloscópio)
+            desenharGradeReticula();
 
             // Tracejados de Setpoint L1 e L2
             desenharLinhaSetpoint(limiteL1, '#ffcc00');
             desenharLinhaSetpoint(limiteL2, '#ff3366');
 
-            // Sinal do Sensor
+            // Sinal do Sensor com Janela de Tempo Ajustada
             canvasCtx.lineWidth = 2;
             canvasCtx.strokeStyle = '#00ff66';
             canvasCtx.beginPath();
 
-            const larguraFatia = canvas.width * 1.0 / tamanhoBuffer;
+            const taxaAostragem = audioContext.sampleRate;
+            const amostrasExibidas = Math.min(
+                tamanhoBuffer, 
+                Math.floor((tempoTotalMs / 1000.0) * taxaAostragem)
+            );
+
+            const larguraFatia = canvas.width * 1.0 / amostrasExibidas;
             let x = 0;
             let somaQuadrados = 0;
             let valorPico = 0;
 
-            for (let i = 0; i < tamanhoBuffer; i++) {
+            for (let i = 0; i < amostrasExibidas; i++) {
                 const v = (dadosFormaOnda[i] - 128) / 128.0;
                 const y = (v * canvas.height / 2) + (canvas.height / 2);
 
@@ -294,11 +329,50 @@
 
             canvasCtx.stroke();
 
-            const rms = Math.sqrt(somaQuadrados / tamanhoBuffer);
+            const rms = Math.sqrt(somaQuadrados / amostrasExibidas);
             document.getElementById('valRMS').textContent = rms.toFixed(4);
             document.getElementById('valPico').textContent = valorPico.toFixed(4);
 
             atualizarLogicaVibracall(rms);
+        }
+
+        function desenharGradeReticula() {
+            const divisoesHorizontais = 10;
+            const divisoesVerticais = 6;
+
+            canvasCtx.lineWidth = 1;
+            canvasCtx.strokeStyle = '#003311';
+
+            // Linhas Verticais
+            const larguraDiv = canvas.width / divisoesHorizontais;
+            for (let i = 1; i < divisoesHorizontais; i++) {
+                canvasCtx.beginPath();
+                canvasCtx.moveTo(i * larguraDiv, 0);
+                canvasCtx.lineTo(i * larguraDiv, canvas.height);
+                canvasCtx.stroke();
+            }
+
+            // Linhas Horizontais
+            const alturaDiv = canvas.height / divisoesVerticais;
+            for (let j = 1; j < divisoesVerticais; j++) {
+                canvasCtx.beginPath();
+                canvasCtx.moveTo(0, j * alturaDiv);
+                canvasCtx.lineTo(canvas.width, j * alturaDiv);
+                canvasCtx.stroke();
+            }
+
+            // Eixo Central Mais Destacado
+            canvasCtx.strokeStyle = '#006622';
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(0, canvas.height / 2);
+            canvasCtx.lineTo(canvas.width, canvas.height / 2);
+            canvasCtx.stroke();
+
+            // Texto Informativo da Escala de Tempo
+            canvasCtx.fillStyle = '#00aa44';
+            canvasCtx.font = '10px monospace';
+            const msPorDiv = (tempoTotalMs / divisoesHorizontais).toFixed(2);
+            canvasCtx.fillText(`${tempoTotalMs.toFixed(1)} ms/tela | ${msPorDiv} ms/div`, 8, 14);
         }
 
         function desenharLinhaSetpoint(limite, cor) {
@@ -327,7 +401,7 @@
                     estadoVibracall = "CONTÍNUO";
                     elEstado.textContent = "CONTÍNUO";
                     elEstado.style.color = "#ff3366";
-                    acionarVibracallHardware(true);
+                    iniciarContinuo();
                 }
             } else if (rms >= limiteL1) {
                 if (estadoVibracall !== "PULSANTE") {
@@ -341,32 +415,46 @@
                     estadoVibracall = "OFF";
                     elEstado.textContent = "OFF";
                     elEstado.style.color = "#8b949e";
-                    pararPulsacao();
-                    acionarVibracallHardware(false);
+                    pararTodosVibracall();
                 }
             }
         }
 
         function iniciarPulsacao() {
-            pararPulsacao();
+            pararTodosVibracall();
             let estado = false;
             temporizadorPulsacao = setInterval(() => {
                 estado = !estado;
-                acionarVibracallHardware(estado);
+                if (estado && "vibrate" in navigator) {
+                    navigator.vibrate(120);
+                }
             }, 200);
         }
 
-        function pararPulsacao() {
+        function iniciarContinuo() {
+            pararTodosVibracall();
+            if ("vibrate" in navigator) {
+                navigator.vibrate(2000);
+            }
+            // Renova a vibração contínua antes que expire o tempo do SO
+            temporizadorContinuo = setInterval(() => {
+                if ("vibrate" in navigator) {
+                    navigator.vibrate(2000);
+                }
+            }, 1800);
+        }
+
+        function pararTodosVibracall() {
             if (temporizadorPulsacao) {
                 clearInterval(temporizadorPulsacao);
                 temporizadorPulsacao = null;
             }
-        }
-
-        function acionarVibracallHardware(ligar) {
+            if (temporizadorContinuo) {
+                clearInterval(temporizadorContinuo);
+                temporizadorContinuo = null;
+            }
             if ("vibrate" in navigator) {
-                if (ligar) navigator.vibrate(500);
-                else navigator.vibrate(0);
+                navigator.vibrate(0);
             }
         }
     </script>
