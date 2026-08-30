@@ -91,10 +91,11 @@
             accent-color: #00ff66;
         }
 
+        /* Ajustado para 2 colunas amplas */
         .grid-medidores {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
             width: 100%;
             margin-top: 15px;
         }
@@ -103,7 +104,7 @@
             background-color: #21262d;
             border: 1px solid #30363d;
             border-radius: 8px;
-            padding: 10px 5px;
+            padding: 12px 8px;
             text-align: center;
         }
 
@@ -114,20 +115,19 @@
         }
 
         .card-medidor .valor {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             font-family: monospace;
             color: #ffffff;
             margin-top: 5px;
         }
 
-        #card-estado { border-color: #00ff66; }
-        #valEstado { color: #8b949e; }
-
         .controles-top {
             display: flex;
             gap: 10px;
             margin-bottom: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         button {
@@ -144,17 +144,15 @@
 
         button:hover { background-color: #2ea043; }
 
-        #btnCongelar {
-            background-color: #8b949e;
-        }
+        #btnCongelar { background-color: #8b949e; }
+        #btnCongelar.ativo { background-color: #d97706; }
 
-        #btnCongelar.ativo {
-            background-color: #d97706;
-        }
+        #btnMute { background-color: #1f6feb; }
+        #btnMute.mutado { background-color: #da3633; }
 
         @media (max-width: 480px) {
             .painel-sliders { flex-direction: column; }
-            .card-medidor .valor { font-size: 1rem; }
+            .card-medidor .valor { font-size: 1.1rem; }
             .controles-top { flex-direction: column; width: 100%; }
         }
     </style>
@@ -167,6 +165,7 @@
     <div class="controles-top">
         <button id="btnIniciar">Ligar Entrada de Áudio</button>
         <button id="btnCongelar">Congelar Tela (Hold)</button>
+        <button id="btnMute">Vibracall: ATIVO!!</button>
     </div>
 
     <div id="painel-principal">
@@ -192,10 +191,6 @@
                 <div class="rotulo">Valor de Pico</div>
                 <div class="valor" id="valPico">0.0000</div>
             </div>
-            <div class="card-medidor" id="card-estado">
-                <div class="rotulo">Modo Vibracall</div>
-                <div class="valor" id="valEstado">OFF</div>
-            </div>
         </div>
     </div>
 
@@ -205,9 +200,9 @@
         let canvas, canvasCtx;
         let emExecucao = false;
         let telaCongelada = false;
+        let vibracallMutado = false;
 
-        // Janela total de visualização na largura da tela (em milissegundos)
-        // 2.0 ms permite visualizar aproximadamente 9 ciclos da senoide de 4500 Hz
+        // Janela total de visualização na largura da tela (em ms)
         const tempoTotalMs = 2.0;
 
         let limiteL1 = 0.08;
@@ -216,6 +211,7 @@
         let estadoVibracall = "OFF";
         let temporizadorPulsacao = null;
         let temporizadorContinuo = null;
+        let estadoLedPulsante = false; // Estado do pisca visual para modo L1
 
         document.getElementById('sliderL1').addEventListener('input', (e) => {
             limiteL1 = parseFloat(e.target.value);
@@ -239,6 +235,19 @@
             }
         });
 
+        document.getElementById('btnMute').addEventListener('click', () => {
+            vibracallMutado = !vibracallMutado;
+            const btn = document.getElementById('btnMute');
+            if (vibracallMutado) {
+                btn.textContent = "Vibracall: MUTE❌";
+                btn.classList.add('mutado');
+                pararTodosVibracallMotor(); // Desliga o motor de imediato
+            } else {
+                btn.textContent = "Vibracall: ATIVO!!";
+                btn.classList.remove('mutado');
+            }
+        });
+
         document.getElementById('btnIniciar').addEventListener('click', async () => {
             if (emExecucao) return;
 
@@ -246,7 +255,6 @@
             canvasCtx = canvas.getContext('2d');
 
             try {
-                // Configuração com AGC desativado para evitar amplificação de ruído no silêncio
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: { 
                         echoCancellation: false, 
@@ -280,7 +288,6 @@
 
             requestAnimationFrame(renderizar);
 
-            // Se a tela estiver congelada pelo botão Hold, pula a atualização gráfica
             if (telaCongelada) return;
 
             const tamanhoBuffer = analisador.fftSize;
@@ -290,14 +297,14 @@
             canvasCtx.fillStyle = '#000000';
             canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Desenho da Grade Quadriculada (Retícula de Osciloscópio)
+            // Desenho da Grade Quadriculada
             desenharGradeReticula();
 
             // Tracejados de Setpoint L1 e L2
             desenharLinhaSetpoint(limiteL1, '#ffcc00');
             desenharLinhaSetpoint(limiteL2, '#ff3366');
 
-            // Sinal do Sensor com Janela de Tempo Ajustada
+            // Sinal do Sensor
             canvasCtx.lineWidth = 2;
             canvasCtx.strokeStyle = '#00ff66';
             canvasCtx.beginPath();
@@ -329,6 +336,9 @@
 
             canvasCtx.stroke();
 
+            // Desenhar Bolinha Indicadora Visual (LED de 1 cm)
+            desenharBolinhaLED();
+
             const rms = Math.sqrt(somaQuadrados / amostrasExibidas);
             document.getElementById('valRMS').textContent = rms.toFixed(4);
             document.getElementById('valPico').textContent = valorPico.toFixed(4);
@@ -343,32 +353,26 @@
             canvasCtx.lineWidth = 1;
             canvasCtx.strokeStyle = '#003311';
 
-            // Linhas Verticais
-            const larguraDiv = canvas.width / divisoesHorizontais;
             for (let i = 1; i < divisoesHorizontais; i++) {
                 canvasCtx.beginPath();
-                canvasCtx.moveTo(i * larguraDiv, 0);
-                canvasCtx.lineTo(i * larguraDiv, canvas.height);
+                canvasCtx.moveTo(i * (canvas.width / divisoesHorizontais), 0);
+                canvasCtx.lineTo(i * (canvas.width / divisoesHorizontais), canvas.height);
                 canvasCtx.stroke();
             }
 
-            // Linhas Horizontais
-            const alturaDiv = canvas.height / divisoesVerticais;
             for (let j = 1; j < divisoesVerticais; j++) {
                 canvasCtx.beginPath();
-                canvasCtx.moveTo(0, j * alturaDiv);
-                canvasCtx.lineTo(canvas.width, j * alturaDiv);
+                canvasCtx.moveTo(0, j * (canvas.height / divisoesVerticais));
+                canvasCtx.lineTo(canvas.width, j * (canvas.height / divisoesVerticais));
                 canvasCtx.stroke();
             }
 
-            // Eixo Central Mais Destacado
             canvasCtx.strokeStyle = '#006622';
             canvasCtx.beginPath();
             canvasCtx.moveTo(0, canvas.height / 2);
             canvasCtx.lineTo(canvas.width, canvas.height / 2);
             canvasCtx.stroke();
 
-            // Texto Informativo da Escala de Tempo
             canvasCtx.fillStyle = '#00aa44';
             canvasCtx.font = '10px monospace';
             const msPorDiv = (tempoTotalMs / divisoesHorizontais).toFixed(2);
@@ -393,39 +397,66 @@
             canvasCtx.setLineDash([]);
         }
 
-        function atualizarLogicaVibracall(rms) {
-            const elEstado = document.getElementById('valEstado');
+        function desenharBolinhaLED() {
+            // Diâmetro de ~1 cm (raio de 19 pixels)
+            const raioLED = 19; 
+            const xLED = canvas.width - 35;
+            const yLED = 35;
 
-            if (rms >= limiteL2) {
-                if (estadoVibracall !== "CONTÍNUO") {
-                    estadoVibracall = "CONTÍNUO";
-                    elEstado.textContent = "CONTÍNUO";
-                    elEstado.style.color = "#ff3366";
-                    iniciarContinuo();
-                }
-            } else if (rms >= limiteL1) {
-                if (estadoVibracall !== "PULSANTE") {
-                    estadoVibracall = "PULSANTE";
-                    elEstado.textContent = "PULSANTE";
-                    elEstado.style.color = "#ffcc00";
-                    iniciarPulsacao();
-                }
-            } else {
-                if (estadoVibracall !== "OFF") {
-                    estadoVibracall = "OFF";
-                    elEstado.textContent = "OFF";
-                    elEstado.style.color = "#8b949e";
-                    pararTodosVibracall();
+            let corLED = '#222222'; // Desligado / Off
+            let corBorda = '#444444';
+
+            if (estadoVibracall === "CONTÍNUO") {
+                corLED = '#ff3366'; // Vermelho Aceso
+                corBorda = '#ffffff';
+            } else if (estadoVibracall === "PULSANTE") {
+                if (estadoLedPulsante) {
+                    corLED = '#ffcc00'; // Amarelo Aceso
+                    corBorda = '#ffffff';
+                } else {
+                    corLED = '#332a00'; // Amarelo Apagado
+                    corBorda = '#665500';
                 }
             }
+
+            canvasCtx.beginPath();
+            canvasCtx.arc(xLED, yLED, raioLED, 0, 2 * Math.PI, false);
+            canvasCtx.fillStyle = corLED;
+            canvasCtx.fill();
+            canvasCtx.lineWidth = 3;
+            canvasCtx.strokeStyle = corBorda;
+            canvasCtx.stroke();
         }
 
+function atualizarLogicaVibracall(rms) {
+    if (rms > limiteL2) {
+        // Sinal Forte (Acima de L2) -> Alerta de aproximação excessiva
+        if (estadoVibracall !== "PULSANTE") {
+            estadoVibracall = "PULSANTE";
+            iniciarPulsacao();
+        }
+    } else if (rms < limiteL1) {
+        // Sinal Fraco (Abaixo de L1) -> Alerta de afastamento / perda da pista
+        if (estadoVibracall !== "CONTÍNUO") {
+            estadoVibracall = "CONTÍNUO";
+            iniciarContinuo();
+        }
+    } else {
+        // Sinal Médio (Entre L1 e L2) -> Zona central ideal / SILÊNCIO
+        if (estadoVibracall !== "OFF") {
+            estadoVibracall = "OFF";
+            pararTodosVibracall();
+        }
+    }
+}
         function iniciarPulsacao() {
             pararTodosVibracall();
-            let estado = false;
+            estadoLedPulsante = false;
+            
             temporizadorPulsacao = setInterval(() => {
-                estado = !estado;
-                if (estado && "vibrate" in navigator) {
+                estadoLedPulsante = !estadoLedPulsante;
+                
+                if (!vibracallMutado && estadoLedPulsante && "vibrate" in navigator) {
                     navigator.vibrate(120);
                 }
             }, 200);
@@ -433,12 +464,13 @@
 
         function iniciarContinuo() {
             pararTodosVibracall();
-            if ("vibrate" in navigator) {
+            
+            if (!vibracallMutado && "vibrate" in navigator) {
                 navigator.vibrate(2000);
             }
-            // Renova a vibração contínua antes que expire o tempo do SO
+            
             temporizadorContinuo = setInterval(() => {
-                if ("vibrate" in navigator) {
+                if (!vibracallMutado && "vibrate" in navigator) {
                     navigator.vibrate(2000);
                 }
             }, 1800);
@@ -453,6 +485,11 @@
                 clearInterval(temporizadorContinuo);
                 temporizadorContinuo = null;
             }
+            estadoLedPulsante = false;
+            pararTodosVibracallMotor();
+        }
+
+        function pararTodosVibracallMotor() {
             if ("vibrate" in navigator) {
                 navigator.vibrate(0);
             }
