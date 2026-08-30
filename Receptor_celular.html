@@ -165,7 +165,7 @@
     <div class="controles-top">
         <button id="btnIniciar">Ligar Entrada de Áudio</button>
         <button id="btnCongelar">Congelar Tela (Hold)</button>
-        <button id="btnMute">Vibracall: ATIVO!!</button>
+        <button id="btnMute"> Vibracall: ATIVO!!  </button>
     </div>
 
     <div id="painel-principal">
@@ -201,6 +201,9 @@
         let emExecucao = false;
         let telaCongelada = false;
         let vibracallMutado = false;
+        let estadoCandidato = "OFF";
+        let tempoInicioCandidato = 0;
+        const tempoConfirmacaoMs = 200; // 1 segundo para confirmar a mudança
 
         // Janela total de visualização na largura da tela (em ms)
         const tempoTotalMs = 2.0;
@@ -239,7 +242,7 @@
             vibracallMutado = !vibracallMutado;
             const btn = document.getElementById('btnMute');
             if (vibracallMutado) {
-                btn.textContent = "Vibracall: MUTE❌";
+                btn.textContent = "Vibracall: MUDO❌";
                 btn.classList.add('mutado');
                 pararTodosVibracallMotor(); // Desliga o motor de imediato
             } else {
@@ -429,24 +432,37 @@
         }
 
 function atualizarLogicaVibracall(rms) {
+    // 1. Determina qual é o estado sugerido no instante atual
+    let novoEstadoSugerido = "OFF";
     if (rms > limiteL2) {
-        // Sinal Forte (Acima de L2) -> Alerta de aproximação excessiva
-        if (estadoVibracall !== "PULSANTE") {
-            estadoVibracall = "PULSANTE";
-            iniciarPulsacao();
-        }
+        novoEstadoSugerido = "PULSANTE";
     } else if (rms < limiteL1) {
-        // Sinal Fraco (Abaixo de L1) -> Alerta de afastamento / perda da pista
-        if (estadoVibracall !== "CONTÍNUO") {
-            estadoVibracall = "CONTÍNUO";
-            iniciarContinuo();
+        novoEstadoSugerido = "CONTÍNUO";
+    } else {
+        novoEstadoSugerido = "OFF";
+    }
+
+    // 2. Se o sinal mudou em relação ao estado ATUAL de saída:
+    if (novoEstadoSugerido !== estadoVibracall) {
+        
+        // Se é a primeira vez que vemos essa sugestão, inicia o cronômetro
+        if (novoEstadoSugerido !== estadoCandidato) {
+            estadoCandidato = novoEstadoSugerido;
+            tempoInicioCandidato = Date.now();
+        } else {
+            // Se o sinal se manteve nessa nova faixa por mais de 1000 ms (1 segundo):
+            if (Date.now() - tempoInicioCandidato >= tempoConfirmacaoMs) {
+                // CONFIRMADO! Aplica a mudança definitiva de estado
+                estadoVibracall = estadoCandidato;
+                
+                if (estadoVibracall === "PULSANTE") iniciarPulsacao();
+                else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
+                else pararTodosVibracall();
+            }
         }
     } else {
-        // Sinal Médio (Entre L1 e L2) -> Zona central ideal / SILÊNCIO
-        if (estadoVibracall !== "OFF") {
-            estadoVibracall = "OFF";
-            pararTodosVibracall();
-        }
+        // Se o sinal voltou ao estado atual, reseta o candidato
+        estadoCandidato = estadoVibracall;
     }
 }
         function iniciarPulsacao() {
