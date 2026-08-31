@@ -480,41 +480,30 @@ function atualizarLogicaVibracall(yLinha) {
     const yPixelsL1 = (canvas.height / 2) - (limiteL1 * canvas.height / 2);
     const yPixelsL2 = (canvas.height / 2) - (limiteL2 * canvas.height / 2);
 
-    // No Canvas, menor valor de Y fica no TOPO (L2 = Sinal Forte).
-    // Maior valor de Y fica na BASE (L1 = Sinal Fraco).
-    const yL2_Topo = Math.min(yPixelsL1, yPixelsL2);  // Linha superior (Parede Virtual)
-    const yL1_Base = Math.max(yPixelsL1, yPixelsL2);  // Linha inferior (Afastamento)
+    const yL2_Topo = Math.min(yPixelsL1, yPixelsL2);  // Linha superior
+    const yL1_Base = Math.max(yPixelsL1, yPixelsL2);  // Linha inferior
 
     let novoEstadoSugerido = "OFF";
 
-    // 2. Avaliação das Regiões ajustada para a física da pista:
+    // 2. Avaliação das Regiões (Lógica ajustada por você)
     if (yAtual < yL2_Topo) {
         novoEstadoSugerido = "PULSANTE";   // Linha desceu além de L1 (Muito longe do cabo -> ALERTA)
     } else if (yAtual >= yL2_Topo && yAtual <= yL1_Base) {
         novoEstadoSugerido = "OFF";        // Entre L2 e L1 (Zona de conforto / Trajetória correta)
     } else if (yAtual > yL1_Base) {
         novoEstadoSugerido = "CONTÍNUO";   // Linha subiu além de L2 (Muito perto do cabo -> PAREDE)
-
     }
 
-    // 3. Aplicação do Filtro de Tempo (Confirmação)
+    // 3. Transição Instantânea (Sem delay de tempo)
     if (novoEstadoSugerido !== estadoVibracall) {
-        if (novoEstadoSugerido !== estadoCandidato) {
-            estadoCandidato = novoEstadoSugerido;
-            tempoInicioCandidato = Date.now();
-        } else if (Date.now() - tempoInicioCandidato >= tempoConfirmacaoMs) {
-            estadoVibracall = estadoCandidato;
-            
-            // Dispara ações
-            if (estadoVibracall === "PULSANTE") iniciarPulsacao();
-            else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
-            else pararTodosVibracall();
-        }
-    } else {
-        estadoCandidato = estadoVibracall;
+        estadoVibracall = novoEstadoSugerido;
+        
+        // Dispara ações imediatas do motor
+        if (estadoVibracall === "PULSANTE") iniciarPulsacao();
+        else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
+        else pararTodosVibracall();
     }
 }
-
         function iniciarPulsacao() {
             pararTodosVibracall();
             estadoLedPulsante = false;
