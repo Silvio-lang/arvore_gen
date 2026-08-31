@@ -216,6 +216,10 @@
         let temporizadorContinuo = null;
         let estadoLedPulsante = false; // Estado do pisca visual para modo L1
 
+// Variáveis para a Média Móvel da linha horizontal de distância
+        const historicoDistancia = [];
+        const tamanhoJanelaMedia = 10; // 10 amostras (~166 ms)
+
         document.getElementById('sliderL1').addEventListener('input', (e) => {
             limiteL1 = parseFloat(e.target.value);
             document.getElementById('txtL1').textContent = limiteL1.toFixed(2);
@@ -286,67 +290,72 @@
             }
         });
 
-        function renderizar() {
-            if (!emExecucao) return;
+function renderizar() {
+    if (!emExecucao) return;
 
-            requestAnimationFrame(renderizar);
+    requestAnimationFrame(renderizar);
 
-            if (telaCongelada) return;
+    if (telaCongelada) return;
 
-            const tamanhoBuffer = analisador.fftSize;
-            const dadosFormaOnda = new Uint8Array(tamanhoBuffer);
-            analisador.getByteTimeDomainData(dadosFormaOnda);
+    const tamanhoBuffer = analisador.fftSize;
+    const dadosFormaOnda = new Uint8Array(tamanhoBuffer);
+    analisador.getByteTimeDomainData(dadosFormaOnda);
 
-            canvasCtx.fillStyle = '#000000';
-            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    canvasCtx.fillStyle = '#000000';
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Desenho da Grade Quadriculada
-            desenharGradeReticula();
+    // Desenho da Grade Quadriculada
+    desenharGradeReticula();
 
-            // Tracejados de Setpoint L1 e L2
-            desenharLinhaSetpoint(limiteL1, '#ffcc00');
-            desenharLinhaSetpoint(limiteL2, '#ff3366');
+    // Tracejados de Setpoint L1 e L2
+    desenharLinhaSetpoint(limiteL1, '#ffcc00');
+    desenharLinhaSetpoint(limiteL2, '#ff3366');
 
-            // Sinal do Sensor
-            canvasCtx.lineWidth = 2;
-            canvasCtx.strokeStyle = '#00ff66';
-            canvasCtx.beginPath();
+    // Sinal do Sensor
+    canvasCtx.lineWidth = 1;
+    canvasCtx.strokeStyle = '#777777';  // <<  COR DA LINHA DO SENSOR
+    canvasCtx.beginPath();
 
-            const taxaAostragem = audioContext.sampleRate;
-            const amostrasExibidas = Math.min(
-                tamanhoBuffer, 
-                Math.floor((tempoTotalMs / 1000.0) * taxaAostragem)
-            );
+    const taxaAostragem = audioContext.sampleRate;
+    const amostrasExibidas = Math.min(
+        tamanhoBuffer, 
+        Math.floor((tempoTotalMs / 1000.0) * taxaAostragem)
+    );
 
-            const larguraFatia = canvas.width * 1.0 / amostrasExibidas;
-            let x = 0;
-            let somaQuadrados = 0;
-            let valorPico = 0;
+    const larguraFatia = canvas.width * 1.0 / amostrasExibidas;
+    let x = 0;
+    let somaQuadrados = 0;
+    let valorPico = 0;
 
-            for (let i = 0; i < amostrasExibidas; i++) {
-                const v = (dadosFormaOnda[i] - 128) / 128.0;
-                const y = (v * canvas.height / 2) + (canvas.height / 2);
+    for (let i = 0; i < amostrasExibidas; i++) {
+        const v = (dadosFormaOnda[i] - 128) / 128.0;
+        const y = (v * canvas.height / 2) + (canvas.height / 2);
 
-                if (i === 0) canvasCtx.moveTo(x, y);
-                else canvasCtx.lineTo(x, y);
+        if (i === 0) canvasCtx.moveTo(x, y);
+        else canvasCtx.lineTo(x, y);
 
-                x += larguraFatia;
+        x += larguraFatia;
 
-                const absV = Math.abs(v);
-                if (absV > valorPico) valorPico = absV;
-                somaQuadrados += v * v;
-            }
+        const absV = Math.abs(v);
+        if (absV > valorPico) valorPico = absV;
+        somaQuadrados += v * v;
+    }
 
-            canvasCtx.stroke();
+    canvasCtx.stroke();
 
-            // Desenhar Bolinha Indicadora Visual (LED de 1 cm)
-            desenharBolinhaLED();
+    const rms = Math.sqrt(somaQuadrados / amostrasExibidas);
 
-            const rms = Math.sqrt(somaQuadrados / amostrasExibidas);
+             // 1. A função desenha a linha amarela e retorna a posição Y em pixels
+            const yLinhaAmarela = desenharLinhaDistanciaSuave(rms, canvas, canvasCtx);
+
+            // 2. Atualizamos a lógica com a posição Y (e não com o valor RMS)
+            atualizarLogicaVibracall(yLinhaAmarela);
+
+            // 3. Chamada com o nome exato da sua função e seus parâmetros
+            desenharBolinha(canvasCtx, canvas);
+
             document.getElementById('valRMS').textContent = rms.toFixed(4);
             document.getElementById('valPico').textContent = valorPico.toFixed(4);
-
-            atualizarLogicaVibracall(rms);
         }
 
         function desenharGradeReticula() {
@@ -382,6 +391,39 @@
             canvasCtx.fillText(`${tempoTotalMs.toFixed(1)} ms/tela | ${msPorDiv} ms/div`, 8, 14);
         }
 
+function desenharLinhaDistanciaSuave(rms, canvas, ctx) {
+    const elemSliderK = document.getElementById('sliderK');
+    const kEscalaDistancia = elemSliderK ? parseFloat(elemSliderK.value) : 1.0; 
+    
+    const distanciaInstantanea = kEscalaDistancia / (rms + 0.001);
+
+    historicoDistancia.push(distanciaInstantanea);
+    if (historicoDistancia.length > tamanhoJanelaMedia) {
+        historicoDistancia.shift();
+    }
+    const soma = historicoDistancia.reduce((acc, val) => acc + val, 0);
+    const distanciaFiltrada = soma / historicoDistancia.length;
+
+    const yCentro = canvas.height / 2;
+    let yLinhaDistancia = yCentro - distanciaFiltrada;
+
+    const limiteTopo = 80; // <<=====================  Mudar posição da linha de "muito fora!". Quanto menor, mais distância.
+    const limiteCentro = yCentro - 10
+    yLinhaDistancia = Math.max(limiteTopo, Math.min(yLinhaDistancia, limiteCentro));
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#FFD700'; // Dourado
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);     // Tracejado
+    ctx.moveTo(0, yLinhaDistancia);
+    ctx.lineTo(canvas.width, yLinhaDistancia);
+    ctx.stroke();
+    ctx.setLineDash([]);        // Restaura estilo contínuo
+
+    // RETORNA A POSIÇÃO Y FILTRADA PARA A LÓGICA DO VIBRACALL
+    return yLinhaDistancia;
+}
+
         function desenharLinhaSetpoint(limite, cor) {
             const ySuperior = (canvas.height / 2) - (limite * canvas.height / 2);
             const yInferior = (canvas.height / 2) + (limite * canvas.height / 2);
@@ -400,71 +442,79 @@
             canvasCtx.setLineDash([]);
         }
 
-        function desenharBolinhaLED() {
-            // Diâmetro de ~1 cm (raio de 19 pixels)
-            const raioLED = 19; 
-            const xLED = canvas.width - 35;
-            const yLED = 35;
+function desenharBolinha(ctx, canvas) {
+    const raio = 12;
+    const x = canvas.width - 25;
+    const y = 25;
 
-            let corLED = '#222222'; // Desligado / Off
-            let corBorda = '#444444';
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, raio, 0, 2 * Math.PI);
 
-            if (estadoVibracall === "CONTÍNUO") {
-                corLED = '#ff3366'; // Vermelho Aceso
-                corBorda = '#ffffff';
-            } else if (estadoVibracall === "PULSANTE") {
-                if (estadoLedPulsante) {
-                    corLED = '#ffcc00'; // Amarelo Aceso
-                    corBorda = '#ffffff';
-                } else {
-                    corLED = '#332a00'; // Amarelo Apagado
-                    corBorda = '#665500';
-                }
-            }
+    // Avalia o estado global 'estadoVibracall' para definir a cor da Bolinha:
+    if (estadoVibracall === "PULSANTE") {
+        // Modo PULSANTE: Amarelo piscante (alterna a cada 300 ms)
+        const piscar = Math.floor(Date.now() / 300) % 2 === 0;
+        ctx.fillStyle = piscar ? '#FFD700' : '#444400';
 
-            canvasCtx.beginPath();
-            canvasCtx.arc(xLED, yLED, raioLED, 0, 2 * Math.PI, false);
-            canvasCtx.fillStyle = corLED;
-            canvasCtx.fill();
-            canvasCtx.lineWidth = 3;
-            canvasCtx.strokeStyle = corBorda;
-            canvasCtx.stroke();
-        }
+    } else if (estadoVibracall === "CONTÍNUO") {
+        // Modo CONTÍNUO (Parede Virtual): Vermelho firme
+        ctx.fillStyle = '#FF0000';
 
-function atualizarLogicaVibracall(rms) {
-    // 1. Determina qual é o estado sugerido no instante atual
-    let novoEstadoSugerido = "OFF";
-    if (rms > limiteL2) {
-        novoEstadoSugerido = "PULSANTE";
-    } else if (rms < limiteL1) {
-        novoEstadoSugerido = "CONTÍNUO";
     } else {
-        novoEstadoSugerido = "OFF";
+        // Modo OFF (Zona de Silêncio / Descanso): Cinza apagado
+        ctx.fillStyle = '#333333';
     }
 
-    // 2. Se o sinal mudou em relação ao estado ATUAL de saída:
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#FFFFFF'; // Borda branca de destaque
+    ctx.stroke();
+    ctx.restore();
+}
+
+function atualizarLogicaVibracall(yLinha) {
+    const yAtual = Number(yLinha);
+
+    // 1. Converte os limites decimais para posições Y em Pixels na tela
+    const yPixelsL1 = (canvas.height / 2) - (limiteL1 * canvas.height / 2);
+    const yPixelsL2 = (canvas.height / 2) - (limiteL2 * canvas.height / 2);
+
+    // No Canvas, menor valor de Y fica no TOPO (L2 = Sinal Forte).
+    // Maior valor de Y fica na BASE (L1 = Sinal Fraco).
+    const yL2_Topo = Math.min(yPixelsL1, yPixelsL2);  // Linha superior (Parede Virtual)
+    const yL1_Base = Math.max(yPixelsL1, yPixelsL2);  // Linha inferior (Afastamento)
+
+    let novoEstadoSugerido = "OFF";
+
+    // 2. Avaliação das Regiões ajustada para a física da pista:
+    if (yAtual < yL2_Topo) {
+        novoEstadoSugerido = "PULSANTE";   // Linha desceu além de L1 (Muito longe do cabo -> ALERTA)
+    } else if (yAtual >= yL2_Topo && yAtual <= yL1_Base) {
+        novoEstadoSugerido = "OFF";        // Entre L2 e L1 (Zona de conforto / Trajetória correta)
+    } else if (yAtual > yL1_Base) {
+        novoEstadoSugerido = "CONTÍNUO";   // Linha subiu além de L2 (Muito perto do cabo -> PAREDE)
+
+    }
+
+    // 3. Aplicação do Filtro de Tempo (Confirmação)
     if (novoEstadoSugerido !== estadoVibracall) {
-        
-        // Se é a primeira vez que vemos essa sugestão, inicia o cronômetro
         if (novoEstadoSugerido !== estadoCandidato) {
             estadoCandidato = novoEstadoSugerido;
             tempoInicioCandidato = Date.now();
-        } else {
-            // Se o sinal se manteve nessa nova faixa por mais de 1000 ms (1 segundo):
-            if (Date.now() - tempoInicioCandidato >= tempoConfirmacaoMs) {
-                // CONFIRMADO! Aplica a mudança definitiva de estado
-                estadoVibracall = estadoCandidato;
-                
-                if (estadoVibracall === "PULSANTE") iniciarPulsacao();
-                else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
-                else pararTodosVibracall();
-            }
+        } else if (Date.now() - tempoInicioCandidato >= tempoConfirmacaoMs) {
+            estadoVibracall = estadoCandidato;
+            
+            // Dispara ações
+            if (estadoVibracall === "PULSANTE") iniciarPulsacao();
+            else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
+            else pararTodosVibracall();
         }
     } else {
-        // Se o sinal voltou ao estado atual, reseta o candidato
         estadoCandidato = estadoVibracall;
     }
 }
+
         function iniciarPulsacao() {
             pararTodosVibracall();
             estadoLedPulsante = false;
