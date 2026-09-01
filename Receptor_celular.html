@@ -165,8 +165,10 @@
     <div class="controles-top">
         <button id="btnIniciar">Ligar Entrada de Áudio</button>
         <button id="btnCongelar">Congelar Tela (Hold)</button>
-        <button id="btnMute"> Vibracall: OFF ❌</button>
-        <button id="btnTouchLock">Touch: ATIVO 🔓</button>
+    <div class="linha-dupla-botoes">
+            <button id="btnMute">Vibracall: ATIVO!!</button>
+            <button id="btnTouch">Touch: ATIVO 🔓</button>
+    </div>    
     </div>
 
     <div id="painel-principal">
@@ -251,7 +253,7 @@
                 btn.classList.add('mutado');
                 pararTodosVibracallMotor(); // Desliga o motor de imediato
             } else {
-                btn.textContent = "Vibracall: ON ⚙";
+                btn.textContent = "Vibracall: ON  ⚙";
                 btn.classList.remove('mutado');
             }
         });
