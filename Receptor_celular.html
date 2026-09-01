@@ -155,6 +155,26 @@
             .card-medidor .valor { font-size: 1.1rem; }
             .controles-top { flex-direction: column; width: 100%; }
         }
+    .linha-dupla-botoes {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .linha-dupla-botoes button {
+        flex: 1; /* Faz ambos dividirem o espaço em 50% */
+    }
+
+#btnTouch {
+    position: relative;
+    z-index: 10000; /* Fica acima da camada de bloqueio (9999) */
+    background-color: #238636;
+}
+
+#btnTouch.bloqueado {
+    background-color: #da3633;
+}
     </style>
 </head>
 <body>
@@ -170,6 +190,7 @@
             <button id="btnTouch">Touch: ATIVO 🔓</button>
     </div>    
     </div>
+<div id="camadaBloqueio" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: rgba(0,0,0,0.01);"></div>
 
     <div id="painel-principal">
         <canvas id="telaOsciloscopio" width="570" height="250"></canvas>
@@ -217,7 +238,12 @@
         let estadoVibracall = "OFF";
         let temporizadorPulsacao = null;
         let temporizadorContinuo = null;
-        let estadoLedPulsante = false; // Estado do pisca visual para modo L1
+        let estadoLedPulsante = false; // Estado do pisca visual para modo 
+
+        let touchBloqueado = false;
+        let temporizadorTrava = null;
+        const btnTouch = document.getElementById('btnTouch');
+        const camadaBloqueio = document.getElementById('camadaBloqueio');
 
 // Variáveis para a Média Móvel da linha horizontal de distância
         const historicoDistancia = [];
@@ -552,6 +578,43 @@ function atualizarLogicaVibracall(yLinha) {
                 navigator.vibrate(0);
             }
         }
+function travarTela() {
+    touchBloqueado = true;
+    btnTouch.textContent = "Touch: BLOQUEADO 🔒";
+    btnTouch.classList.add('bloqueado');
+    camadaBloqueio.style.display = 'block';
+}
+
+function destravarTela() {
+    touchBloqueado = false;
+    btnTouch.textContent = "Touch: ATIVO 🔓";
+    btnTouch.classList.remove('bloqueado');
+    camadaBloqueio.style.display = 'none';
+}
+
+btnTouch.addEventListener('pointerdown', (e) => {
+    if (!touchBloqueado) {
+        travarTela();
+    } else {
+        btnTouch.textContent = "Segure 2s...";
+        temporizadorTrava = setTimeout(() => {
+            destravarTela();
+        }, 2000);
+    }
+});
+
+btnTouch.addEventListener('pointerup', cancelarPressao);
+btnTouch.addEventListener('pointerleave', cancelarPressao);
+
+function cancelarPressao() {
+    if (temporizadorTrava) {
+        clearTimeout(temporizadorTrava);
+        temporizadorTrava = null;
+        if (touchBloqueado) {
+            btnTouch.textContent = "Touch: BLOQUEADO 🔒";
+        }
+    }
+}
     </script>
 </body>
 </html>
