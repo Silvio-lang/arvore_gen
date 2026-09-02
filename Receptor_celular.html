@@ -284,40 +284,45 @@
             }
         });
 
-        document.getElementById('btnIniciar').addEventListener('click', async () => {
-            if (emExecucao) return;
+document.getElementById('btnIniciar').addEventListener('click', async () => {
+    if (emExecucao) return;
 
-            canvas = document.getElementById('telaOsciloscopio');
-            canvasCtx = canvas.getContext('2d');
+    canvas = document.getElementById('telaOsciloscopio');
+    canvasCtx = canvas.getContext('2d');
 
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: { 
-                        echoCancellation: false, 
-                        noiseSuppression: false, 
-                        autoGainControl: false 
-                    },
-                    video: false
-                });
-
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const fonteMicrofone = audioContext.createMediaStreamSource(stream);
-
-                analisador = audioContext.createAnalyser();
-                analisador.fftSize = 2048;
-
-                fonteMicrofone.connect(analisador);
-
-                emExecucao = true;
-                document.getElementById('btnIniciar').textContent = "Receptor Ativo";
-                document.getElementById('btnIniciar').style.backgroundColor = "#1f6feb";
-
-                renderizar();
-
-            } catch (erro) {
-                alert("Erro ao acessar a entrada de áudio: " + erro.message);
-            }
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: { 
+                echoCancellation: false, 
+                noiseSuppression: false, 
+                autoGainControl: false,
+                // Força o Android a usar a captura crua de hardware (sem filtros de voz)
+                channelCount: 1,
+                sampleRate: 44100
+            },
+            video: false
         });
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Garante que o AudioContext rode na mesma taxa nativa
+        const fonteMicrofone = audioContext.createMediaStreamSource(stream);
+
+        analisador = audioContext.createAnalyser();
+        analisador.fftSize = 2048;
+
+        fonteMicrofone.connect(analisador);
+
+        emExecucao = true;
+        document.getElementById('btnIniciar').textContent = "Receptor Ativo";
+        document.getElementById('btnIniciar').style.backgroundColor = "#1f6feb";
+
+        renderizar();
+
+    } catch (erro) {
+        alert("Erro ao acessar a entrada de áudio: " + erro.message);
+    }
+});
 
 function renderizar() {
     if (!emExecucao) return;
@@ -337,8 +342,8 @@ function renderizar() {
     desenharGradeReticula();
 
     // Tracejados de Setpoint L1 e L2
-    desenharLinhaSetpoint(limiteL1, '#ffcc00');
-    desenharLinhaSetpoint(limiteL2, '#ff3366');
+    desenharLinhaSetpoint(limiteL1, '#ffffff');
+    desenharLinhaSetpoint(limiteL2, '#ffff00');
 
     // Sinal do Sensor
     canvasCtx.lineWidth = 1;
@@ -433,12 +438,20 @@ function desenharLinhaDistanciaSuave(rms, canvas, ctx) {
     const soma = historicoDistancia.reduce((acc, val) => acc + val, 0);
     const distanciaFiltrada = soma / historicoDistancia.length;
 
-    const yCentro = canvas.height / 2;
-    let yLinhaDistancia = yCentro - distanciaFiltrada;
+    let yLinhaDistancia = canvas.height - distanciaFiltrada;
 
-    const limiteTopo = 80; // <<=====================  Mudar posição da linha de "muito fora!". Quanto menor, mais distância.
-    const limiteCentro = yCentro - 10
-    yLinhaDistancia = Math.max(limiteTopo, Math.min(yLinhaDistancia, limiteCentro));
+    // =========================================================================
+    // AJUSTE TEMPORÁRIO DE TESTE:
+    // Troque '0.70' abaixo pela porcentagem da tela onde quer travar o teto
+    // Ex: 0.35 (35%), 0.50 (50%), 0.70 (70%), 0.85 (85%)
+    // =========================================================================
+    const porcentagemMaxima = 0.40; 
+
+    const limiteTopo = canvas.height * (1 - porcentagemMaxima);
+    const limiteBase = canvas.height - 10;
+
+    yLinhaDistancia = Math.max(limiteTopo, Math.min(yLinhaDistancia, limiteBase));
+    // =========================================================================
 
     ctx.beginPath();
     ctx.strokeStyle = '#FFD700'; // Dourado
@@ -449,27 +462,25 @@ function desenharLinhaDistanciaSuave(rms, canvas, ctx) {
     ctx.stroke();
     ctx.setLineDash([]);        // Restaura estilo contínuo
 
-    // RETORNA A POSIÇÃO Y FILTRADA PARA A LÓGICA DO VIBRACALL
     return yLinhaDistancia;
 }
 
-        function desenharLinhaSetpoint(limite, cor) {
-            const ySuperior = (canvas.height / 2) - (limite * canvas.height / 2);
-            const yInferior = (canvas.height / 2) + (limite * canvas.height / 2);
+function desenharLinhaSetpoint(limite, cor) {
+    // ESCALA COMPLETA: Mapeia o limite de 0.0 (rodapé) até 1.0 (topo)
+    // Eliminado o espelhamento do semiciclo inferior
+    const yPixels = canvas.height - (limite * canvas.height);
 
-            canvasCtx.lineWidth = 1;
-            canvasCtx.strokeStyle = cor;
-            canvasCtx.setLineDash([5, 5]);
+    canvasCtx.lineWidth = 1;
+    canvasCtx.strokeStyle = cor;
+    canvasCtx.setLineDash([5, 5]);
 
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(0, ySuperior);
-            canvasCtx.lineTo(canvas.width, ySuperior);
-            canvasCtx.moveTo(0, yInferior);
-            canvasCtx.lineTo(canvas.width, yInferior);
-            canvasCtx.stroke();
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, yPixels);
+    canvasCtx.lineTo(canvas.width, yPixels);
+    canvasCtx.stroke();
 
-            canvasCtx.setLineDash([]);
-        }
+    canvasCtx.setLineDash([]);
+}
 
 function desenharBolinha(ctx, canvas) {
     const raio = 12;
@@ -502,37 +513,37 @@ function desenharBolinha(ctx, canvas) {
     ctx.restore();
 }
 
-function atualizarLogicaVibracall(yLinha) {
-    const yAtual = Number(yLinha);
+function atualizarLogicaVibracall(yLinhaAmarela) {
+    const yAtual = Number(yLinhaAmarela);
 
-    // 1. Converte os limites decimais para posições Y em Pixels na tela
-    const yPixelsL1 = (canvas.height / 2) - (limiteL1 * canvas.height / 2);
-    const yPixelsL2 = (canvas.height / 2) - (limiteL2 * canvas.height / 2);
+    // Mapeia L1 e L2 para a MESMA escala inteira do Canvas (0.0 no rodapé, 1.0 no topo)
+    const yPixelsL1 = canvas.height - (limiteL1 * canvas.height);
+    const yPixelsL2 = canvas.height - (limiteL2 * canvas.height);
 
-    const yL2_Topo = Math.min(yPixelsL1, yPixelsL2);  // Linha superior
-    const yL1_Base = Math.max(yPixelsL1, yPixelsL2);  // Linha inferior
+    // No Canvas, menor Y fica no TOPO (Sinal Forte / L2), maior Y fica no RODAPÉ (Sinal Fraco / L1)
+    const yL2_Topo = Math.min(yPixelsL1, yPixelsL2);
+    const yL1_Base = Math.max(yPixelsL1, yPixelsL2);
 
     let novoEstadoSugerido = "OFF";
 
-    // 2. Avaliação das Regiões (Lógica ajustada por você)
+    // Avaliação direta na tela:
     if (yAtual < yL2_Topo) {
-        novoEstadoSugerido = "PULSANTE";   // Linha desceu além de L1 (Muito longe do cabo -> ALERTA)
+        novoEstadoSugerido = "PULSANTE";   // Linha passou do limite superior -> ALERTA
     } else if (yAtual >= yL2_Topo && yAtual <= yL1_Base) {
-        novoEstadoSugerido = "OFF";        // Entre L2 e L1 (Zona de conforto / Trajetória correta)
+        novoEstadoSugerido = "OFF";        // Linha entre L1 e L2 -> ZONA DE CONFORTO
     } else if (yAtual > yL1_Base) {
-        novoEstadoSugerido = "CONTÍNUO";   // Linha subiu além de L2 (Muito perto do cabo -> PAREDE)
+        novoEstadoSugerido = "CONTÍNUO";   // Linha caiu abaixo de L1 -> PAREDE VIRTUAL
     }
 
-    // 3. Transição Instantânea (Sem delay de tempo)
+    // Aplicação com a sua janela de confirmação de 200ms
     if (novoEstadoSugerido !== estadoVibracall) {
         estadoVibracall = novoEstadoSugerido;
-        
-        // Dispara ações imediatas do motor
         if (estadoVibracall === "PULSANTE") iniciarPulsacao();
         else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
         else pararTodosVibracall();
     }
 }
+
         function iniciarPulsacao() {
             pararTodosVibracall();
             estadoLedPulsante = false;
