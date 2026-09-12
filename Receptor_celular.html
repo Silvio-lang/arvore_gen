@@ -175,7 +175,35 @@
 #btnTouch.bloqueado {
     background-color: #da3633;
 }
+
+    /* Estilo do Painel de Calibração */
+    .painel-calibracao {
+        display: flex;
+        gap: 12px;
+        margin: 15px 0;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .btn-calibrar {
+        flex: 1;
+        padding: 12px;
+        background-color: #0284c7;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-calibrar:active {
+        background-color: #0369a1;
+        transform: scale(0.98);
+    }
     </style>
+
 </head>
 <body>
 
@@ -194,7 +222,16 @@
 
     <div id="painel-principal">
         <canvas id="telaOsciloscopio" width="570" height="250"></canvas>
-        
+
+<div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: center;">
+    <button onclick="registrarPonto1m()" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
+        Calibrar 1 Metro
+    </button>
+    <button onclick="registrarPonto2m()" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
+        Calibrar 2 Metros
+    </button>
+</div>
+
         <div class="painel-sliders">
             <div class="controle-slider l1">
                 <label for="sliderL1">Ajuste limite próximo: <span id="txtL1">0.08</span></label>
@@ -204,6 +241,7 @@
     <label for="sliderL2">Inicio Sinal Forte (perto): <span id="txtL2">0.60</span></label>
     <input type="range" id="sliderL2" min="0.05" max="0.9" step="0.01" value="0.60">
 </div>
+
         </div>
 
         <div class="grid-medidores">
@@ -218,37 +256,52 @@
         </div>
     </div>
 
-    <script>
+<script>
+        // =========================================================================
+        // 1. VARIÁVEIS GLOBAIS E ESTADOS DO APLICATIVO
+        // =========================================================================
         let audioContext;
         let analisador;
         let canvas, canvasCtx;
         let emExecucao = false;
         let telaCongelada = false;
+
+        // Limites da Barra Horizontal (Bancada padrão)
+        const FREQ_LONGE = 5000;
+        const FREQ_PERTO = 2800;
+
+        // Estado da Calibração por Dois Pontos (1m e 2m)
+        let modoCalibracao = true;
+        let p1m = { freq: null, dist: 1.0 };
+        let p2m = { freq: null, dist: 2.0 };
+
+        // Limites de segurança para calibração
+        const FREQ_SATURACAO_MIN = 1000; 
+        const FREQ_SATURACAO_MAX = 8000; 
+        const DELTA_MINIMO_VALIDO = 200; 
+
+        // Configurações do Filtro de Média Móvel (ZCR)
+        const TAMANHO_AMOSTRAS_ZCR = 4;
+        const historicoFrequenciaZCR = [];
+
+        // Estado e Controle do Vibracall
         let vibracallMutado = true;
-        let estadoCandidato = "OFF";
-        let tempoInicioCandidato = 0;
-        const tempoConfirmacaoMs = 200; // 1 segundo para confirmar a mudança
-
-        // Janela total de visualização na largura da tela (em ms)
-        const tempoTotalMs = 2.0;
-
         let limiteL1 = 0.08;
         let limiteL2 = 0.60;
-
         let estadoVibracall = "OFF";
         let temporizadorPulsacao = null;
         let temporizadorContinuo = null;
-        let estadoLedPulsante = false; // Estado do pisca visual para modo 
+        let estadoLedPulsante = false;
 
+        // Trava de Tela Touch
         let touchBloqueado = false;
         let temporizadorTrava = null;
         const btnTouch = document.getElementById('btnTouch');
         const camadaBloqueio = document.getElementById('camadaBloqueio');
 
-// Variáveis para a Média Móvel da linha horizontal de distância
-        const historicoDistancia = [];
-        const tamanhoJanelaMedia = 10; // 10 amostras (~166 ms)
-
+        // =========================================================================
+        // 2. EVENT LISTENERS DA INTERFACE (SLIDERS E BOTÕES)
+        // =========================================================================
         document.getElementById('sliderL1').addEventListener('input', (e) => {
             limiteL1 = parseFloat(e.target.value);
             document.getElementById('txtL1').textContent = limiteL1.toFixed(2);
@@ -277,288 +330,266 @@
             if (vibracallMutado) {
                 btn.textContent = "Vibracall: OFF❌";
                 btn.classList.add('mutado');
-                pararTodosVibracallMotor(); // Desliga o motor de imediato
+                pararTodosVibracallMotor();
             } else {
-                btn.textContent = "Vibracall: ON  ⚙";
+                btn.textContent = "Vibracall: ON ⚙";
                 btn.classList.remove('mutado');
             }
         });
 
-document.getElementById('btnIniciar').addEventListener('click', async () => {
-    if (emExecucao) return;
+        document.getElementById('btnIniciar').addEventListener('click', async () => {
+            if (emExecucao) return;
 
-    canvas = document.getElementById('telaOsciloscopio');
-    canvasCtx = canvas.getContext('2d');
+            canvas = document.getElementById('telaOsciloscopio');
+            canvasCtx = canvas.getContext('2d');
 
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: { 
-                echoCancellation: false, 
-                noiseSuppression: false, 
-                autoGainControl: false,
-                // Força o Android a usar a captura crua de hardware (sem filtros de voz)
-                channelCount: 1,
-                sampleRate: 44100
-            },
-            video: false
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: { 
+                        echoCancellation: false, 
+                        noiseSuppression: false, 
+                        autoGainControl: false,
+                        channelCount: 1,
+                        sampleRate: 44100
+                    },
+                    video: false
+                });
+
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const fonteMicrofone = audioContext.createMediaStreamSource(stream);
+
+                analisador = audioContext.createAnalyser();
+                analisador.fftSize = 2048;
+
+                fonteMicrofone.connect(analisador);
+
+                emExecucao = true;
+                document.getElementById('btnIniciar').textContent = "Receptor Ativo";
+                document.getElementById('btnIniciar').style.backgroundColor = "#1f6feb";
+
+                renderizar();
+
+            } catch (erro) {
+                alert("Erro ao acessar a entrada de áudio: " + erro.message);
+            }
         });
 
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-        // Garante que o AudioContext rode na mesma taxa nativa
-        const fonteMicrofone = audioContext.createMediaStreamSource(stream);
-
-        analisador = audioContext.createAnalyser();
-        analisador.fftSize = 2048;
-
-        fonteMicrofone.connect(analisador);
-
-        emExecucao = true;
-        document.getElementById('btnIniciar').textContent = "Receptor Ativo";
-        document.getElementById('btnIniciar').style.backgroundColor = "#1f6feb";
-
-        renderizar();
-
-    } catch (erro) {
-        alert("Erro ao acessar a entrada de áudio: " + erro.message);
-    }
-});
-
-// 1. Função superleve para contagem de cruzamentos pelo zero ascendentes
-function calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem) {
-    let cruzamentos = 0;
-    for (let i = 1; i < dadosFormaOnda.length; i++) {
-        if (dadosFormaOnda[i - 1] <= 0 && dadosFormaOnda[i] > 0) {
-            cruzamentos++;
-        }
-    }
-    const duracaoSegundos = dadosFormaOnda.length / taxaAmostragem;
-    return cruzamentos / duracaoSegundos;
-}
-
-// 2. Função renderizar() modificada para leitura de Frequência
-function renderizar() {
-    if (!emExecucao) return;
-
-    requestAnimationFrame(renderizar);
-
-    if (telaCongelada) return;
-
-    const tamanhoBuffer = analisador.fftSize;
-    // Trabalhar com Float32Array facilita o Zero-Crossing (valores de -1.0 a +1.0)
-    const dadosFormaOnda = new Float32Array(tamanhoBuffer);
-    analisador.getFloatTimeDomainData(dadosFormaOnda);
-
-    canvasCtx.fillStyle = '#000000';
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Desenho da Grade Quadriculada
-    desenharGradeReticula();
-
-    // Tracejados de Setpoint L1 e L2 (Ajustes de Frequência Limite)
-    desenharLinhaSetpoint(limiteL1, '#ffffff');
-    desenharLinhaSetpoint(limiteL2, '#ffff00');
-
-    // Tracejar o sinal do sensor no Canvas
-    canvasCtx.lineWidth = 1;
-    canvasCtx.strokeStyle = '#777777';
-    canvasCtx.beginPath();
-
-    const taxaAmostragem = audioContext.sampleRate;
-    const amostrasExibidas = Math.min(
-        tamanhoBuffer, 
-        Math.floor((tempoTotalMs / 1000.0) * taxaAmostragem)
-    );
-
-    const larguraFatia = canvas.width * 1.0 / amostrasExibidas;
-    let x = 0;
-
-    for (let i = 0; i < amostrasExibidas; i++) {
-        const v = dadosFormaOnda[i];
-        const y = (v * canvas.height / 2) + (canvas.height / 2);
-
-        if (i === 0) canvasCtx.moveTo(x, y);
-        else canvasCtx.lineTo(x, y);
-
-        x += larguraFatia;
-    }
-
-    canvasCtx.stroke();
-
-    // CÁLCULO DE FREQUÊNCIA EM VEZ DE RMS
-    const freqMedida = calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem);
-
-    // Mapeamento normalizado da frequência para exibição no Canvas
-    // Assumindo a faixa ajustada de 1250 Hz (Perto) a 2500 Hz (Longe)
-    const freqMin = 1250;
-    const freqMax = 2500;
-    
-    // Normaliza de 0.0 a 1.0 (Invertido: Menor frequência = Maior nível/Perto)
-    const nivelNormalizado = 1.0 - Math.min(1.0, Math.max(0.0, (freqMedida - freqMin) / (freqMax - freqMin)));
-
-    // Desenha a linha amarela suave baseada na Frequência Normalizada
-    const yLinhaAmarela = desenharLinhaDistanciaSuave(nivelNormalizado, canvas, canvasCtx);
-
-    // Atualiza lógica de acionamento e bolinha visual
-    atualizarLogicaVibracall(yLinhaAmarela);
-    desenharBolinha(canvasCtx, canvas);
-
-    // Atualiza os cartões de texto com a Frequência
-    document.getElementById('valRMS').textContent = freqMedida.toFixed(1) + " Hz";
-    document.getElementById('valPico').textContent = (freqMedida / 1000).toFixed(2) + " kHz";
-}
-
-        function desenharGradeReticula() {
-            const divisoesHorizontais = 10;
-            const divisoesVerticais = 6;
-
-            canvasCtx.lineWidth = 1;
-            canvasCtx.strokeStyle = '#003311';
-
-            for (let i = 1; i < divisoesHorizontais; i++) {
-                canvasCtx.beginPath();
-                canvasCtx.moveTo(i * (canvas.width / divisoesHorizontais), 0);
-                canvasCtx.lineTo(i * (canvas.width / divisoesHorizontais), canvas.height);
-                canvasCtx.stroke();
+        // =========================================================================
+        // 3. PROCESSAMENTO DE ÁUDIO E FILTRAGEM (ZCR E MÉDIA MÓVEL)
+        // =========================================================================
+        function calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem) {
+            let cruzamentos = 0;
+            for (let i = 1; i < dadosFormaOnda.length; i++) {
+                if (dadosFormaOnda[i - 1] <= 0 && dadosFormaOnda[i] > 0) {
+                    cruzamentos++;
+                }
             }
-
-            for (let j = 1; j < divisoesVerticais; j++) {
-                canvasCtx.beginPath();
-                canvasCtx.moveTo(0, j * (canvas.height / divisoesVerticais));
-                canvasCtx.lineTo(canvas.width, j * (canvas.height / divisoesVerticais));
-                canvasCtx.stroke();
-            }
-
-            canvasCtx.strokeStyle = '#006622';
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(0, canvas.height / 2);
-            canvasCtx.lineTo(canvas.width, canvas.height / 2);
-            canvasCtx.stroke();
-
-            canvasCtx.fillStyle = '#00aa44';
-            canvasCtx.font = '10px monospace';
-            const msPorDiv = (tempoTotalMs / divisoesHorizontais).toFixed(2);
-            canvasCtx.fillText(`${tempoTotalMs.toFixed(1)} ms/tela | ${msPorDiv} ms/div`, 8, 14);
+            const duracaoSegundos = dadosFormaOnda.length / taxaAmostragem;
+            return cruzamentos / duracaoSegundos;
         }
 
-function desenharLinhaDistanciaSuave(rms, canvas, ctx) {
-    const elemSliderK = document.getElementById('sliderK');
-    const kEscalaDistancia = elemSliderK ? parseFloat(elemSliderK.value) : 1.0; 
-    
-    const distanciaInstantanea = kEscalaDistancia / (rms + 0.001);
+        function aplicarMediaMovel(novaFreq) {
+            if (novaFreq <= 0) return 0;
 
-    historicoDistancia.push(distanciaInstantanea);
-    if (historicoDistancia.length > tamanhoJanelaMedia) {
-        historicoDistancia.shift();
-    }
-    const soma = historicoDistancia.reduce((acc, val) => acc + val, 0);
-    const distanciaFiltrada = soma / historicoDistancia.length;
+            historicoFrequenciaZCR.push(novaFreq);
 
-    let yLinhaDistancia = canvas.height - distanciaFiltrada;
+            if (historicoFrequenciaZCR.length > TAMANHO_AMOSTRAS_ZCR) {
+                historicoFrequenciaZCR.shift();
+            }
 
-    // =========================================================================
-    // AJUSTE TEMPORÁRIO DE TESTE:
-    // Troque '0.70' abaixo pela porcentagem da tela onde quer travar o teto
-    // Ex: 0.35 (35%), 0.50 (50%), 0.70 (70%), 0.85 (85%)
-    // =========================================================================
-    const porcentagemMaxima = 0.40; 
+            const soma = historicoFrequenciaZCR.reduce((acc, val) => acc + val, 0);
+            return soma / historicoFrequenciaZCR.length;
+        }
 
-    const limiteTopo = canvas.height * (1 - porcentagemMaxima);
-    const limiteBase = canvas.height - 10;
+        // =========================================================================
+        // 4. FUNÇÕES DE CALIBRAÇÃO (1m E 2m)
+        // =========================================================================
+        function registrarPonto1m() {
+            const tamanhoBuffer = analisador ? analisador.fftSize : 2048;
+            const dadosFormaOnda = new Float32Array(tamanhoBuffer);
+            if (analisador) analisador.getFloatTimeDomainData(dadosFormaOnda);
+            const taxaAmostragem = audioContext ? audioContext.sampleRate : 44100;
 
-    yLinhaDistancia = Math.max(limiteTopo, Math.min(yLinhaDistancia, limiteBase));
-    // =========================================================================
+            const fInst = calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem);
+            const fAtual = aplicarMediaMovel(fInst);
 
-    ctx.beginPath();
-    ctx.strokeStyle = '#FFD700'; // Dourado
-    ctx.lineWidth = 2;
-    ctx.setLineDash([6, 4]);     // Tracejado
-    ctx.moveTo(0, yLinhaDistancia);
-    ctx.lineTo(canvas.width, yLinhaDistancia);
-    ctx.stroke();
-    ctx.setLineDash([]);        // Restaura estilo contínuo
+            if (fAtual < FREQ_SATURACAO_MIN || fAtual > FREQ_SATURACAO_MAX) {
+                alert("Frequência fora da faixa (" + fAtual.toFixed(0) + " Hz)! Verifique o sinal.");
+                return;
+            }
 
-    return yLinhaDistancia;
-}
+            p1m.freq = fAtual;
+            alert("Ponto de 1 Metro Registrado: " + fAtual.toFixed(1) + " Hz");
+            validarEIniciarMedicao();
+        }
 
-function desenharLinhaSetpoint(limite, cor) {
-    // ESCALA COMPLETA: Mapeia o limite de 0.0 (rodapé) até 1.0 (topo)
-    // Eliminado o espelhamento do semiciclo inferior
-    const yPixels = canvas.height - (limite * canvas.height);
+        function registrarPonto2m() {
+            const tamanhoBuffer = analisador ? analisador.fftSize : 2048;
+            const dadosFormaOnda = new Float32Array(tamanhoBuffer);
+            if (analisador) analisador.getFloatTimeDomainData(dadosFormaOnda);
+            const taxaAmostragem = audioContext ? audioContext.sampleRate : 44100;
 
-    canvasCtx.lineWidth = 1;
-    canvasCtx.strokeStyle = cor;
-    canvasCtx.setLineDash([5, 5]);
+            const fInst = calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem);
+            const fAtual = aplicarMediaMovel(fInst);
 
-    canvasCtx.beginPath();
-    canvasCtx.moveTo(0, yPixels);
-    canvasCtx.lineTo(canvas.width, yPixels);
-    canvasCtx.stroke();
+            if (fAtual < FREQ_SATURACAO_MIN || fAtual > FREQ_SATURACAO_MAX) {
+                alert("Frequência fora da faixa (" + fAtual.toFixed(0) + " Hz)! Verifique o sinal.");
+                return;
+            }
 
-    canvasCtx.setLineDash([]);
-}
+            p2m.freq = fAtual;
+            alert("Ponto de 2 Metros Registrado: " + fAtual.toFixed(1) + " Hz");
+            validarEIniciarMedicao();
+        }
 
-function desenharBolinha(ctx, canvas) {
-    const raio = 12;
-    const x = canvas.width - 25;
-    const y = 25;
+        function validarEIniciarMedicao() {
+            if (p1m.freq !== null && p2m.freq !== null) {
+                const delta = Math.abs(p1m.freq - p2m.freq);
+                if (delta < DELTA_MINIMO_VALIDO) {
+                    alert("Diferença de frequência pequena entre 1m e 2m (" + delta.toFixed(0) + " Hz). Refaça a calibração!");
+                    p1m.freq = null;
+                    p2m.freq = null;
+                    return;
+                }
+                modoCalibracao = false;
+                alert("Calibração Concluída com Sucesso!\nMedição de distância ativada.");
+            }
+        }
 
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(x, y, raio, 0, 2 * Math.PI);
+        function calcularDistanciaReal(fMedida) {
+            if (modoCalibracao || p1m.freq === null || p2m.freq === null) return null;
 
-    // Avalia o estado global 'estadoVibracall' para definir a cor da Bolinha:
-    if (estadoVibracall === "PULSANTE") {
-        // Modo PULSANTE: Amarelo piscante (alterna a cada 300 ms)
-        const piscar = Math.floor(Date.now() / 300) % 2 === 0;
-        ctx.fillStyle = piscar ? '#FFD700' : '#444400';
+            // Interpolação linear de distância
+            const dist = p1m.dist + (fMedida - p1m.freq) * ((p2m.dist - p1m.dist) / (p2m.freq - p1m.freq));
+            return dist;
+        }
 
-    } else if (estadoVibracall === "CONTÍNUO") {
-        // Modo CONTÍNUO (Parede Virtual): Vermelho firme
-        ctx.fillStyle = '#FF0000';
+        // =========================================================================
+        // 5. LAÇO DE RENDERIZAÇÃO E DESENHO NO CANVAS
+        // =========================================================================
+        function renderizar() {
+            if (!emExecucao) return;
+            requestAnimationFrame(renderizar);
+            if (telaCongelada) return;
 
-    } else {
-        // Modo OFF (Zona de Silêncio / Descanso): Cinza apagado
-        ctx.fillStyle = '#333333';
-    }
+            const tamanhoBuffer = analisador.fftSize;
+            const dadosFormaOnda = new Float32Array(tamanhoBuffer);
+            analisador.getFloatTimeDomainData(dadosFormaOnda);
 
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#FFFFFF'; // Borda branca de destaque
-    ctx.stroke();
-    ctx.restore();
-}
+            const taxaAmostragem = audioContext.sampleRate;
 
-function atualizarLogicaVibracall(yLinhaAmarela) {
-    const yAtual = Number(yLinhaAmarela);
+            // Limpa o Canvas
+            canvasCtx.fillStyle = '#000000';
+            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Mapeia L1 e L2 para a MESMA escala inteira do Canvas (0.0 no rodapé, 1.0 no topo)
-    const yPixelsL1 = canvas.height - (limiteL1 * canvas.height);
-    const yPixelsL2 = canvas.height - (limiteL2 * canvas.height);
+            // Calcula Frequência com Média Móvel
+            const freqInstantanea = calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem);
+            const freqMedida = aplicarMediaMovel(freqInstantanea);
 
-    // No Canvas, menor Y fica no TOPO (Sinal Forte / L2), maior Y fica no RODAPÉ (Sinal Fraco / L1)
-    const yL2_Topo = Math.min(yPixelsL1, yPixelsL2);
-    const yL1_Base = Math.max(yPixelsL1, yPixelsL2);
+            let nivelProximidade = 0;
 
-    let novoEstadoSugerido = "OFF";
+            if (modoCalibracao) {
+                // Escala visual padrão de bancada durante a calibração
+                const freqClamp = Math.min(FREQ_LONGE, Math.max(FREQ_PERTO, freqMedida));
+                nivelProximidade = (freqClamp - FREQ_PERTO) / (FREQ_LONGE - FREQ_PERTO);
+            } else {
+                // Cálculo da distância real pós-calibração
+                const distanciaCalculada = calcularDistanciaReal(freqMedida);
 
-    // Avaliação direta na tela:
-    if (yAtual < yL2_Topo) {
-        novoEstadoSugerido = "PULSANTE";   // Linha passou do limite superior -> ALERTA
-    } else if (yAtual >= yL2_Topo && yAtual <= yL1_Base) {
-        novoEstadoSugerido = "OFF";        // Linha entre L1 e L2 -> ZONA DE CONFORTO
-    } else if (yAtual > yL1_Base) {
-        novoEstadoSugerido = "CONTÍNUO";   // Linha caiu abaixo de L1 -> PAREDE VIRTUAL
-    }
+                if (distanciaCalculada !== null) {
+                    const distClamp = Math.min(2.0, Math.max(1.0, distanciaCalculada));
+                    nivelProximidade = (distClamp - 1.0) / (2.0 - 1.0);
+                }
+            }
 
-    // Aplicação com a sua janela de confirmação de 200ms
-    if (novoEstadoSugerido !== estadoVibracall) {
-        estadoVibracall = novoEstadoSugerido;
-        if (estadoVibracall === "PULSANTE") iniciarPulsacao();
-        else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
-        else pararTodosVibracall();
-    }
-}
+            // Desenha a Barra e Atualiza o Vibracall
+            desenharBarraHorizontal(canvasCtx, canvas.width, canvas.height, nivelProximidade);
+            atualizarLogicaVibracall(nivelProximidade);
+
+            // Atualiza Mostradores de Texto na Tela
+            const elRMS = document.getElementById('valRMS');
+            const elPico = document.getElementById('valPico');
+
+            if (elRMS) elRMS.textContent = freqMedida.toFixed(1) + " Hz";
+
+            if (elPico) {
+                if (!modoCalibracao) {
+                    const dist = calcularDistanciaReal(freqMedida);
+                    elPico.textContent = dist !== null ? dist.toFixed(2) + " m" : "Fora da Faixa";
+                } else {
+                    elPico.textContent = (freqMedida / 1000).toFixed(2) + " kHz";
+                }
+            }
+        }
+
+        function desenharBarraHorizontal(ctx, largura, altura, nivel) {
+            const margemX = 15;
+            const alturaBarra = Math.round(altura * 0.20);
+            const margemY = Math.round((altura - alturaBarra) / 2);
+            const larguraCalha = largura - (margemX * 2);
+
+            // Calha externa
+            ctx.strokeStyle = '#444444';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(margemX, margemY, larguraCalha, alturaBarra);
+
+            // Preenchimento proporcional
+            const larguraPreenchimento = larguraCalha * nivel;
+
+            if (nivel >= limiteL2) {
+                ctx.fillStyle = '#FF0000'; // Vermelho
+            } else if (nivel >= limiteL1) {
+                ctx.fillStyle = '#FFD700'; // Amarelo
+            } else {
+                ctx.fillStyle = '#00FF00'; // Verde
+            }
+
+            if (larguraPreenchimento > 0) {
+                ctx.fillRect(margemX + 2, margemY + 2, larguraPreenchimento - 4, alturaBarra - 4);
+            }
+
+            // Marcador L1 (Linha Branca)
+            const xL1 = margemX + (larguraCalha * limiteL1);
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(xL1, margemY - 4);
+            ctx.lineTo(xL1, margemY + alturaBarra + 4);
+            ctx.stroke();
+
+            // Marcador L2 (Linha Amarela)
+            const xL2 = margemX + (larguraCalha * limiteL2);
+            ctx.strokeStyle = '#FFFF00';
+            ctx.beginPath();
+            ctx.moveTo(xL2, margemY - 4);
+            ctx.lineTo(xL2, margemY + alturaBarra + 4);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+        }
+
+        // =========================================================================
+        // 6. LÓGICA DO VIBRACALL E BLOQUEIO DE TELA
+        // =========================================================================
+        function atualizarLogicaVibracall(nivelProximidade) {
+            let novoEstadoSugerido = "OFF";
+
+            if (nivelProximidade >= limiteL2) {
+                novoEstadoSugerido = "PULSANTE";   // Passou de L2 -> Alerta
+            } else if (nivelProximidade < limiteL1) {
+                novoEstadoSugerido = "CONTÍNUO";   // Abaixo de L1 -> Parede virtual
+            } else {
+                novoEstadoSugerido = "OFF";        // Entre L1 e L2 -> Zona segura
+            }
+
+            if (novoEstadoSugerido !== estadoVibracall) {
+                estadoVibracall = novoEstadoSugerido;
+                if (estadoVibracall === "PULSANTE") iniciarPulsacao();
+                else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
+                else pararTodosVibracall();
+            }
+        }
 
         function iniciarPulsacao() {
             pararTodosVibracall();
@@ -605,43 +636,44 @@ function atualizarLogicaVibracall(yLinhaAmarela) {
                 navigator.vibrate(0);
             }
         }
-function travarTela() {
-    touchBloqueado = true;
-    btnTouch.textContent = "Touch: BLOQUEADO 🔒";
-    btnTouch.classList.add('bloqueado');
-    camadaBloqueio.style.display = 'block';
-}
 
-function destravarTela() {
-    touchBloqueado = false;
-    btnTouch.textContent = "Touch: ATIVO 🔓";
-    btnTouch.classList.remove('bloqueado');
-    camadaBloqueio.style.display = 'none';
-}
-
-btnTouch.addEventListener('pointerdown', (e) => {
-    if (!touchBloqueado) {
-        travarTela();
-    } else {
-        btnTouch.textContent = "Segure 2s...";
-        temporizadorTrava = setTimeout(() => {
-            destravarTela();
-        }, 2000);
-    }
-});
-
-btnTouch.addEventListener('pointerup', cancelarPressao);
-btnTouch.addEventListener('pointerleave', cancelarPressao);
-
-function cancelarPressao() {
-    if (temporizadorTrava) {
-        clearTimeout(temporizadorTrava);
-        temporizadorTrava = null;
-        if (touchBloqueado) {
+        function travarTela() {
+            touchBloqueado = true;
             btnTouch.textContent = "Touch: BLOQUEADO 🔒";
+            btnTouch.classList.add('bloqueado');
+            camadaBloqueio.style.display = 'block';
         }
-    }
-}
+
+        function destravarTela() {
+            touchBloqueado = false;
+            btnTouch.textContent = "Touch: ATIVO 🔓";
+            btnTouch.classList.remove('bloqueado');
+            camadaBloqueio.style.display = 'none';
+        }
+
+        btnTouch.addEventListener('pointerdown', (e) => {
+            if (!touchBloqueado) {
+                travarTela();
+            } else {
+                btnTouch.textContent = "Segure 2s...";
+                temporizadorTrava = setTimeout(() => {
+                    destravarTela();
+                }, 2000);
+            }
+        });
+
+        btnTouch.addEventListener('pointerup', cancelarPressao);
+        btnTouch.addEventListener('pointerleave', cancelarPressao);
+
+        function cancelarPressao() {
+            if (temporizadorTrava) {
+                clearTimeout(temporizadorTrava);
+                temporizadorTrava = null;
+                if (touchBloqueado) {
+                    btnTouch.textContent = "Touch: BLOQUEADO 🔒";
+                }
+            }
+        }
     </script>
 </body>
 </html>
