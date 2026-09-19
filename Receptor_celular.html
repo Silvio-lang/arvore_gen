@@ -266,9 +266,9 @@
         let emExecucao = false;
         let telaCongelada = false;
 
-        // Limites da Barra Horizontal (Bancada padrão)
-        const FREQ_LONGE = 3500;
-        const FREQ_PERTO = 2800;
+        // Limites da Barra Horizontal (Valores padrão de bancada: Perto = Freq Menor, Longe = Freq Maior)
+        const FREQ_PERTO = 2800; // 1m aproximado
+        const FREQ_LONGE = 3500; // 2m aproximado
 
         // Estado da Calibração por Dois Pontos (1m e 2m)
         let modoCalibracao = true;
@@ -457,11 +457,16 @@
         }
 
         function calcularDistanciaReal(fMedida) {
-            if (modoCalibracao || p1m.freq === null || p2m.freq === null) return null;
+            let f1 = modoCalibracao ? FREQ_PERTO : p1m.freq;
+            let f2 = modoCalibracao ? FREQ_LONGE : p2m.freq;
 
-            // Interpolação linear de distância
-            const dist = p1m.dist + (fMedida - p1m.freq) * ((p2m.dist - p1m.dist) / (p2m.freq - p1m.freq));
-            return dist;
+            if (!f1 || !f2 || f1 === f2) return 1.0;
+
+            // Interpolação linear da distância (1m = f1, 2m = f2)
+            const dist = 1.0 + (fMedida - f1) * ((2.0 - 1.0) / (f2 - f1));
+            
+            // Limita a exibição entre 0.5m e 3.0m para evitar valores incoerentes
+            return Math.max(0.5, Math.min(3.0, dist));
         }
 
         // =========================================================================
@@ -487,19 +492,14 @@
             const freqMedida = aplicarMediaMovel(freqInstantanea);
 
             let nivelProximidade = 0;
+            let f1 = modoCalibracao ? FREQ_PERTO : p1m.freq;
+            let f2 = modoCalibracao ? FREQ_LONGE : p2m.freq;
 
-            if (modoCalibracao) {
-                // Escala visual padrão de bancada durante a calibração
-                const freqClamp = Math.min(FREQ_LONGE, Math.max(FREQ_PERTO, freqMedida));
-                nivelProximidade = (freqClamp - FREQ_PERTO) / (FREQ_LONGE - FREQ_PERTO);
-            } else {
-                // Cálculo da distância real pós-calibração
-                const distanciaCalculada = calcularDistanciaReal(freqMedida);
-
-                if (distanciaCalculada !== null) {
-                    const distClamp = Math.min(2.0, Math.max(1.0, distanciaCalculada));
-                    nivelProximidade = (distClamp - 1.0) / (2.0 - 1.0);
-                }
+            if (f1 && f2 && f1 !== f2) {
+                // Barra cresce conforme aumenta a distância (freqMedida se aproxima de f2)
+                const freqClamp = Math.min(Math.max(f1, f2), Math.max(Math.min(f1, f2), freqMedida));
+                nivelProximidade = (freqClamp - f1) / (f2 - f1);
+                nivelProximidade = Math.max(0, Math.min(1, nivelProximidade));
             }
 
             // Desenha a Barra e Atualiza o Vibracall
@@ -507,18 +507,18 @@
             atualizarLogicaVibracall(nivelProximidade);
 
             // Atualiza Mostradores de Texto na Tela
-            const elRMS = document.getElementById('valRMS');
-            const elPico = document.getElementById('valPico');
+            const elRMS = document.getElementById('valRMS');   // Campo para dado técnico
+            const elPico = document.getElementById('valPico'); // Campo em Destaque (Distância)
 
-            if (elRMS) elRMS.textContent = freqMedida.toFixed(1) + " Hz";
+            // 1. Exibe a Frequência Técnica
+            if (elRMS) {
+                elRMS.textContent = freqMedida.toFixed(0) + " Hz";
+            }
 
+            // 2. Exibe a Distância em Metros em Destaque Principal
             if (elPico) {
-                if (!modoCalibracao) {
-                    const dist = calcularDistanciaReal(freqMedida);
-                    elPico.textContent = dist !== null ? dist.toFixed(2) + " m" : "Fora da Faixa";
-                } else {
-                    elPico.textContent = (freqMedida / 1000).toFixed(2) + " kHz";
-                }
+                const dist = calcularDistanciaReal(freqMedida);
+                elPico.textContent = dist.toFixed(2) + " m";
             }
         }
 
@@ -537,11 +537,11 @@
             const larguraPreenchimento = larguraCalha * nivel;
 
             if (nivel >= limiteL2) {
-                ctx.fillStyle = '#FF0000'; // Vermelho
+                ctx.fillStyle = '#FF0000'; // Vermelho (Afastado)
             } else if (nivel >= limiteL1) {
-                ctx.fillStyle = '#FFD700'; // Amarelo
+                ctx.fillStyle = '#FFD700'; // Amarelo (Atenção)
             } else {
-                ctx.fillStyle = '#00FF00'; // Verde
+                ctx.fillStyle = '#00FF00'; // Verde (Próximo / Alinhado)
             }
 
             if (larguraPreenchimento > 0) {
@@ -576,9 +576,9 @@
             let novoEstadoSugerido = "OFF";
 
             if (nivelProximidade >= limiteL2) {
-                novoEstadoSugerido = "PULSANTE";   // Passou de L2 -> Alerta
+                novoEstadoSugerido = "PULSANTE";   // Passou de L2 -> Alerta de afastamento
             } else if (nivelProximidade < limiteL1) {
-                novoEstadoSugerido = "CONTÍNUO";   // Abaixo de L1 -> Parede virtual
+                novoEstadoSugerido = "CONTÍNUO";   // Abaixo de L1 -> Alerta de extrema proximidade
             } else {
                 novoEstadoSugerido = "OFF";        // Entre L1 e L2 -> Zona segura
             }
@@ -618,18 +618,20 @@
             }, 1800);
         }
 
-        function pararTodosVibracall() {
-            if (temporizadorPulsacao) {
-                clearInterval(temporizadorPulsacao);
-                temporizadorPulsacao = null;
-            }
-            if (temporizadorContinuo) {
-                clearInterval(temporizadorContinuo);
-                temporizadorContinuo = null;
-            }
-            estadoLedPulsante = false;
-            pararTodosVibracallMotor();
-        }
+function pararTodosVibracall() {
+    if (temporizadorPulsacao) {
+        clearInterval(temporizadorPulsacao);
+        temporizadorPulsacao = null;
+    }
+    if (temporizadorContinuo) {
+        clearInterval(temporizadorContinuo);
+        temporizadorContinuo = null;
+    }
+    estadoLedPulsante = false;
+    
+    // Interrompe imediatamente qualquer vibração em andamento no hardware
+    pararTodosVibracallMotor();
+}
 
         function pararTodosVibracallMotor() {
             if ("vibrate" in navigator) {
