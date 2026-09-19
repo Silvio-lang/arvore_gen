@@ -267,7 +267,7 @@
         let telaCongelada = false;
 
         // Limites da Barra Horizontal (Bancada padrão)
-        const FREQ_LONGE = 5000;
+        const FREQ_LONGE = 3500;
         const FREQ_PERTO = 2800;
 
         // Estado da Calibração por Dois Pontos (1m e 2m)
@@ -276,9 +276,9 @@
         let p2m = { freq: null, dist: 2.0 };
 
         // Limites de segurança para calibração
-        const FREQ_SATURACAO_MIN = 1000; 
-        const FREQ_SATURACAO_MAX = 8000; 
-        const DELTA_MINIMO_VALIDO = 200; 
+        const FREQ_SATURACAO_MIN = 1500; 
+        const FREQ_SATURACAO_MAX = 4000; 
+        const DELTA_MINIMO_VALIDO = 100; 
 
         // Configurações do Filtro de Média Móvel (ZCR)
         const TAMANHO_AMOSTRAS_ZCR = 4;
