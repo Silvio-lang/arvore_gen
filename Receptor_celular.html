@@ -544,19 +544,20 @@ function desenharBarraHorizontal(ctx, largura, altura, nivel) {
     // Preenchimento proporcional
     const larguraPreenchimento = larguraCalha * nivel;
 
-    if (nivel >= limiteL2) {
-        ctx.fillStyle = '#FF0000'; // Vermelho (Afastado)
-    } else if (nivel >= limiteL1) {
-        ctx.fillStyle = '#FFD700'; // Amarelo (Atenção)
+    // LÓGICA DE CORES: Vermelho nas extremidades (fora da faixa L1-L2) e Verde no centro
+    if (nivel < limiteL1) {
+        ctx.fillStyle = '#FF0000'; // Vermelho (Muito Próximo / Abaixo de L1)
+    } else if (nivel >= limiteL1 && nivel <= limiteL2) {
+        ctx.fillStyle = '#00FF00'; // Verde (Zona Segura / Centralizada entre L1 e L2)
     } else {
-        ctx.fillStyle = '#00FF00'; // Verde (Próximo / Alinhado)
+        ctx.fillStyle = '#FF0000'; // Vermelho (Muito Afastado / Acima de L2)
     }
 
     if (larguraPreenchimento > 0) {
         ctx.fillRect(margemX + 2, margemY + 2, larguraPreenchimento - 4, alturaBarra - 4);
     }
 
-    // Marcador L1 (Linha Branca)
+    // Marcador L1 (Linha Branca tracejada)
     const xL1 = margemX + (larguraCalha * limiteL1);
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 2;
@@ -566,9 +567,9 @@ function desenharBarraHorizontal(ctx, largura, altura, nivel) {
     ctx.lineTo(xL1, margemY + alturaBarra + 4);
     ctx.stroke();
 
-    // Marcador L2 (Linha Amarela)
+    // Marcador L2 (Linha Branca tracejada)
     const xL2 = margemX + (larguraCalha * limiteL2);
-    ctx.strokeStyle = '#FFFF00';
+    ctx.strokeStyle = '#FFFFFF';
     ctx.beginPath();
     ctx.moveTo(xL2, margemY - 4);
     ctx.lineTo(xL2, margemY + alturaBarra + 4);
@@ -576,17 +577,13 @@ function desenharBarraHorizontal(ctx, largura, altura, nivel) {
 
     ctx.setLineDash([]);
 
-    // =========================================================================
-    // RÓTULOS DE EXTREMIDADE (1.0 m à Esquerda | 2.5 m à Direita)
-    // =========================================================================
+    // Rótulos de Extremidade (1.0 m e 2.5 m)
     ctx.fillStyle = '#AAAAAA';
     ctx.font = '12px sans-serif';
 
-    // Extremidade Esquerda
     ctx.textAlign = 'left';
     ctx.fillText('1.0 m', margemX, margemY + alturaBarra + 16);
 
-    // Extremidade Direita
     ctx.textAlign = 'right';
     ctx.fillText('2.5 m', margemX + larguraCalha, margemY + alturaBarra + 16);
 }
