@@ -214,7 +214,7 @@
         <button id="btnIniciar">Ligar Entrada de Áudio</button>
         <button id="btnCongelar">Congelar Tela (Hold)</button>
     <div class="linha-dupla-botoes">
-            <button id="btnMute">Vibracall: ATIVO!!</button>
+            <button id="btnMute">ATIVAR Vibracal</button>
             <button id="btnTouch">Touch: ATIVO 🔓</button>
     </div>    
     </div>
@@ -223,12 +223,18 @@
     <div id="painel-principal">
         <canvas id="telaOsciloscopio" width="570" height="250"></canvas>
 
+<!-- Indicadores Visuais de Limite de Calibração -->
+<div style="display: flex; justify-content: space-between; width: 100%; box-sizing: border-box; padding: 0 15px; margin-top: 5px; color: #888888; font-size: 0.9em; font-weight: bold;">
+    <span>Início: 1.0 m</span>
+    <span>Fim: 2.5 m</span>
+</div>
+
 <div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: center;">
     <button onclick="registrarPonto1m()" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
         Calibrar 1 Metro
     </button>
     <button onclick="registrarPonto2m()" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
-        Calibrar 2 Metros
+        Calibrar 2.5 Metros
     </button>
 </div>
 
@@ -246,11 +252,11 @@
 
         <div class="grid-medidores">
             <div class="card-medidor">
-                <div class="rotulo">Amplitude RMS</div>
+                <div class="rotulo">FREQUÊNCIA</div>
                 <div class="valor" id="valRMS">0.0000</div>
             </div>
             <div class="card-medidor">
-                <div class="rotulo">Valor de Pico</div>
+                <div class="rotulo">DISTÂNCIA</div>
                 <div class="valor" id="valPico">0.0000</div>
             </div>
         </div>
@@ -267,17 +273,17 @@
         let telaCongelada = false;
 
         // Limites da Barra Horizontal (Valores padrão de bancada: Perto = Freq Menor, Longe = Freq Maior)
-        const FREQ_PERTO = 2800; // 1m aproximado
-        const FREQ_LONGE = 3500; // 2m aproximado
+        const FREQ_PERTO = 2800; // 1.0m aproximado
+        const FREQ_LONGE = 3800; // 2.5m aproximado
 
-        // Estado da Calibração por Dois Pontos (1m e 2m)
+        // Estado da Calibração por Dois Pontos (1.0m e 2.5m)
         let modoCalibracao = true;
         let p1m = { freq: null, dist: 1.0 };
-        let p2m = { freq: null, dist: 2.0 };
+        let p2m = { freq: null, dist: 2.5 };
 
         // Limites de segurança para calibração
         const FREQ_SATURACAO_MIN = 1500; 
-        const FREQ_SATURACAO_MAX = 4000; 
+        const FREQ_SATURACAO_MAX = 4500; 
         const DELTA_MINIMO_VALIDO = 100; 
 
         // Configurações do Filtro de Média Móvel (ZCR)
@@ -286,8 +292,10 @@
 
         // Estado e Controle do Vibracall
         let vibracallMutado = true;
-        let limiteL1 = 0.08;
-        let limiteL2 = 0.60;
+        // Os sliders iniciam cobrindo toda a extensão (1.0m a 2.5m)
+        // O ajuste fino da janela de atuação será feito empiricamente na interface
+        let limiteL1 = 0.00; // Equivale a 1.0m (Início da faixa)
+        let limiteL2 = 1.00; // Equivale a 2.5m (Fim da faixa)
         let estadoVibracall = "OFF";
         let temporizadorPulsacao = null;
         let temporizadorContinuo = null;
@@ -402,7 +410,7 @@
         }
 
         // =========================================================================
-        // 4. FUNÇÕES DE CALIBRAÇÃO (1m E 2m)
+        // 4. FUNÇÕES DE CALIBRAÇÃO (1.0m E 2.5m)
         // =========================================================================
         function registrarPonto1m() {
             const tamanhoBuffer = analisador ? analisador.fftSize : 2048;
@@ -419,7 +427,7 @@
             }
 
             p1m.freq = fAtual;
-            alert("Ponto de 1 Metro Registrado: " + fAtual.toFixed(1) + " Hz");
+            alert("Ponto de 1.0 Metro Registrado: " + fAtual.toFixed(1) + " Hz");
             validarEIniciarMedicao();
         }
 
@@ -438,7 +446,7 @@
             }
 
             p2m.freq = fAtual;
-            alert("Ponto de 2 Metros Registrado: " + fAtual.toFixed(1) + " Hz");
+            alert("Ponto de 2.5 Metros Registrado: " + fAtual.toFixed(1) + " Hz");
             validarEIniciarMedicao();
         }
 
@@ -446,13 +454,13 @@
             if (p1m.freq !== null && p2m.freq !== null) {
                 const delta = Math.abs(p1m.freq - p2m.freq);
                 if (delta < DELTA_MINIMO_VALIDO) {
-                    alert("Diferença de frequência pequena entre 1m e 2m (" + delta.toFixed(0) + " Hz). Refaça a calibração!");
+                    alert("Diferença de frequência pequena entre 1.0m e 2.5m (" + delta.toFixed(0) + " Hz). Refaça a calibração!");
                     p1m.freq = null;
                     p2m.freq = null;
                     return;
                 }
                 modoCalibracao = false;
-                alert("Calibração Concluída com Sucesso!\nMedição de distância ativada.");
+                alert("Calibração Concluída com Sucesso!\nMedição de distância ativada (1.0m a 2.5m).");
             }
         }
 
@@ -462,11 +470,11 @@
 
             if (!f1 || !f2 || f1 === f2) return 1.0;
 
-            // Interpolação linear da distância (1m = f1, 2m = f2)
-            const dist = 1.0 + (fMedida - f1) * ((2.0 - 1.0) / (f2 - f1));
+            // Interpolação linear da distância (1.0m = f1, 2.5m = f2)
+            const dist = 1.0 + (fMedida - f1) * ((2.5 - 1.0) / (f2 - f1));
             
-            // Limita a exibição entre 0.5m e 3.0m para evitar valores incoerentes
-            return Math.max(0.5, Math.min(3.0, dist));
+            // Limita a exibição entre 0.5m e 3.5m para evitar valores incoerentes nas bordas
+            return Math.max(0.5, Math.min(3.5, dist));
         }
 
         // =========================================================================
@@ -522,74 +530,66 @@
             }
         }
 
-        function desenharBarraHorizontal(ctx, largura, altura, nivel) {
-            const margemX = 15;
-            const alturaBarra = Math.round(altura * 0.20);
-            const margemY = Math.round((altura - alturaBarra) / 2);
-            const larguraCalha = largura - (margemX * 2);
+function desenharBarraHorizontal(ctx, largura, altura, nivel) {
+    const margemX = 15;
+    const alturaBarra = Math.round(altura * 0.20);
+    const margemY = Math.round((altura - alturaBarra) / 2);
+    const larguraCalha = largura - (margemX * 2);
 
-            // Calha externa
-            ctx.strokeStyle = '#444444';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(margemX, margemY, larguraCalha, alturaBarra);
+    // Calha externa
+    ctx.strokeStyle = '#444444';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(margemX, margemY, larguraCalha, alturaBarra);
 
-            // Preenchimento proporcional
-            const larguraPreenchimento = larguraCalha * nivel;
+    // Preenchimento proporcional
+    const larguraPreenchimento = larguraCalha * nivel;
 
-            if (nivel >= limiteL2) {
-                ctx.fillStyle = '#FF0000'; // Vermelho (Afastado)
-            } else if (nivel >= limiteL1) {
-                ctx.fillStyle = '#FFD700'; // Amarelo (Atenção)
-            } else {
-                ctx.fillStyle = '#00FF00'; // Verde (Próximo / Alinhado)
-            }
+    if (nivel >= limiteL2) {
+        ctx.fillStyle = '#FF0000'; // Vermelho (Afastado)
+    } else if (nivel >= limiteL1) {
+        ctx.fillStyle = '#FFD700'; // Amarelo (Atenção)
+    } else {
+        ctx.fillStyle = '#00FF00'; // Verde (Próximo / Alinhado)
+    }
 
-            if (larguraPreenchimento > 0) {
-                ctx.fillRect(margemX + 2, margemY + 2, larguraPreenchimento - 4, alturaBarra - 4);
-            }
+    if (larguraPreenchimento > 0) {
+        ctx.fillRect(margemX + 2, margemY + 2, larguraPreenchimento - 4, alturaBarra - 4);
+    }
 
-            // Marcador L1 (Linha Branca)
-            const xL1 = margemX + (larguraCalha * limiteL1);
-            ctx.strokeStyle = '#FFFFFF';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([3, 3]);
-            ctx.beginPath();
-            ctx.moveTo(xL1, margemY - 4);
-            ctx.lineTo(xL1, margemY + alturaBarra + 4);
-            ctx.stroke();
+    // Marcador L1 (Linha Branca)
+    const xL1 = margemX + (larguraCalha * limiteL1);
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(xL1, margemY - 4);
+    ctx.lineTo(xL1, margemY + alturaBarra + 4);
+    ctx.stroke();
 
-            // Marcador L2 (Linha Amarela)
-            const xL2 = margemX + (larguraCalha * limiteL2);
-            ctx.strokeStyle = '#FFFF00';
-            ctx.beginPath();
-            ctx.moveTo(xL2, margemY - 4);
-            ctx.lineTo(xL2, margemY + alturaBarra + 4);
-            ctx.stroke();
+    // Marcador L2 (Linha Amarela)
+    const xL2 = margemX + (larguraCalha * limiteL2);
+    ctx.strokeStyle = '#FFFF00';
+    ctx.beginPath();
+    ctx.moveTo(xL2, margemY - 4);
+    ctx.lineTo(xL2, margemY + alturaBarra + 4);
+    ctx.stroke();
 
-            ctx.setLineDash([]);
-        }
+    ctx.setLineDash([]);
 
-        // =========================================================================
-        // 6. LÓGICA DO VIBRACALL E BLOQUEIO DE TELA
-        // =========================================================================
-        function atualizarLogicaVibracall(nivelProximidade) {
-            let novoEstadoSugerido = "OFF";
+    // =========================================================================
+    // RÓTULOS DE EXTREMIDADE (1.0 m à Esquerda | 2.5 m à Direita)
+    // =========================================================================
+    ctx.fillStyle = '#AAAAAA';
+    ctx.font = '12px sans-serif';
 
-            if (nivelProximidade >= limiteL2) {
-                novoEstadoSugerido = "PULSANTE";   // Passou de L2 -> Alerta de afastamento
-            } else if (nivelProximidade < limiteL1) {
-                novoEstadoSugerido = "CONTÍNUO";   // Abaixo de L1 -> Alerta de extrema proximidade
-            } else {
-                novoEstadoSugerido = "OFF";        // Entre L1 e L2 -> Zona segura
-            }
+    // Extremidade Esquerda
+    ctx.textAlign = 'left';
+    ctx.fillText('1.0 m', margemX, margemY + alturaBarra + 16);
 
-            if (novoEstadoSugerido !== estadoVibracall) {
-                estadoVibracall = novoEstadoSugerido;
-                if (estadoVibracall === "PULSANTE") iniciarPulsacao();
-                else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
-                else pararTodosVibracall();
-            }
-        }
+    // Extremidade Direita
+    ctx.textAlign = 'right';
+    ctx.fillText('2.5 m', margemX + larguraCalha, margemY + alturaBarra + 16);
+}
 
         function iniciarPulsacao() {
             pararTodosVibracall();
@@ -618,20 +618,20 @@
             }, 1800);
         }
 
-function pararTodosVibracall() {
-    if (temporizadorPulsacao) {
-        clearInterval(temporizadorPulsacao);
-        temporizadorPulsacao = null;
-    }
-    if (temporizadorContinuo) {
-        clearInterval(temporizadorContinuo);
-        temporizadorContinuo = null;
-    }
-    estadoLedPulsante = false;
-    
-    // Interrompe imediatamente qualquer vibração em andamento no hardware
-    pararTodosVibracallMotor();
-}
+        function pararTodosVibracall() {
+            if (temporizadorPulsacao) {
+                clearInterval(temporizadorPulsacao);
+                temporizadorPulsacao = null;
+            }
+            if (temporizadorContinuo) {
+                clearInterval(temporizadorContinuo);
+                temporizadorContinuo = null;
+            }
+            estadoLedPulsante = false;
+            
+            // Interrompe imediatamente qualquer vibração em andamento no hardware
+            pararTodosVibracallMotor();
+        }
 
         function pararTodosVibracallMotor() {
             if ("vibrate" in navigator) {
