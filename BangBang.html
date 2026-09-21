@@ -107,7 +107,6 @@
           </div>
           <input type="range" id="input-offset" min="-150" max="150" value="0" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
         </div>
-      </div>
 
       <div class="pt-2">
         <button id="btn-aplicar-modal" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg shadow transition">
@@ -140,14 +139,15 @@
     const valVelocidade = document.getElementById('val-velocidade');
     const valOffset = document.getElementById('val-offset');
 
-    // PARÂMETROS DA SIMULAÇÃO
+
+// PARÂMETROS DA SIMULAÇÃO (VALORES INICIAIS AJUSTADOS)
     let config = {
-      hasteLength: 60,
-      maxSteerAngle: 15 * (Math.PI / 180),
-      speed: 2.0,
-      caboOffset: 0,
+      hasteLength: 20,                          // Comprimento da Haste: 20 px
+      maxSteerAngle: 8 * (Math.PI / 180),       // Ângulo Máximo das Rodas: 8° (convertido para radianos)
+      speed: 1.0,                               // Velocidade do Carrinho: 1.0
+      caboOffset: 50,                           // Deslocamento da Pista: 50 px
       caboWidth: 12
-    };
+   };
 
     // ESTADO DO VEÍCULO (GEOMETRIA ACKERMANN/BICICLETA)
     let vehicle = {
@@ -211,27 +211,36 @@ function updatePhysics() {
   // 3. Posição do cabo emissor de referência
   const caboX = (canvas.width / 2) + config.caboOffset;
 
-  // 4. Verificação binária do sensor
-  const distToCabo = Math.abs(sensorX - caboX);
-  vehicle.sensorTouched = distToCabo <= (config.caboWidth / 2);
+  // 4. Definição da Faixa de Offset Lateral (Igual ao atleta cego em relação ao cabo)
+  // Define o deslocamento desejado do sensor em relação ao cabo (ex: 50px à esquerda do cabo)
+  const offsetDesejado = 50; 
+  const zonaAlvoX = caboX - offsetDesejado; // Linha de trajetória do carrinho
 
-  // 5. LÓGICA DE CONTROLE CORRIGIDA (Bang-Bang baseada na posição do sensor):
-  // Se o sensor está à esquerda do cabo: esterça para a direita (+angle)
-  // Se o sensor está à direita do cabo ou tocando: esterça para a esquerda (-angle)
-  if (sensorX < caboX) {
-    // Sensor está à esquerda da linha -> Virar para a direita para buscar a linha
+  // 5. Verificação da Presença de Sinal
+  // O sensor só detecta sinal se estiver próximo da faixa de offset do cabo
+  const distParaCabo = Math.abs(sensorX - caboX);
+  vehicle.sensorTouched = distParaCabo <= (config.caboWidth / 2 + offsetDesejado);
+
+  // 6. LÓGICA DE CONTROLE BANG-BANG COM PERDA DE SINAL ALÉM DO CABO:
+  // Se o sensor passou além do cabo para a direita (sensorX > caboX), o sinal "desaparece"
+  // e o carrinho precisa virar para a DIREITA para recuperar o cabo.
+  if (sensorX > caboX) {
+    // Passou do cabo (lado direito / sem sinal) -> Esterça para a DIREITA para voltar ao cabo
+    vehicle.steerAngle = config.maxSteerAngle;
+  } else if (sensorX < zonaAlvoX) {
+    // Muito afastado à esquerda da zona de offset -> Esterça para a DIREITA para se aproximar da zona
     vehicle.steerAngle = config.maxSteerAngle;
   } else {
-    // Sensor está sobre ou à direita da linha -> Virar para a esquerda para voltar/sair
+    // Dentro da zona de offset / sob o cabo -> Esterça para a ESQUERDA para manter a distância de offset
     vehicle.steerAngle = -config.maxSteerAngle;
   }
 
-  // 6. Atualização da orientação e posição do veículo (Geometria Ackermann)
+  // 7. Atualização cinemática do veículo (Geometria Ackermann)
   vehicle.heading += (config.speed / vehicle.wheelbase) * Math.tan(vehicle.steerAngle);
   vehicle.x += config.speed * Math.cos(vehicle.heading);
   vehicle.y += config.speed * Math.sin(vehicle.heading);
 
-  // 7. Registro do rastro percorrido pelo sensor
+  // 8. Registro do rastro percorrido pelo sensor
   vehicle.trail.push({
     x: sensorX,
     y: sensorY,
@@ -242,7 +251,7 @@ function updatePhysics() {
     vehicle.trail.shift();
   }
 
-  // Loop contínuo da tela quando o carrinho sobe todo o percurso
+  // Reinício do topo da tela
   if (vehicle.y < -50) {
     vehicle.y = canvas.height + 20;
     vehicle.trail = [];
