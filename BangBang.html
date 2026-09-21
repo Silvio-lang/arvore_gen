@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Carrinho Guiado por Haste Avançada</title>
+  <!-- Tailwind CSS para estilização moderna -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome para ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Estilização personalizada para scrollbar e sliders */
+    input[type=range] {
+      accent-color: #3b82f6;
+    }
+    .toast-fade {
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col overflow-hidden bg-slate-950">
+
+  <!-- Cabeçalho -->
+  <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-3">
+      <div class="bg-blue-600/20 text-blue-400 p-2 rounded-lg border border-blue-500/30">
+        <i class="fa-solid fa-car-side text-xl"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg text-slate-100 leading-tight">Simulador de Controle Por Haste Avançada</h1>
+        <p class="text-xs text-slate-400">Emulação de navegação autônoma binária com cabo emissor</p>
+      </div>
+    </div>
+    <div id="toastNotification" class="toast-fade opacity-0 translate-y-[-10px] bg-blue-600/90 text-white text-xs px-4 py-2 rounded-full font-medium shadow-lg border border-blue-400/30 flex items-center gap-2">
+      <i class="fa-solid fa-circle-info"></i>
+      <span id="toastMessage">Sistema Inicializado</span>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal / Layout Dividido -->
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+
+    <!-- Área do Canvas (Visualização) -->
+    <section class="flex-1 relative flex items-center justify-center bg-slate-950 p-4 min-h-[350px]">
+      <div class="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800 bg-slate-900/60 shadow-2xl flex flex-col">
+        <!-- Overlay Superior de Status -->
+        <div class="absolute top-4 left-4 z-10 flex flex-wrap gap-3 pointer-events-none">
+          <div class="bg-slate-900/90 backdrop-blur border border-slate-800 px-3 py-2 rounded-xl shadow-lg flex items-center gap-3">
+            <div id="sensorStatusDot" class="w-4 h-4 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all duration-150"></div>
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Status do Sensor</div>
+              <div id="sensorStatusText" class="text-xs font-bold text-slate-200">0 (FORA DO CABO)</div>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/90 backdrop-blur border border-slate-800 px-3 py-2 rounded-xl shadow-lg flex items-center gap-3">
+            <div class="text-blue-400">
+              <i class="fa-solid fa-compass text-lg"></i>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Ângulo Rodas</div>
+              <div id="wheelAngleDisplay" class="text-xs font-mono font-bold text-slate-200">0.0°</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instrução de Interatividade -->
+        <div class="absolute bottom-4 left-4 z-10 bg-slate-900/80 backdrop-blur border border-slate-800/80 text-slate-300 text-xs px-3 py-1.5 rounded-lg pointer-events-none flex items-center gap-2">
+          <i class="fa-solid fa-hand-pointer text-blue-400"></i>
+          <span>Clique e arraste no canvas para mover o cabo emissor lateralmente</span>
+        </div>
+
+        <!-- Canvas Principal -->
+        <canvas id="simCanvas" class="w-full h-full cursor-grab active:cursor-grabbing block"></canvas>
+      </div>
+    </section>
+
+    <!-- Painel Lateral de Parâmetros e Controles -->
+    <aside class="w-full lg:w-96 bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-800 p-5 flex flex-col gap-5 overflow-y-auto">
+      
+      <!-- Botões de Ação Principal -->
+      <div class="grid grid-cols-2 gap-3">
+        <button id="btnPlayPause" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-xl shadow-lg shadow-blue-600/20 transition-all">
+          <i class="fa-solid fa-pause" id="playIcon"></i>
+          <span id="playText">Pausar</span>
+        </button>
+        <button id="btnReset" class="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-850 text-slate-200 font-medium py-2.5 px-4 rounded-xl border border-slate-700 transition-all">
+          <i class="fa-solid fa-rotate-left"></i>
+          <span>Reiniciar</span>
+        </button>
+      </div>
+
+      <hr class="border-slate-800">
+
+      <!-- Controles de Perturbação da Pista -->
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <label for="trackOffset" class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-arrows-left-right text-blue-400"></i>
+            Deslocamento do Cabo (Pista)
+          </label>
+          <span id="trackOffsetVal" class="text-xs font-mono bg-slate-800 px-2 py-0.5 rounded text-blue-300 font-semibold">0 px</span>
+        </div>
+        <input type="range" id="trackOffset" min="-250" max="250" value="0" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+        <div class="flex justify-between text-[10px] text-slate-500">
+          <span>← Esquerda (-250px)</span>
+          <span>Centro</span>
+          <span>Direita (+250px) →</span>
+        </div>
+      </div>
+
+      <hr class="border-slate-800">
+
+      <!-- Parâmetros do Veículo e Geometria -->
+      <div class="space-y-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-blue-400"></i>
+          Ajustes de Controle e Geometria
+        </h3>
+
+        <!-- Comprimento da Haste (Look-Ahead) -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300">Comprimento da Haste</span>
+            <span id="rodLengthVal" class="font-mono bg-slate-800 px-2 py-0.5 rounded text-blue-300 font-semibold">80 px</span>
+          </div>
+          <input type="range" id="rodLength" min="20" max="180" value="80" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+          <p class="text-[10px] text-slate-500">Determina a distância antecipada de leitura do sensor.</p>
+        </div>
+
+        <!-- Ângulo Máximo de Esterçamento -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300">Ângulo de Esterçamento</span>
+            <span id="steerAngleVal" class="font-mono bg-slate-800 px-2 py-0.5 rounded text-blue-300 font-semibold">25°</span>
+          </div>
+          <input type="range" id="steerAngle" min="5" max="45" value="25" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+          <p class="text-[10px] text-slate-500">Ângulo aplicado quando o sensor altera de estado (Bang-Bang).</p>
+        </div>
+
+        <!-- Velocidade do Carrinho -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300">Velocidade do Carrinho</span>
+            <span id="carSpeedVal" class="font-mono bg-slate-800 px-2 py-0.5 rounded text-blue-300 font-semibold">2.5 px/f</span>
+          </div>
+          <input type="range" id="carSpeed" min="0.5" max="6.0" step="0.1" value="2.5" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+        </div>
+      </div>
+
+      <hr class="border-slate-800">
+
+      <!-- Opções de Visualização -->
+      <div class="space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Opções de Exibição</h3>
+        <div class="flex items-center justify-between text-xs text-slate-300">
+          <label for="chkShowTrail" class="cursor-pointer select-none">Exibir Rastro da Trajetória</label>
+          <input type="checkbox" id="chkShowTrail" checked class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-blue-600 focus:ring-0 cursor-pointer">
+        </div>
+        <button id="btnClearTrail" class="w-full text-xs py-2 bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition-all border border-slate-700/50">
+          Limpar Rastro
+        </button>
+      </div>
+
+      <!-- Rodapé explicativo -->
+      <div class="mt-auto pt-4 border-t border-slate-800/50 text-[11px] text-slate-500 leading-relaxed">
+        <p><strong class="text-slate-400">Lógica do Algoritmo:</strong> O sensor na ponta da haste verifica se está sobre a largura do cabo. Se <span class="text-emerald-400">estiver no cabo (1)</span>, esterça para a esquerda; se <span class="text-red-400">estiver fora (0)</span>, esterça para a direita.</p>
+      </div>
+
+    </aside>
+  </main>
+
+  <script>
+    /* 
+     * SIMULAÇÃO DE NAVEGAÇÃO AUTÔNOMA COM SENSOR HASTE BINÁRIO
+     * Desenvolvido para testes de resposta dinâmica e controle proporcional/bang-bang.
+     */
+
+    // Constante padrão de exibição de avisos (2000 ms)
+    const NOTIFICATION_DURATION = 2000;
+
+    // Configuração dos Elementos da DOM
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const playIcon = document.getElementById('playIcon');
+    const playText = document.getElementById('playText');
+    const btnReset = document.getElementById('btnReset');
+
+    const trackOffsetInput = document.getElementById('trackOffset');
+    const trackOffsetVal = document.getElementById('trackOffsetVal');
+    const rodLengthInput = document.getElementById('rodLength');
+    const rodLengthVal = document.getElementById('rodLengthVal');
+    const steerAngleInput = document.getElementById('steerAngle');
+    const steerAngleVal = document.getElementById('steerAngleVal');
+    const carSpeedInput = document.getElementById('carSpeed');
+    const carSpeedVal = document.getElementById('carSpeedVal');
+
+    const sensorStatusDot = document.getElementById('sensorStatusDot');
+    const sensorStatusText = document.getElementById('sensorStatusText');
+    const wheelAngleDisplay = document.getElementById('wheelAngleDisplay');
+
+    const chkShowTrail = document.getElementById('chkShowTrail');
+    const btnClearTrail = document.getElementById('btnClearTrail');
+
+    const toastNotification = document.getElementById('toastNotification');
+    const toastMessage = document.getElementById('toastMessage');
+
+    let toastTimeout = null;
+
+    // Função para exibir mensagem temporizada de 2 segundos
+    function showNotification(msg) {
+      toastMessage.textContent = msg;
+      toastNotification.classList.remove('opacity-0', 'translate-y-[-10px]');
+      toastNotification.classList.add('opacity-100', 'translate-y-0');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+
+      toastTimeout = setTimeout(() => {
+        toastNotification.classList.remove('opacity-100', 'translate-y-0');
+        toastNotification.classList.add('opacity-0', 'translate-y-[-10px]');
+      }, NOTIFICATION_DURATION);
+    }
+
+    // Estado da Simulação
+    let isRunning = true;
+    let isDraggingTrack = false;
+
+    // Parâmetros do Cabo Emissor (Pista)
+    const track = {
+      cableWidth: 14, // Largura útil de detecção do sinal do cabo
+      offset: 0,      // Deslocamento X da linha central
+      targetOffset: 0
+    };
+
+    // Modelo Físico do Carrinho
+    const car = {
+      x: 0,
+      y: 0,
+      heading: -Math.PI / 2, // Apontando para cima inicialmente
+      wheelbase: 45,         // Distância entre eixos
+      width: 32,             // Largura do chassi
+      length: 60,            // Comprimento do chassi
+      speed: 2.5,
+      steeringAngle: 0,      // Ângulo atual das rodas dianteiras
+      targetSteeringAngle: 0,// Ângulo de destino
+      steerRate: 0.15,       // Velocidade de esterçamento suave das rodas
+
+      // Configurações do Sensor
+      rodLength: 80,         // Tamanho da haste até o sensor
+      maxSteerAngleDeg: 25,  // Ângulo do algoritmo bang-bang
+      sensorDetected: false, // 1 ou 0
+      sensorPos: { x: 0, y: 0 }
+    };
+
+    // Histórico da trajetória (Rastro)
+    let trail = [];
+    const MAX_TRAIL_POINTS = 600;
+
+    // Ajustar tamanho do canvas de forma responsiva
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+      if (car.x === 0 && car.y === 0) {
+        resetSimulation();
+      }
+    }
+
+    function resetSimulation() {
+      const centerX = canvas.width / 2;
+      const startY = canvas.height - 120;
+
+      car.x = centerX + track.offset;
+      car.y = startY;
+      car.heading = -Math.PI / 2;
+      car.steeringAngle = 0;
+      car.targetSteeringAngle = 0;
+
+      trail = [];
+      showNotification("Simulação reiniciada");
+    }
+
+    // Eventos de Controles (Sliders & Buttons)
+    btnPlayPause.addEventListener('click', () => {
+      isRunning = !isRunning;
+      if (isRunning) {
+        playIcon.className = 'fa-solid fa-pause';
+        playText.textContent = 'Pausar';
+        showNotification("Simulação em execução");
+      } else {
+        playIcon.className = 'fa-solid fa-play';
+        playText.textContent = 'Iniciar';
+        showNotification("Simulação pausada");
+      }
+    });
+
+    btnReset.addEventListener('click', resetSimulation);
+
+    trackOffsetInput.addEventListener('input', (e) => {
+      track.offset = parseFloat(e.target.value);
+      trackOffsetVal.textContent = `${track.offset > 0 ? '+' : ''}${track.offset} px`;
+    });
+
+    rodLengthInput.addEventListener('input', (e) => {
+      car.rodLength = parseFloat(e.target.value);
+      rodLengthVal.textContent = `${car.rodLength} px`;
+    });
+
+    steerAngleInput.addEventListener('input', (e) => {
+      car.maxSteerAngleDeg = parseFloat(e.target.value);
+      steerAngleVal.textContent = `${car.maxSteerAngleDeg}°`;
+    });
+
+    carSpeedInput.addEventListener('input', (e) => {
+      car.speed = parseFloat(e.target.value);
+      carSpeedVal.textContent = `${car.speed.toFixed(1)} px/f`;
+    });
+
+    btnClearTrail.addEventListener('click', () => {
+      trail = [];
+      showNotification("Rastro limpo");
+    });
+
+    // Interatividade com Mouse/Touch no Canvas para mover o cabo emissor
+    function handlePointerMove(e) {
+      if (!isDraggingTrack) return;
+      const rect = canvas.getBoundingClientRect();
+      const pointerX = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const centerX = canvas.width / 2;
+      
+      let newOffset = Math.round(pointerX - centerX);
+      newOffset = Math.max(-250, Math.min(250, newOffset));
+
+      track.offset = newOffset;
+      trackOffsetInput.value = newOffset;
+      trackOffsetVal.textContent = `${newOffset > 0 ? '+' : ''}${newOffset} px`;
+    }
+
+    canvas.addEventListener('mousedown', (e) => { isDraggingTrack = true; handlePointerMove(e); });
+    canvas.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', () => { isDraggingTrack = false; });
+
+    canvas.addEventListener('touchstart', (e) => { isDraggingTrack = true; handlePointerMove(e); });
+    canvas.addEventListener('touchmove', handlePointerMove);
+    window.addEventListener('touchend', () => { isDraggingTrack = false; });
+
+
+    function updatePhysics() {
+      if (!isRunning) return;
+
+      // 1. Posição do Sensor na Ponta da Haste Avançada (Look-Ahead)
+      // O sensor fica posicionado a partir do centro do eixo dianteiro
+      const frontAxleX = car.x + Math.cos(car.heading) * (car.wheelbase / 2);
+      const frontAxleY = car.y + Math.sin(car.heading) * (car.wheelbase / 2);
+
+      car.sensorPos.x = frontAxleX + Math.cos(car.heading) * car.rodLength;
+      car.sensorPos.y = frontAxleY + Math.sin(car.heading) * car.rodLength;
+
+      // 2. Cálculo da Posição do Cabo Emissor no Y do Sensor
+      const cableXAtSensorY = (canvas.width / 2) + track.offset;
+
+      // 3. Verificação de Detecção Binária (Sensor Tocando o Cabo ou Não)
+      const distToCable = Math.abs(car.sensorPos.x - cableXAtSensorY);
+      car.sensorDetected = distToCable <= (track.cableWidth / 2);
+
+      // 4. Algoritmo de Controle Binário (Bang-Bang / 1 Bit)
+      const maxSteerRad = (car.maxSteerAngleDeg * Math.PI) / 180;
+      
+      if (car.sensorDetected) {
+        // Se TOCANDO O CABO (1): Esterça para a esquerda para sair do cabo
+        car.targetSteeringAngle = -maxSteerRad;
+      } else {
+        // Se FORA DO CABO (0): Verifica de que lado está e esterça para buscar o cabo
+        if (car.sensorPos.x > cableXAtSensorY) {
+          // Sensor está à direita do cabo -> esterça forte para a esquerda
+          car.targetSteeringAngle = -maxSteerRad;
+        } else {
+          // Sensor está à esquerda do cabo -> esterça forte para a direita
+          car.targetSteeringAngle = maxSteerRad;
+        }
+      }
+
+      // Suavização da resposta mecânica das rodas (atuador de direção)
+      car.steeringAngle += (car.targetSteeringAngle - car.steeringAngle) * car.steerRate;
+
+      // 5. Modelo Cinemático de Veículo tipo Bicicleta (Bicycle Model)
+      // Movimento baseado no ângulo das rodas e na distância entre eixos
+      car.x += Math.cos(car.heading) * car.speed;
+      car.y += Math.sin(car.heading) * car.speed;
+      car.heading += (car.speed / car.wheelbase) * Math.tan(car.steeringAngle);
+
+      // Loop infinito vertical para manter a simulação fluida na tela
+      if (car.y < -100) {
+        car.y = canvas.height + 50;
+        trail = [];
+      }
+
+      // Salva rastro para renderização
+      if (chkShowTrail.checked) {
+        trail.push({ x: car.x, y: car.y, detected: car.sensorDetected });
+        if (trail.length > MAX_TRAIL_POINTS) trail.shift();
+      }
+
+      // Atualiza Indicadores da Interface (UI)
+      if (car.sensorDetected) {
+        sensorStatusDot.className = 'w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)] transition-all duration-150';
+        sensorStatusText.textContent = '1 (TOCANDO CABO)';
+        sensorStatusText.className = 'text-xs font-bold text-emerald-400';
+      } else {
+        sensorStatusDot.className = 'w-4 h-4 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all duration-150';
+        sensorStatusText.textContent = '0 (FORA DO CABO)';
+        sensorStatusText.className = 'text-xs font-bold text-red-400';
+      }
+
+      const steerDeg = (car.steeringAngle * 180 / Math.PI).toFixed(1);
+      wheelAngleDisplay.textContent = `${steerDeg > 0 ? '+' : ''}${steerDeg}°`;
+    }
+
+    function draw() {
+      // Limpar Canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const cableX = centerX + track.offset;
+
+      // 1. Desenhar Pista e Marcações
+      // Área de asfalto da pista
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(centerX - 280 + track.offset, 0, 560, canvas.height);
+
+      // Bordas laterais da pista
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(centerX - 280 + track.offset, 0);
+      ctx.lineTo(centerX - 280 + track.offset, canvas.height);
+      ctx.moveTo(centerX + 280 + track.offset, 0);
+      ctx.lineTo(centerX + 280 + track.offset, canvas.height);
+      ctx.stroke();
+
+      // 2. Cabo Emissor Central (Linha com brilho)
+      // Brilho difuso do campo eletromagnético do cabo
+      const glow = ctx.createLinearGradient(cableX - 25, 0, cableX + 25, 0);
+      glow.addColorStop(0, 'rgba(59, 130, 246, 0)');
+      glow.addColorStop(0.5, 'rgba(59, 130, 246, 0.25)');
+      glow.addColorStop(1, 'rgba(59, 130, 246, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(cableX - 25, 0, 50, canvas.height);
+
+      // Cabo físico / faixa de emissão
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = track.cableWidth;
+      ctx.beginPath();
+      ctx.moveTo(cableX, 0);
+      ctx.lineTo(cableX, canvas.height);
+      ctx.stroke();
+
+      // Núcleo do cabo
+      ctx.strokeStyle = '#93c5fd';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cableX, 0);
+      ctx.lineTo(cableX, canvas.height);
+      ctx.stroke();
+
+      // 3. Rastro da Trajetória
+      if (chkShowTrail.checked && trail.length > 1) {
+        for (let i = 1; i < trail.length; i++) {
+          ctx.beginPath();
+          ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
+          ctx.lineTo(trail[i].x, trail[i].y);
+          ctx.strokeStyle = trail[i].detected ? 'rgba(16, 185, 129, 0.6)' : 'rgba(239, 68, 68, 0.4)';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        }
+      }
+
+      // 4. Desenhar o Carrinho
+      ctx.save();
+      ctx.translate(car.x, car.y);
+      ctx.rotate(car.heading);
+
+      // Chassi do Carrinho
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(-car.length / 2, -car.width / 2, car.length, car.width, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Detalhe superior do teto
+      ctx.fillStyle = '#334155';
+      ctx.beginPath();
+      ctx.roundRect(-car.length / 4, -car.width / 3, car.length / 2, (car.width * 2) / 3, 4);
+      ctx.fill();
+
+      // Rodas Traseiras (Fixas)
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1.5;
+      
+      // Traseira Esquerda
+      ctx.fillRect(-car.wheelbase / 2 - 8, -car.width / 2 - 4, 16, 6);
+      ctx.strokeRect(-car.wheelbase / 2 - 8, -car.width / 2 - 4, 16, 6);
+      // Traseira Direita
+      ctx.fillRect(-car.wheelbase / 2 - 8, car.width / 2 - 2, 16, 6);
+      ctx.strokeRect(-car.wheelbase / 2 - 8, car.width / 2 - 2, 16, 6);
+
+      // Rodas Dianteiras (Esterçáveis com car.steeringAngle)
+      const drawFrontWheel = (yOffset) => {
+        ctx.save();
+        ctx.translate(car.wheelbase / 2, yOffset);
+        ctx.rotate(car.steeringAngle);
+        ctx.fillStyle = '#0284c7';
+        ctx.fillRect(-8, -3, 16, 6);
+        ctx.strokeStyle = '#38bdf8';
+        ctx.strokeRect(-8, -3, 16, 6);
+        ctx.restore();
+      };
+
+      drawFrontWheel(-car.width / 2 - 1); // Dianteira Esquerda
+      drawFrontWheel(car.width / 2 + 1);  // Dianteira Direita
+
+      // Haste Avançada (Suporte do Sensor)
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(car.wheelbase / 2, 0);
+      ctx.lineTo(car.wheelbase / 2 + car.rodLength, 0);
+      ctx.stroke();
+
+      // Articulação na base da haste
+      ctx.fillStyle = '#cbd5e1';
+      ctx.beginPath();
+      ctx.arc(car.wheelbase / 2, 0, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Headlights (Faróis)
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(car.length / 2 - 2, -car.width / 3, 3, 0, Math.PI * 2);
+      ctx.arc(car.length / 2 - 2, car.width / 3, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore(); // Restaura contexto estático do canvas
+
+      // 5. Desenhar o Sensor na Ponta da Haste (Coordenadas Globais)
+      ctx.save();
+      ctx.translate(car.sensorPos.x, car.sensorPos.y);
+
+      // Anéis de Pulso do Sensor
+      const sensorColor = car.sensorDetected ? '#10b981' : '#ef4444';
+      ctx.strokeStyle = sensorColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Núcleo do Sensor
+      ctx.fillStyle = sensorColor;
+      ctx.beginPath();
+      ctx.arc(0, 0, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Rótulo indicativo
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(car.sensorDetected ? '1' : '0', 0, -15);
+
+      ctx.restore();
+    }
+
+    function loop() {
+      updatePhysics();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    // Inicialização da Aplicação
+    window.addEventListener('resize', resizeCanvas);
+
+    window.onload = () => {
+      resizeCanvas();
+      resetSimulation();
+      showNotification("Demonstração pronta para teste");
+      loop();
+    };
+  </script>
+</body>
+</html>
