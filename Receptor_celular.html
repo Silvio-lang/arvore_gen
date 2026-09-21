@@ -272,7 +272,7 @@
         let emExecucao = false;
         let telaCongelada = false;
 
-        // Limites da Barra Horizontal (Valores padrão de bancada: Perto = Freq Menor, Longe = Freq Maior)
+        // Limites da Barra Horizontal (Valores padrão de bancada)
         const FREQ_PERTO = 2800; // 1.0m aproximado
         const FREQ_LONGE = 3800; // 2.5m aproximado
 
@@ -292,8 +292,6 @@
 
         // Estado e Controle do Vibracall
         let vibracallMutado = true;
-        // Os sliders iniciam cobrindo toda a extensão (1.0m a 2.5m)
-        // O ajuste fino da janela de atuação será feito empiricamente na interface
         let limiteL1 = 0.00; // Equivale a 1.0m (Início da faixa)
         let limiteL2 = 1.00; // Equivale a 2.5m (Fim da faixa)
         let estadoVibracall = "OFF";
@@ -308,16 +306,65 @@
         const camadaBloqueio = document.getElementById('camadaBloqueio');
 
         // =========================================================================
+        // 1.1 GERENCIAMENTO DO LOCALSTORAGE (MEMÓRIA NÃO VOLÁTIL)
+        // =========================================================================
+        function carregarDadosSalvos() {
+            const freq1Salva = localStorage.getItem('calib_p1m_freq');
+            const freq2Salva = localStorage.getItem('calib_p2m_freq');
+            const l1Salvo = localStorage.getItem('vibracall_L1');
+            const l2Salvo = localStorage.getItem('vibracall_L2');
+
+            if (freq1Salva !== null && freq2Salva !== null) {
+                p1m.freq = parseFloat(freq1Salva);
+                p2m.freq = parseFloat(freq2Salva);
+                modoCalibracao = false; // Restaura estado calibrado
+            }
+
+            if (l1Salvo !== null) {
+                limiteL1 = parseFloat(l1Salvo);
+                const sliderL1 = document.getElementById('sliderL1');
+                if (sliderL1) sliderL1.value = limiteL1;
+                const txtL1 = document.getElementById('txtL1');
+                if (txtL1) txtL1.textContent = limiteL1.toFixed(2);
+            }
+
+            if (l2Salvo !== null) {
+                limiteL2 = parseFloat(l2Salvo);
+                const sliderL2 = document.getElementById('sliderL2');
+                if (sliderL2) sliderL2.value = limiteL2;
+                const txtL2 = document.getElementById('txtL2');
+                if (txtL2) txtL2.textContent = limiteL2.toFixed(2);
+            }
+        }
+
+        function salvarCalibracaoStorage() {
+            if (p1m.freq !== null && p2m.freq !== null) {
+                localStorage.setItem('calib_p1m_freq', p1m.freq);
+                localStorage.setItem('calib_p2m_freq', p2m.freq);
+            }
+        }
+
+        function salvarSlidersStorage() {
+            localStorage.setItem('vibracall_L1', limiteL1);
+            localStorage.setItem('vibracall_L2', limiteL2);
+        }
+
+        // Carrega as configurações salvas assim que o script é iniciado
+        carregarDadosSalvos();
+
+        // =========================================================================
         // 2. EVENT LISTENERS DA INTERFACE (SLIDERS E BOTÕES)
         // =========================================================================
         document.getElementById('sliderL1').addEventListener('input', (e) => {
             limiteL1 = parseFloat(e.target.value);
             document.getElementById('txtL1').textContent = limiteL1.toFixed(2);
+            salvarSlidersStorage();
         });
 
         document.getElementById('sliderL2').addEventListener('input', (e) => {
             limiteL2 = parseFloat(e.target.value);
             document.getElementById('txtL2').textContent = limiteL2.toFixed(2);
+            salvarSlidersStorage();
         });
 
         document.getElementById('btnCongelar').addEventListener('click', () => {
@@ -342,6 +389,13 @@
             } else {
                 btn.textContent = "Vibracall: ON ⚙";
                 btn.classList.remove('mutado');
+                
+                // TESTE DIRETO DE HARDWARE: Dá um pulso curto de 300ms ao ativar
+                if ("vibrate" in navigator) {
+                    navigator.vibrate(300);
+                } else {
+                    alert("A API de vibração não é suportada neste navegador!");
+                }
             }
         });
 
@@ -364,6 +418,10 @@
                 });
 
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+
                 const fonteMicrofone = audioContext.createMediaStreamSource(stream);
 
                 analisador = audioContext.createAnalyser();
@@ -460,7 +518,8 @@
                     return;
                 }
                 modoCalibracao = false;
-                alert("Calibração Concluída com Sucesso!\nMedição de distância ativada (1.0m a 2.5m).");
+                salvarCalibracaoStorage(); // Grava permanentemente a calibração válida
+                alert("Calibração Concluída e Salva com Sucesso!\nMedição de distância ativada (1.0m a 2.5m).");
             }
         }
 
@@ -473,7 +532,7 @@
             // Interpolação linear da distância (1.0m = f1, 2.5m = f2)
             const dist = 1.0 + (fMedida - f1) * ((2.5 - 1.0) / (f2 - f1));
             
-            // Limita a exibição entre 0.5m e 3.5m para evitar valores incoerentes nas bordas
+            // Limita a exibição entre 0.5m e 3.5m para evitar extrapolações
             return Math.max(0.5, Math.min(3.5, dist));
         }
 
@@ -485,108 +544,133 @@
             requestAnimationFrame(renderizar);
             if (telaCongelada) return;
 
-            const tamanhoBuffer = analisador.fftSize;
+            // 1. CAPTURA DOS DADOS DE ÁUDIO
+            const tamanhoBuffer = analisador ? analisador.fftSize : 2048;
             const dadosFormaOnda = new Float32Array(tamanhoBuffer);
-            analisador.getFloatTimeDomainData(dadosFormaOnda);
-
-            const taxaAmostragem = audioContext.sampleRate;
-
-            // Limpa o Canvas
-            canvasCtx.fillStyle = '#000000';
-            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Calcula Frequência com Média Móvel
-            const freqInstantanea = calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem);
-            const freqMedida = aplicarMediaMovel(freqInstantanea);
-
-            let nivelProximidade = 0;
-            let f1 = modoCalibracao ? FREQ_PERTO : p1m.freq;
-            let f2 = modoCalibracao ? FREQ_LONGE : p2m.freq;
-
-            if (f1 && f2 && f1 !== f2) {
-                // Barra cresce conforme aumenta a distância (freqMedida se aproxima de f2)
-                const freqClamp = Math.min(Math.max(f1, f2), Math.max(Math.min(f1, f2), freqMedida));
-                nivelProximidade = (freqClamp - f1) / (f2 - f1);
-                nivelProximidade = Math.max(0, Math.min(1, nivelProximidade));
+            if (analisador) {
+                analisador.getFloatTimeDomainData(dadosFormaOnda);
             }
 
-            // Desenha a Barra e Atualiza o Vibracall
-            desenharBarraHorizontal(canvasCtx, canvas.width, canvas.height, nivelProximidade);
-            atualizarLogicaVibracall(nivelProximidade);
+            const taxaAmostragem = audioContext ? audioContext.sampleRate : 44100;
 
-            // Atualiza Mostradores de Texto na Tela
-            const elRMS = document.getElementById('valRMS');   // Campo para dado técnico
-            const elPico = document.getElementById('valPico'); // Campo em Destaque (Distância)
+            // 2. CÁLCULO DA FREQUÊNCIA E DISTÂNCIA
+            const freqInstantanea = calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem);
+            const freqMedida = aplicarMediaMovel(freqInstantanea);
+            const distCalculada = calcularDistanciaReal(freqMedida);
 
-            // 1. Exibe a Frequência Técnica
+            // 3. ATUALIZAÇÃO IMEDIATA DOS MOSTRADORES HTML
+            const elRMS = document.getElementById('valRMS');
+            const elPico = document.getElementById('valPico');
+
             if (elRMS) {
                 elRMS.textContent = freqMedida.toFixed(0) + " Hz";
             }
 
-            // 2. Exibe a Distância em Metros em Destaque Principal
             if (elPico) {
-                const dist = calcularDistanciaReal(freqMedida);
-                elPico.textContent = dist.toFixed(2) + " m";
+                elPico.textContent = distCalculada.toFixed(2) + " m";
+            }
+
+            // 4. DESENHO NO CANVAS E LÓGICA DO VIBRACALL
+            if (canvasCtx && canvas) {
+                // Limpa o Canvas
+                canvasCtx.fillStyle = '#000000';
+                canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+                let nivelProximidade = 0;
+                let f1 = modoCalibracao ? FREQ_PERTO : p1m.freq;
+                let f2 = modoCalibracao ? FREQ_LONGE : p2m.freq;
+
+                if (f1 && f2 && f1 !== f2) {
+                    const freqClamp = Math.min(Math.max(f1, f2), Math.max(Math.min(f1, f2), freqMedida));
+                    nivelProximidade = (freqClamp - f1) / (f2 - f1);
+                    nivelProximidade = Math.max(0, Math.min(1, nivelProximidade));
+                }
+
+                // Desenha a Barra e Atualiza o Vibracall
+                desenharBarraHorizontal(canvasCtx, canvas.width, canvas.height, nivelProximidade);
+                atualizarLogicaVibracall(nivelProximidade);
             }
         }
 
-function desenharBarraHorizontal(ctx, largura, altura, nivel) {
-    const margemX = 15;
-    const alturaBarra = Math.round(altura * 0.20);
-    const margemY = Math.round((altura - alturaBarra) / 2);
-    const larguraCalha = largura - (margemX * 2);
+        function desenharBarraHorizontal(ctx, largura, altura, nivel) {
+            const margemX = 15;
+            const alturaBarra = Math.round(altura * 0.20);
+            const margemY = Math.round((altura - alturaBarra) / 2);
+            const larguraCalha = largura - (margemX * 2);
 
-    // Calha externa
-    ctx.strokeStyle = '#444444';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(margemX, margemY, larguraCalha, alturaBarra);
+            // Calha externa
+            ctx.strokeStyle = '#444444';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(margemX, margemY, larguraCalha, alturaBarra);
 
-    // Preenchimento proporcional
-    const larguraPreenchimento = larguraCalha * nivel;
+            // Preenchimento proporcional
+            const larguraPreenchimento = larguraCalha * nivel;
 
-    // LÓGICA DE CORES: Vermelho nas extremidades (fora da faixa L1-L2) e Verde no centro
-    if (nivel < limiteL1) {
-        ctx.fillStyle = '#FF0000'; // Vermelho (Muito Próximo / Abaixo de L1)
-    } else if (nivel >= limiteL1 && nivel <= limiteL2) {
-        ctx.fillStyle = '#00FF00'; // Verde (Zona Segura / Centralizada entre L1 e L2)
-    } else {
-        ctx.fillStyle = '#FF0000'; // Vermelho (Muito Afastado / Acima de L2)
-    }
+            // LÓGICA DE CORES: Vermelho nas duas extremidades e Verde no centro
+            if (nivel < limiteL1) {
+                ctx.fillStyle = '#FF0000'; // Vermelho (Extrema proximidade / Abaixo de L1)
+            } else if (nivel >= limiteL1 && nivel <= limiteL2) {
+                ctx.fillStyle = '#00FF00'; // Verde (Zona Segura / Centralizada entre L1 e L2)
+            } else {
+                ctx.fillStyle = '#FF0000'; // Vermelho (Extremo afastamento / Acima de L2)
+            }
 
-    if (larguraPreenchimento > 0) {
-        ctx.fillRect(margemX + 2, margemY + 2, larguraPreenchimento - 4, alturaBarra - 4);
-    }
+            if (larguraPreenchimento > 0) {
+                ctx.fillRect(margemX + 2, margemY + 2, larguraPreenchimento - 4, alturaBarra - 4);
+            }
 
-    // Marcador L1 (Linha Branca tracejada)
-    const xL1 = margemX + (larguraCalha * limiteL1);
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    ctx.moveTo(xL1, margemY - 4);
-    ctx.lineTo(xL1, margemY + alturaBarra + 4);
-    ctx.stroke();
+            // Marcador L1 (Linha Branca tracejada)
+            const xL1 = margemX + (larguraCalha * limiteL1);
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            ctx.moveTo(xL1, margemY - 4);
+            ctx.lineTo(xL1, margemY + alturaBarra + 4);
+            ctx.stroke();
 
-    // Marcador L2 (Linha Branca tracejada)
-    const xL2 = margemX + (larguraCalha * limiteL2);
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.beginPath();
-    ctx.moveTo(xL2, margemY - 4);
-    ctx.lineTo(xL2, margemY + alturaBarra + 4);
-    ctx.stroke();
+            // Marcador L2 (Linha Branca tracejada)
+            const xL2 = margemX + (larguraCalha * limiteL2);
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.moveTo(xL2, margemY - 4);
+            ctx.lineTo(xL2, margemY + alturaBarra + 4);
+            ctx.stroke();
 
-    ctx.setLineDash([]);
+            ctx.setLineDash([]);
 
-    // Rótulos de Extremidade (1.0 m e 2.5 m)
-    ctx.fillStyle = '#AAAAAA';
-    ctx.font = '12px sans-serif';
+            // Rótulos de Extremidade (1.0 m à Esquerda | 2.5 m à Direita)
+            ctx.fillStyle = '#AAAAAA';
+            ctx.font = '12px sans-serif';
 
-    ctx.textAlign = 'left';
-    ctx.fillText('1.0 m', margemX, margemY + alturaBarra + 16);
+            ctx.textAlign = 'left';
+            ctx.fillText('1.0 m', margemX, margemY + alturaBarra + 16);
 
-    ctx.textAlign = 'right';
-    ctx.fillText('2.5 m', margemX + larguraCalha, margemY + alturaBarra + 16);
-}
+            ctx.textAlign = 'right';
+            ctx.fillText('2.5 m', margemX + larguraCalha, margemY + alturaBarra + 16);
+        }
+
+        // =========================================================================
+        // 6. LÓGICA DO VIBRACALL E BLOQUEIO DE TELA
+        // =========================================================================
+        function atualizarLogicaVibracall(nivelProximidade) {
+            let novoEstadoSugerido = "OFF";
+
+            if (nivelProximidade >= limiteL2) {
+                novoEstadoSugerido = "PULSANTE";   // Passou de L2 -> Alerta de afastamento
+            } else if (nivelProximidade < limiteL1) {
+                novoEstadoSugerido = "CONTÍNUO";   // Abaixo de L1 -> Alerta de extrema proximidade
+            } else {
+                novoEstadoSugerido = "OFF";        // Entre L1 e L2 -> Zona segura
+            }
+
+            if (novoEstadoSugerido !== estadoVibracall) {
+                estadoVibracall = novoEstadoSugerido;
+                if (estadoVibracall === "PULSANTE") iniciarPulsacao();
+                else if (estadoVibracall === "CONTÍNUO") iniciarContinuo();
+                else pararTodosVibracall();
+            }
+        }
 
         function iniciarPulsacao() {
             pararTodosVibracall();
@@ -605,14 +689,15 @@ function desenharBarraHorizontal(ctx, largura, altura, nivel) {
             pararTodosVibracall();
             
             if (!vibracallMutado && "vibrate" in navigator) {
-                navigator.vibrate(2000);
+                navigator.vibrate(100);
             }
             
+            // Envia pequenos pulsos de 100ms repetidos a cada 100ms
             temporizadorContinuo = setInterval(() => {
                 if (!vibracallMutado && "vibrate" in navigator) {
-                    navigator.vibrate(2000);
+                    navigator.vibrate(100);
                 }
-            }, 1800);
+            }, 100);
         }
 
         function pararTodosVibracall() {
@@ -626,7 +711,6 @@ function desenharBarraHorizontal(ctx, largura, altura, nivel) {
             }
             estadoLedPulsante = false;
             
-            // Interrompe imediatamente qualquer vibração em andamento no hardware
             pararTodosVibracallMotor();
         }
 
