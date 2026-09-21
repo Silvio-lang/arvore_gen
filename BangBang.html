@@ -76,37 +76,47 @@
         <div>
           <div class="flex justify-between text-xs font-medium mb-1">
             <span class="text-slate-300">Comprimento da Haste (Sensor Avançado)</span>
-            <span id="val-haste" class="text-indigo-400 font-mono">60 px</span>
+            <span id="val-haste" class="text-indigo-400 font-mono">20 px</span>
           </div>
-          <input type="range" id="input-haste" min="20" max="150" value="60" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          <input type="range" id="input-haste" min="10" max="150" value="20" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
         </div>
 
-        <!-- CONTROLE: ÁNGULO DE ESTERÇAMENTO -->
+        <!-- CONTROLE: ÂNGULO DE ESTERÇAMENTO -->
         <div>
           <div class="flex justify-between text-xs font-medium mb-1">
             <span class="text-slate-300">Ângulo Máximo das Rodas</span>
-            <span id="val-angulo" class="text-indigo-400 font-mono">15°</span>
+            <span id="val-angulo" class="text-indigo-400 font-mono">8°</span>
           </div>
-          <input type="range" id="input-angulo" min="5" max="35" value="15" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          <input type="range" id="input-angulo" min="2" max="35" value="8" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
         </div>
 
         <!-- CONTROLE: VELOCIDADE -->
         <div>
           <div class="flex justify-between text-xs font-medium mb-1">
             <span class="text-slate-300">Velocidade do Carrinho</span>
-            <span id="val-velocidade" class="text-indigo-400 font-mono">2.0</span>
+            <span id="val-velocidade" class="text-indigo-400 font-mono">1.0</span>
           </div>
-          <input type="range" id="input-velocidade" min="0.5" max="5.0" step="0.1" value="2.0" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          <input type="range" id="input-velocidade" min="0.5" max="5.0" step="0.1" value="1.0" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+        </div>
+
+        <!-- CONTROLE: ATRASO DE REAÇÃO HUMANA (DELAY) -->
+        <div>
+          <div class="flex justify-between text-xs font-medium mb-1">
+            <span class="text-slate-300">Tempo de Reação Humana (Atraso)</span>
+            <span id="val-delay" class="text-indigo-400 font-mono">0.5 s</span>
+          </div>
+          <input type="range" id="input-delay" min="0.0" max="2.0" step="0.1" value="0.5" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
         </div>
 
         <!-- CONTROLE: DESLOCAMENTO MANUAL DO CABO -->
         <div>
           <div class="flex justify-between text-xs font-medium mb-1">
             <span class="text-slate-300">Deslocamento da Pista (Offset)</span>
-            <span id="val-offset" class="text-indigo-400 font-mono">0 px</span>
+            <span id="val-offset" class="text-indigo-400 font-mono">50 px</span>
           </div>
-          <input type="range" id="input-offset" min="-150" max="150" value="0" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          <input type="range" id="input-offset" min="-150" max="150" value="50" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
         </div>
+      </div>
 
       <div class="pt-2">
         <button id="btn-aplicar-modal" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg shadow transition">
@@ -132,22 +142,27 @@
     const inputHaste = document.getElementById('input-haste');
     const inputAngulo = document.getElementById('input-angulo');
     const inputVelocidade = document.getElementById('input-velocidade');
+    const inputDelay = document.getElementById('input-delay');
     const inputOffset = document.getElementById('input-offset');
 
     const valHaste = document.getElementById('val-haste');
     const valAngulo = document.getElementById('val-angulo');
     const valVelocidade = document.getElementById('val-velocidade');
+    const valDelay = document.getElementById('val-delay');
     const valOffset = document.getElementById('val-offset');
 
-
-// PARÂMETROS DA SIMULAÇÃO (VALORES INICIAIS AJUSTADOS)
+    // PARÂMETROS DA SIMULAÇÃO (VALORES INICIAIS AJUSTADOS)
     let config = {
       hasteLength: 20,                          // Comprimento da Haste: 20 px
-      maxSteerAngle: 8 * (Math.PI / 180),       // Ângulo Máximo das Rodas: 8° (convertido para radianos)
+      maxSteerAngle: 8 * (Math.PI / 180),       // Ângulo Máximo das Rodas: 8°
       speed: 1.0,                               // Velocidade do Carrinho: 1.0
-      caboOffset: 50,                           // Deslocamento da Pista: 50 px
-      caboWidth: 12
-   };
+      caboOffset: 90,                           // Deslocamento da Pista: 90 px
+      caboWidth: 12,
+      humanDelaySec: 0.5                        // Atraso de reação humana: 0.5s
+    };
+
+    // MEMÓRIA HISTÓRICA DO SENSOR PARA ATRASO HUMANO
+    let sensorHistory = [];
 
     // ESTADO DO VEÍCULO (GEOMETRIA ACKERMANN/BICICLETA)
     let vehicle = {
@@ -193,155 +208,179 @@
       vehicle.heading = -Math.PI / 2;
       vehicle.steerAngle = 0;
       vehicle.trail = [];
-      config.caboOffset = 0;
-      inputOffset.value = 0;
-      valOffset.textContent = '0 px';
+      config.caboOffset = 50;
+      inputOffset.value = 50;
+      valOffset.textContent = '50 px';
+      sensorHistory = [];
       showToast("Simulação Reiniciada");
     }
 
-function updatePhysics() {
-  // 1. Posição do eixo dianteiro
-  const frontAxleX = vehicle.x + Math.cos(vehicle.heading) * vehicle.wheelbase;
-  const frontAxleY = vehicle.y + Math.sin(vehicle.heading) * vehicle.wheelbase;
+    function updatePhysics() {
+      // 1. Posição do eixo dianteiro
+      const frontAxleX = vehicle.x + Math.cos(vehicle.heading) * vehicle.wheelbase;
+      const frontAxleY = vehicle.y + Math.sin(vehicle.heading) * vehicle.wheelbase;
 
-  // 2. Posição da ponta do sensor na haste avançada (Look-ahead)
-  const sensorX = frontAxleX + Math.cos(vehicle.heading) * config.hasteLength;
-  const sensorY = frontAxleY + Math.sin(vehicle.heading) * config.hasteLength;
+      // 2. Posição da ponta do sensor na haste avançada
+      const sensorX = frontAxleX + Math.cos(vehicle.heading) * config.hasteLength;
+      const sensorY = frontAxleY + Math.sin(vehicle.heading) * config.hasteLength;
 
-  // 3. Posição do cabo emissor de referência
-  const caboX = (canvas.width / 2) + config.caboOffset;
-
-  // 4. Definição da Faixa de Offset Lateral (Igual ao atleta cego em relação ao cabo)
-  // Define o deslocamento desejado do sensor em relação ao cabo (ex: 50px à esquerda do cabo)
-  const offsetDesejado = 50; 
-  const zonaAlvoX = caboX - offsetDesejado; // Linha de trajetória do carrinho
-
-  // 5. Verificação da Presença de Sinal
-  // O sensor só detecta sinal se estiver próximo da faixa de offset do cabo
-  const distParaCabo = Math.abs(sensorX - caboX);
-  vehicle.sensorTouched = distParaCabo <= (config.caboWidth / 2 + offsetDesejado);
-
-  // 6. LÓGICA DE CONTROLE BANG-BANG COM PERDA DE SINAL ALÉM DO CABO:
-  // Se o sensor passou além do cabo para a direita (sensorX > caboX), o sinal "desaparece"
-  // e o carrinho precisa virar para a DIREITA para recuperar o cabo.
-  if (sensorX > caboX) {
-    // Passou do cabo (lado direito / sem sinal) -> Esterça para a DIREITA para voltar ao cabo
-    vehicle.steerAngle = config.maxSteerAngle;
-  } else if (sensorX < zonaAlvoX) {
-    // Muito afastado à esquerda da zona de offset -> Esterça para a DIREITA para se aproximar da zona
-    vehicle.steerAngle = config.maxSteerAngle;
-  } else {
-    // Dentro da zona de offset / sob o cabo -> Esterça para a ESQUERDA para manter a distância de offset
-    vehicle.steerAngle = -config.maxSteerAngle;
-  }
-
-  // 7. Atualização cinemática do veículo (Geometria Ackermann)
-  vehicle.heading += (config.speed / vehicle.wheelbase) * Math.tan(vehicle.steerAngle);
-  vehicle.x += config.speed * Math.cos(vehicle.heading);
-  vehicle.y += config.speed * Math.sin(vehicle.heading);
-
-  // 8. Registro do rastro percorrido pelo sensor
-  vehicle.trail.push({
-    x: sensorX,
-    y: sensorY,
-    touched: vehicle.sensorTouched
-  });
-
-  if (vehicle.trail.length > 250) {
-    vehicle.trail.shift();
-  }
-
-  // Reinício do topo da tela
-  if (vehicle.y < -50) {
-    vehicle.y = canvas.height + 20;
-    vehicle.trail = [];
-  }
-}
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+      // 3. Posição do cabo emissor
       const caboX = (canvas.width / 2) + config.caboOffset;
 
-      // DESENHO DO CABO EMISSOR
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = config.caboWidth;
-      ctx.shadowColor = '#0284c7';
-      ctx.shadowBlur = 12;
-      ctx.beginPath();
-      ctx.moveTo(caboX, 0);
-      ctx.lineTo(caboX, canvas.height);
-      ctx.stroke();
-      ctx.shadowBlur = 0;
+      // 4. Grava a leitura instantânea no histórico com registro de tempo
+      const now = performance.now();
+      sensorHistory.push({
+        time: now,
+        sensorX: sensorX
+      });
 
-      // LINHA CENTRAL DO CABO
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(caboX, 0);
-      ctx.lineTo(caboX, canvas.height);
-      ctx.stroke();
-
-      // RASTRO DO SENSOR
-      for (let i = 1; i < vehicle.trail.length; i++) {
-        const p1 = vehicle.trail[i - 1];
-        const p2 = vehicle.trail[i];
-        ctx.strokeStyle = p2.touched ? '#22c55e' : '#ef4444';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.stroke();
+      // Descarta registros mais antigos que 2.5s para economizar memória
+      while (sensorHistory.length > 0 && (now - sensorHistory[0].time) > 2500) {
+        sensorHistory.shift();
       }
 
-      // CORPO DO CARRINHO
-      ctx.save();
-      ctx.translate(vehicle.x, vehicle.y);
-      ctx.rotate(vehicle.heading);
+      // 5. Determina a posição do sensor há 'humanDelaySec' segundos atrás
+      const targetTime = now - (config.humanDelaySec * 1000);
+      let delayedSensorX = sensorX;
 
-      ctx.fillStyle = '#334155';
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 1.5;
-      ctx.fillRect(-10, -15, vehicle.wheelbase + 15, 30);
-      ctx.strokeRect(-10, -15, vehicle.wheelbase + 15, 30);
+      if (config.humanDelaySec > 0 && sensorHistory.length > 0) {
+        const delayedEntry = sensorHistory.find(entry => entry.time >= targetTime) || sensorHistory[0];
+        delayedSensorX = delayedEntry.sensorX;
+      }
 
-      // RODAS TRASEIRAS
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(-5, -18, 12, 5);
-      ctx.fillRect(-5, 13, 12, 5);
+      // 6. Faixa de Offset e Presença de Sinal Atual
+      const offsetDesejado = 90;
+      const zonaAlvoX = caboX - offsetDesejado;
+      const distParaCabo = Math.abs(sensorX - caboX);
+      vehicle.sensorTouched = distParaCabo <= (config.caboWidth / 2 + offsetDesejado);
 
-      // RODAS DIANTEIRAS (ESTERÇADAS)
-      ctx.save();
-      ctx.translate(vehicle.wheelbase, -15);
-      ctx.rotate(vehicle.steerAngle);
-      ctx.fillRect(-6, -2.5, 12, 5);
-      ctx.restore();
+      // 7. LÓGICA DE CONTROLE BANG-BANG COM ATRASO HUMANO
+      if (delayedSensorX > caboX) {
+        // Percebeu que passou do cabo -> Esterça para a DIREITA
+        vehicle.steerAngle = config.maxSteerAngle;
+      } else if (delayedSensorX < zonaAlvoX) {
+        // Percebeu que está à esquerda da zona de offset -> Esterça para a DIREITA
+        vehicle.steerAngle = config.maxSteerAngle;
+      } else {
+        // Percebeu que está na zona de offset -> Esterça para a ESQUERDA
+        vehicle.steerAngle = -config.maxSteerAngle;
+      }
 
-      ctx.save();
-      ctx.translate(vehicle.wheelbase, 15);
-      ctx.rotate(vehicle.steerAngle);
-      ctx.fillRect(-6, -2.5, 12, 5);
-      ctx.restore();
+      // 8. Atualização cinemática
+      vehicle.heading += (config.speed / vehicle.wheelbase) * Math.tan(vehicle.steerAngle);
+      vehicle.x += config.speed * Math.cos(vehicle.heading);
+      vehicle.y += config.speed * Math.sin(vehicle.heading);
 
-      // HASTE AVANÇADA
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(vehicle.wheelbase, 0);
-      ctx.lineTo(vehicle.wheelbase + config.hasteLength, 0);
-      ctx.stroke();
+      // 9. Registro do rastro
+      vehicle.trail.push({
+        x: sensorX,
+        y: sensorY,
+        touched: vehicle.sensorTouched
+      });
 
-      // SENSOR NA PONTA DA HASTE
-      ctx.fillStyle = vehicle.sensorTouched ? '#22c55e' : '#ef4444';
-      ctx.beginPath();
-      ctx.arc(vehicle.wheelbase + config.hasteLength, 0, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      if (vehicle.trail.length > 250) {
+        vehicle.trail.shift();
+      }
 
-      ctx.restore();
+      if (vehicle.y < -50) {
+        vehicle.y = canvas.height + 20;
+        vehicle.trail = [];
+      }
     }
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const caboX = (canvas.width / 2) + config.caboOffset;
+
+  // DESENHO DO CABO EMISSOR
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = config.caboWidth;
+  ctx.shadowColor = '#0284c7';
+  ctx.shadowBlur = 12;
+  ctx.beginPath();
+  ctx.moveTo(caboX, 0);
+  ctx.lineTo(caboX, canvas.height);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // LINHA CENTRAL DO CABO
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(caboX, 0);
+  ctx.lineTo(caboX, canvas.height);
+  ctx.stroke();
+
+  // RASTRO DO SENSOR
+  for (let i = 1; i < vehicle.trail.length; i++) {
+    const p1 = vehicle.trail[i - 1];
+    const p2 = vehicle.trail[i];
+    ctx.strokeStyle = p2.touched ? '#22c55e' : '#ef4444';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+  }
+
+  // CORPO DO CARRINHO (CHASSI)
+  ctx.save();
+  ctx.translate(vehicle.x, vehicle.y);
+  ctx.rotate(vehicle.heading);
+
+  ctx.fillStyle = '#1e293b';
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 1.5;
+  ctx.fillRect(-10, -15, vehicle.wheelbase + 15, 30);
+  ctx.strokeRect(-10, -15, vehicle.wheelbase + 15, 30);
+
+  // CONFIGURAÇÃO DOS PNEUS (COR COM ALTO CONTRASTE)
+  ctx.fillStyle = '#64748b';       // Cinza médio destacado do fundo
+  ctx.strokeStyle = '#cbd5e1';     // Borda clara para realçar no fundo escuro
+  ctx.lineWidth = 1;
+
+  // RODAS TRASEIRAS
+  ctx.fillRect(-5, -18, 12, 5);
+  ctx.strokeRect(-5, -18, 12, 5);
+
+  ctx.fillRect(-5, 13, 12, 5);
+  ctx.strokeRect(-5, 13, 12, 5);
+
+  // RODAS DIANTEIRAS (ESTERÇADAS)
+  ctx.save();
+  ctx.translate(vehicle.wheelbase, -15);
+  ctx.rotate(vehicle.steerAngle);
+  ctx.fillRect(-6, -2.5, 12, 5);
+  ctx.strokeRect(-6, -2.5, 12, 5);
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(vehicle.wheelbase, 15);
+  ctx.rotate(vehicle.steerAngle);
+  ctx.fillRect(-6, -2.5, 12, 5);
+  ctx.strokeRect(-6, -2.5, 12, 5);
+  ctx.restore();
+
+  // HASTE AVANÇADA
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(vehicle.wheelbase, 0);
+  ctx.lineTo(vehicle.wheelbase + config.hasteLength, 0);
+  ctx.stroke();
+
+  // SENSOR NA PONTA DA HASTE
+  ctx.fillStyle = vehicle.sensorTouched ? '#22c55e' : '#ef4444';
+  ctx.beginPath();
+  ctx.arc(vehicle.wheelbase + config.hasteLength, 0, 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.restore();
+}
 
     function loop() {
       updatePhysics();
@@ -380,6 +419,11 @@ function updatePhysics() {
     inputVelocidade.addEventListener('input', (e) => {
       config.speed = parseFloat(e.target.value);
       valVelocidade.textContent = config.speed.toFixed(1);
+    });
+
+    inputDelay.addEventListener('input', (e) => {
+      config.humanDelaySec = parseFloat(e.target.value);
+      valDelay.textContent = `${config.humanDelaySec.toFixed(1)} s`;
     });
 
     inputOffset.addEventListener('input', (e) => {
