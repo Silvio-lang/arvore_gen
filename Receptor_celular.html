@@ -213,44 +213,46 @@
     <div class="controles-top">
         <button id="btnIniciar">Ligar Entrada de Áudio</button>
         <button id="btnCongelar">Congelar Tela (Hold)</button>
-    <div class="linha-dupla-botoes">
+        <div class="linha-dupla-botoes">
             <button id="btnMute">ATIVAR Vibracal</button>
             <button id="btnTouch">Touch: ATIVO 🔓</button>
-    </div>    
-   <button onclick="abrirConfiguracaoGrandeza()" style="padding: 10px 15px; font-weight: bold; background-color: #007bff; color: white;       border: none; border-radius: 5px; cursor: pointer;">
-    ⚙️ Configurar Medição
-</button>
+        </div>    
+        
+        <!-- Botões de Configuração da Medição e Escala da Barra -->
+        <div style="display: flex; gap: 10px; margin-top: 10px; justify-content: center; flex-wrap: wrap;">
+            <button onclick="abrirConfiguracaoCalibracao()" style="padding: 10px 15px; font-weight: bold; background-color: #0284c7; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                ⚙️ Pontos de Calibração
+            </button>
+            <button onclick="abrirConfiguracaoEscalaBarra()" style="padding: 10px 15px; font-weight: bold; background-color: #0d9488; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                📏 Limites da Barra
+            </button>
+        </div>
     </div>
-<div id="camadaBloqueio" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: rgba(0,0,0,0.01);"></div>
+
+    <div id="camadaBloqueio" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: rgba(0,0,0,0.01);"></div>
 
     <div id="painel-principal">
         <canvas id="telaOsciloscopio" width="570" height="250"></canvas>
 
-<!-- Indicadores Visuais de Limite de Calibração -->
-<div style="display: flex; justify-content: space-between; width: 100%; box-sizing: border-box; padding: 0 15px; margin-top: 5px; color: #888888; font-size: 0.9em; font-weight: bold;">
-    <span>Início: 1.0 m</span>
-    <span>Fim: 2.5 m</span>
-</div>
-
-<div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: center;">
-    <button id="btnCalib1" onclick="registrarPonto(1)" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
-        Calibrar Ponto 1 (1.0 V)
-    </button>
-    <button id="btnCalib2" onclick="registrarPonto(2)" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
-        Calibrar Ponto 2 (2.5 V)
-    </button>
-</div>
+        <!-- Botões para Executar a Calibração na Bancada -->
+        <div style="display: flex; gap: 10px; margin-top: 10px; margin-bottom: 10px; justify-content: center; flex-wrap: wrap;">
+            <button id="btnCalib1" onclick="registrarPonto1m()" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
+                Calibrar Ponto 1 (1.0 V)
+            </button>
+            <button id="btnCalib2" onclick="registrarPonto2m()" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
+                Calibrar Ponto 2 (2.5 V)
+            </button>
+        </div>
 
         <div class="painel-sliders">
             <div class="controle-slider l1">
                 <label for="sliderL1">Ajuste limite próximo: <span id="txtL1">0.08</span></label>
                 <input type="range" id="sliderL1" min="0.01" max="0.5" step="0.01" value="0.08">
             </div>
-<div class="controle-slider l2">
-    <label for="sliderL2">Inicio Sinal Forte (perto): <span id="txtL2">0.60</span></label>
-    <input type="range" id="sliderL2" min="0.05" max="0.9" step="0.01" value="0.60">
-</div>
-
+            <div class="controle-slider l2">
+                <label for="sliderL2">Inicio Sinal Forte (perto): <span id="txtL2">0.60</span></label>
+                <input type="range" id="sliderL2" min="0.05" max="0.9" step="0.01" value="0.60">
+            </div>
         </div>
 
         <div class="grid-medidores">
@@ -259,7 +261,7 @@
                 <div class="valor" id="valRMS">0.0000</div>
             </div>
             <div class="card-medidor">
-                <div class="rotulo">DISTÂNCIA</div>
+                <div class="rotulo">MEDIDA</div>
                 <div class="valor" id="valPico">0.0000</div>
             </div>
         </div>
@@ -275,21 +277,24 @@
         let emExecucao = false;
         let telaCongelada = false;
 
-        // Configurações Dinâmicas da Grandeza Medida (Padrão inicial: Volts)
+        // Frequência instantânea compartilhada com os botões de calibração
+        let freqMedidaGlobal = 0; 
+
+        // Configurações Dinâmicas da Grandeza Medida
         let unidadeMedida = "V";
+
+        // Pontos de Calibração Física (Física do Sensor)
         let valorPonto1 = 1.0;
         let valorPonto2 = 2.5;
-        let freqMedidaGlobal = 0; // Guarda a leitura atual para os botões de calibração
 
-        // Limites Padrão de Bancada (Frequências de referência iniciais)
-        const FREQ_PERTO = 2800;
-        const FREQ_LONGE = 5000;
+        // Limites Visuais da Barra Horizontal (Escala do Instrumento)
+        let limiteMinBarra = 0.0;
+        let limiteMaxBarra = 3.0;
 
-        // Estado da Calibração por Dois Pontos
+        // Estado da Calibração
         let modoCalibracao = true;
         let p1m = { freq: null, valor: valorPonto1 };
         let p2m = { freq: null, valor: valorPonto2 };
-
         // Limites de segurança para calibração
         const FREQ_SATURACAO_MIN = 1500; 
         const FREQ_SATURACAO_MAX = 7500; 
@@ -546,21 +551,18 @@
             return Math.max(0.5, Math.min(3.5, dist));
         }
 
-       // =========================================================================
-        // VARIAVEIS DE UNIDADE E PONTOS (Adicione no topo do seu script se não existirem)
         // =========================================================================
+        // EQUAÇÃO DA RETA COM EXTRAPOLAÇÃO LIVRE E VARIÁVEIS DINÂMICAS
+        // =========================================================================
+function calcularValorMedido(freq) {
+    let f1 = modoCalibracao ? FREQ_PERTO : p1m.freq;
+    let f2 = modoCalibracao ? FREQ_LONGE : p2m.freq;
 
-        // Função de apoio para interpolação linear da reta
-        function calcularValorMedido(freq) {
-            let f1 = modoCalibracao ? FREQ_PERTO : p1m.freq;
-            let f2 = modoCalibracao ? FREQ_LONGE : p2m.freq;
+    if (!f1 || !f2 || f1 === f2) return 0;
 
-            if (!f1 || !f2 || f1 === f2) return 0;
-
-            // Equação da Reta: y = y1 + ((f - f1) / (f2 - f1)) * (y2 - y1)
-            const valorInterpolado = valorPonto1 + ((freq - f1) / (f2 - f1)) * (valorPonto2 - valorPonto1);
-            return valorInterpolado;
-        }
+    // Equação da reta direta sem travas (permite valores menores que valorPonto1 e negativos)
+    return valorPonto1 + ((freq - f1) / (f2 - f1)) * (valorPonto2 - valorPonto1);
+}
 
         // =========================================================================
         // 5. LAÇO DE RENDERIZAÇÃO E DESENHO NO CANVAS
@@ -606,13 +608,11 @@
                 canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
                 let nivelProximidade = 0;
-                let f1 = modoCalibracao ? FREQ_PERTO : p1m.freq;
-                let f2 = modoCalibracao ? FREQ_LONGE : p2m.freq;
 
-                if (f1 && f2 && f1 !== f2) {
-                    // Mapeamento proporcional sem trava rígida na frequência de medição
-                    nivelProximidade = (freqMedida - f1) / (f2 - f1);
-                    nivelProximidade = Math.max(0, Math.min(1, nivelProximidade));
+                // Mapeamento proporcional da barra baseado no valorCalculado x limites da barra
+                if (limiteMaxBarra !== limiteMinBarra) {
+                    nivelProximidade = (valorCalculado - limiteMinBarra) / (limiteMaxBarra - limiteMinBarra);
+                    nivelProximidade = Math.max(0, Math.min(1, nivelProximidade)); // Garante o preenchimento dentro da calha (0% a 100%)
                 }
 
                 // Desenha a Barra e Atualiza o Vibracall
@@ -621,62 +621,73 @@
             }
         }
 
-        function desenharBarraHorizontal(ctx, largura, altura, nivel) {
-            const margemX = 15;
-            const alturaBarra = Math.round(altura * 0.20);
-            const margemY = Math.round((altura - alturaBarra) / 2);
-            const larguraCalha = largura - (margemX * 2);
+// =========================================================================
+        // 6. DESENHO DA BARRA HORIZONTAL COM CORES DINÂMICAS E MARCADORES (L1 e L2)
+        // =========================================================================
+        function desenharBarraHorizontal(ctx, larguraTela, alturaTela, nivelProximidade) {
+            const larguraCalha = larguraTela - 80;
+            const alturaBarra = 30;
+            const margemX = 40;
+            const margemY = (alturaTela / 2) - (alturaBarra / 2);
 
-            // Calha externa
-            ctx.strokeStyle = '#444444';
-            ctx.lineWidth = 2;
+            // 1. Leitura dos Marcadores dos Sliders
+            const sliderL1 = document.getElementById('sliderL1');
+            const sliderL2 = document.getElementById('sliderL2');
+            
+            const valL1 = sliderL1 ? parseFloat(sliderL1.value) : 0.08;
+            const valL2 = sliderL2 ? parseFloat(sliderL2.value) : 0.60;
+
+            // 2. Desenha a Calha (Fundo da Barra)
+            ctx.fillStyle = '#222222';
+            ctx.fillRect(margemX, margemY, larguraCalha, alturaBarra);
+            ctx.strokeStyle = '#555555';
             ctx.strokeRect(margemX, margemY, larguraCalha, alturaBarra);
 
-            // Preenchimento proporcional
-            const larguraPreenchimento = larguraCalha * nivel;
+            // 3. Determina a Cor Dinâmica do Preenchimento
+            let corPreenchimento = '#dc3545'; //Vermelho (Alarme Forte - L2)
 
-            // LÓGICA DE CORES: Vermelho nas duas extremidades e Verde no centro
-            if (nivel < limiteL1) {
-                ctx.fillStyle = '#FF0000'; // Vermelho (Abaixo de L1)
-            } else if (nivel >= limiteL1 && nivel <= limiteL2) {
-                ctx.fillStyle = '#00FF00'; // Verde (Zona Segura entre L1 e L2)
-            } else {
-                ctx.fillStyle = '#FF0000'; // Vermelho (Acima de L2)
+            if (nivelProximidade >= valL2) {
+                corPreenchimento = '#dc3545'; // Vermelho (Alarme Forte - L2)
+            } else if (nivelProximidade >= valL1) {
+                corPreenchimento = '#ffc107'; // Amarelo/Laranja (Alerta Médio - L1)
             }
 
-            if (larguraPreenchimento > 0) {
-                ctx.fillRect(margemX + 2, margemY + 2, larguraPreenchimento - 4, alturaBarra - 4);
-            }
+            // 4. Desenha o Preenchimento Colorido
+            const larguraPreenchimento = Math.max(0, Math.min(1, nivelProximidade)) * larguraCalha;
+            ctx.fillStyle = corPreenchimento;
+            ctx.fillRect(margemX, margemY, larguraPreenchimento, alturaBarra);
 
-            // Marcador L1 (Linha Branca tracejada)
-            const xL1 = margemX + (larguraCalha * limiteL1);
-            ctx.strokeStyle = '#FFFFFF';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([3, 3]);
+            // 5. Desenha as Linhas Verticais dos Gatilhos (L1 e L2)
+            const xL1 = margemX + (valL1 * larguraCalha);
+            const xL2 = margemX + (valL2 * larguraCalha);
+
+            // Linha L1 (Amarelo)
+            ctx.strokeStyle = '#ffc107';
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(xL1, margemY - 4);
-            ctx.lineTo(xL1, margemY + alturaBarra + 4);
+            ctx.moveTo(xL1, margemY - 5);
+            ctx.lineTo(xL1, margemY + alturaBarra + 5);
             ctx.stroke();
 
-            // Marcador L2 (Linha Branca tracejada)
-            const xL2 = margemX + (larguraCalha * limiteL2);
-            ctx.strokeStyle = '#FFFFFF';
+            // Linha L2 (Vermelho)
+            ctx.strokeStyle = '#dc3545';
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(xL2, margemY - 4);
-            ctx.lineTo(xL2, margemY + alturaBarra + 4);
+            ctx.moveTo(xL2, margemY - 5);
+            ctx.lineTo(xL2, margemY + alturaBarra + 5);
             ctx.stroke();
 
-            ctx.setLineDash([]);
+            ctx.lineWidth = 1; // Restaura espessura padrão
 
-            // Rótulos de Extremidade Dinâmicos com a Unidade Escolhida
-            ctx.fillStyle = '#AAAAAA';
-            ctx.font = '12px sans-serif';
+            // 6. Legendas dos Limites da Barra
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '14px sans-serif';
 
             ctx.textAlign = 'left';
-            ctx.fillText(valorPonto1.toFixed(1) + ' ' + unidadeMedida, margemX, margemY + alturaBarra + 16);
+            ctx.fillText(limiteMinBarra.toFixed(1) + ' ' + unidadeMedida, margemX, margemY + alturaBarra + 22);
 
             ctx.textAlign = 'right';
-            ctx.fillText(valorPonto2.toFixed(1) + ' ' + unidadeMedida, margemX + larguraCalha, margemY + alturaBarra + 16);
+            ctx.fillText(limiteMaxBarra.toFixed(1) + ' ' + unidadeMedida, margemX + larguraCalha, margemY + alturaBarra + 22);
         }
         // =========================================================================
         // 6. LÓGICA DO VIBRACALL E BLOQUEIO DE TELA
@@ -785,41 +796,59 @@
                 }
             }
         }
+// =========================================================================
+        // FUNÇÕES DE CONFIGURAÇÃO INTERATIVA (AJUSTE DOS BOTÕES)
         // =========================================================================
-        // FUNÇÃO PARA CONFIGURAR A GRANDEZA FÍSICA E OS PONTOS DA RETA
-        // =========================================================================
-        function abrirConfiguracaoGrandeza() {
-            // 1. Pergunta o nome da unidade
-            const novaUnidade = prompt("Digite a unidade de medida (ex: V, PSI, °C, m, kg):", unidadeMedida);
-            if (novaUnidade === null || novaUnidade.trim() === "") return; // Cancelado pelo usuário
+        
+        // 1. Configuração dos Pontos de Calibração Física (Física do Sensor)
+        function abrirConfiguracaoCalibracao() {
+            const novaUnidade = prompt("Digite a UNIDADE DE MEDIDA (ex: V, PSI, °C, m, kg):", unidadeMedida);
+            if (novaUnidade === null || novaUnidade.trim() === "") return;
+            const u = novaUnidade.trim();
 
-            // 2. Pergunta o valor do Ponto 1
-            const entradaP1 = prompt(`Digite o valor numérico para o PONTO 1 (${novaUnidade.trim()}):`, valorPonto1);
+            const entradaP1 = prompt(`Digite o valor para o PONTO 1 de calibração (${u}):`, valorPonto1);
             if (entradaP1 === null) return;
             const numP1 = parseFloat(entradaP1);
 
-            // 3. Pergunta o valor do Ponto 2
-            const entradaP2 = prompt(`Digite o valor numérico para o PONTO 2 (${novaUnidade.trim()}):`, valorPonto2);
+            const entradaP2 = prompt(`Digite o valor para o PONTO 2 de calibração (${u}):`, valorPonto2);
             if (entradaP2 === null) return;
             const numP2 = parseFloat(entradaP2);
 
-            // Validação simples
-            if (isNaN(numP1) || isNaN(numP2)) {
-                alert("Por favor, digite valores numéricos válidos!");
+            if (isNaN(numP1) || isNaN(numP2) || numP1 === numP2) {
+                alert("Os pontos devem ser números válidos e diferentes!");
                 return;
             }
 
-            if (numP1 === numP2) {
-                alert("O Ponto 1 e o Ponto 2 não podem ter o mesmo valor!");
-                return;
-            }
-
-            // Atualiza as variáveis globais
-            unidadeMedida = novaUnidade.trim();
+            unidadeMedida = u;
             valorPonto1 = numP1;
             valorPonto2 = numP2;
+            p1m.valor = valorPonto1;
+            p2m.valor = valorPonto2;
 
-            alert(`Configuração salva com sucesso!\nEscala: ${valorPonto1} ${unidadeMedida} até ${valorPonto2} ${unidadeMedida}`);
+            atualizarRotulosBotoes();
+
+            alert(`Calibração Atualizada!\nUnidade: ${unidadeMedida}\nPonto 1: ${valorPonto1} ${unidadeMedida}\nPonto 2: ${valorPonto2} ${unidadeMedida}`);
+        }
+
+        // 2. Configuração dos Limites Visuais da Barra (Escala do Instrumento)
+        function abrirConfiguracaoEscalaBarra() {
+            const entradaMin = prompt(`Digite o LIMITE MÍNIMO da barra (0%) (${unidadeMedida}):`, limiteMinBarra);
+            if (entradaMin === null) return;
+            const numMin = parseFloat(entradaMin);
+
+            const entradaMax = prompt(`Digite o LIMITE MÁXIMO da barra (100%) (${unidadeMedida}):`, limiteMaxBarra);
+            if (entradaMax === null) return;
+            const numMax = parseFloat(entradaMax);
+
+            if (isNaN(numMin) || isNaN(numMax) || numMin >= numMax) {
+                alert("O limite máximo deve ser maior que o limite mínimo!");
+                return;
+            }
+
+            limiteMinBarra = numMin;
+            limiteMaxBarra = numMax;
+
+            alert(`Escala da Barra Atualizada!\nExibição: ${limiteMinBarra} ${unidadeMedida} até ${limiteMaxBarra} ${unidadeMedida}`);
         }
         // =========================================================================
         // ATUALIZAÇÃO DOS TEXTOS DOS BOTÕES
