@@ -217,6 +217,9 @@
             <button id="btnMute">ATIVAR Vibracal</button>
             <button id="btnTouch">Touch: ATIVO 🔓</button>
     </div>    
+   <button onclick="abrirConfiguracaoGrandeza()" style="padding: 10px 15px; font-weight: bold; background-color: #007bff; color: white;       border: none; border-radius: 5px; cursor: pointer;">
+    ⚙️ Configurar Medição
+</button>
     </div>
 <div id="camadaBloqueio" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: rgba(0,0,0,0.01);"></div>
 
@@ -230,11 +233,11 @@
 </div>
 
 <div style="display: flex; gap: 10px; margin-bottom: 10px; justify-content: center;">
-    <button onclick="registrarPonto1m()" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
-        Calibrar 1 Metro
+    <button id="btnCalib1" onclick="registrarPonto(1)" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
+        Calibrar Ponto 1 (1.0 V)
     </button>
-    <button onclick="registrarPonto2m()" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
-        Calibrar 2.5 Metros
+    <button id="btnCalib2" onclick="registrarPonto(2)" style="padding: 10px; background: #0284c7; color: white; border: none; border-radius: 5px; font-weight: bold;">
+        Calibrar Ponto 2 (2.5 V)
     </button>
 </div>
 
@@ -263,7 +266,7 @@
     </div>
 
 <script>
-        // =========================================================================
+// =========================================================================
         // 1. VARIÁVEIS GLOBAIS E ESTADOS DO APLICATIVO
         // =========================================================================
         let audioContext;
@@ -272,19 +275,25 @@
         let emExecucao = false;
         let telaCongelada = false;
 
-        // Limites da Barra Horizontal (Valores padrão de bancada)
-        const FREQ_PERTO = 2800; // 1.0m aproximado
-        const FREQ_LONGE = 3800; // 2.5m aproximado
+        // Configurações Dinâmicas da Grandeza Medida (Padrão inicial: Volts)
+        let unidadeMedida = "V";
+        let valorPonto1 = 1.0;
+        let valorPonto2 = 2.5;
+        let freqMedidaGlobal = 0; // Guarda a leitura atual para os botões de calibração
 
-        // Estado da Calibração por Dois Pontos (1.0m e 2.5m)
+        // Limites Padrão de Bancada (Frequências de referência iniciais)
+        const FREQ_PERTO = 2800;
+        const FREQ_LONGE = 5000;
+
+        // Estado da Calibração por Dois Pontos
         let modoCalibracao = true;
-        let p1m = { freq: null, dist: 1.0 };
-        let p2m = { freq: null, dist: 2.5 };
+        let p1m = { freq: null, valor: valorPonto1 };
+        let p2m = { freq: null, valor: valorPonto2 };
 
         // Limites de segurança para calibração
         const FREQ_SATURACAO_MIN = 1500; 
-        const FREQ_SATURACAO_MAX = 4500; 
-        const DELTA_MINIMO_VALIDO = 100; 
+        const FREQ_SATURACAO_MAX = 7500; 
+        const DELTA_MINIMO_VALIDO = 100;
 
         // Configurações do Filtro de Média Móvel (ZCR)
         const TAMANHO_AMOSTRAS_ZCR = 4;
@@ -468,25 +477,26 @@
         }
 
         // =========================================================================
-        // 4. FUNÇÕES DE CALIBRAÇÃO (1.0m E 2.5m)
+        // 4. FUNÇÕES DE REGISTRO DE CALIBRAÇÃO DINÂMICAS
         // =========================================================================
         function registrarPonto1m() {
-            const tamanhoBuffer = analisador ? analisador.fftSize : 2048;
-            const dadosFormaOnda = new Float32Array(tamanhoBuffer);
-            if (analisador) analisador.getFloatTimeDomainData(dadosFormaOnda);
-            const taxaAmostragem = audioContext ? audioContext.sampleRate : 44100;
-
-            const fInst = calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem);
-            const fAtual = aplicarMediaMovel(fInst);
-
-            if (fAtual < FREQ_SATURACAO_MIN || fAtual > FREQ_SATURACAO_MAX) {
-                alert("Frequência fora da faixa (" + fAtual.toFixed(0) + " Hz)! Verifique o sinal.");
+            if (!freqMedida || freqMedida <= 0) {
+                alert("Nenhuma frequência válida detectada para calibração!");
                 return;
             }
 
-            p1m.freq = fAtual;
-            alert("Ponto de 1.0 Metro Registrado: " + fAtual.toFixed(1) + " Hz");
-            validarEIniciarMedicao();
+            p1m.freq = freqMedida;
+            alert(`Ponto 1 calibrado com sucesso!\nValor: ${valorPonto1} ${unidadeMedida}\nFrequência: ${freqMedida.toFixed(0)} Hz`);
+        }
+
+        function registrarPonto2m() {
+            if (!freqMedida || freqMedida <= 0) {
+                alert("Nenhuma frequência válida detectada para calibração!");
+                return;
+            }
+
+            p2m.freq = freqMedida;
+            alert(`Ponto 2 calibrado com sucesso!\nValor: ${valorPonto2} ${unidadeMedida}\nFrequência: ${freqMedida.toFixed(0)} Hz`);
         }
 
         function registrarPonto2m() {
@@ -536,6 +546,22 @@
             return Math.max(0.5, Math.min(3.5, dist));
         }
 
+       // =========================================================================
+        // VARIAVEIS DE UNIDADE E PONTOS (Adicione no topo do seu script se não existirem)
+        // =========================================================================
+
+        // Função de apoio para interpolação linear da reta
+        function calcularValorMedido(freq) {
+            let f1 = modoCalibracao ? FREQ_PERTO : p1m.freq;
+            let f2 = modoCalibracao ? FREQ_LONGE : p2m.freq;
+
+            if (!f1 || !f2 || f1 === f2) return 0;
+
+            // Equação da Reta: y = y1 + ((f - f1) / (f2 - f1)) * (y2 - y1)
+            const valorInterpolado = valorPonto1 + ((freq - f1) / (f2 - f1)) * (valorPonto2 - valorPonto1);
+            return valorInterpolado;
+        }
+
         // =========================================================================
         // 5. LAÇO DE RENDERIZAÇÃO E DESENHO NO CANVAS
         // =========================================================================
@@ -553,10 +579,12 @@
 
             const taxaAmostragem = audioContext ? audioContext.sampleRate : 44100;
 
-            // 2. CÁLCULO DA FREQUÊNCIA E DISTÂNCIA
+            // 2. CÁLCULO DA FREQUÊNCIA E VALOR INTERPOLADO
             const freqInstantanea = calcularFrequenciaZCR(dadosFormaOnda, taxaAmostragem);
             const freqMedida = aplicarMediaMovel(freqInstantanea);
-            const distCalculada = calcularDistanciaReal(freqMedida);
+            const valorCalculado = calcularValorMedido(freqMedida);
+
+            freqMedidaGlobal = freqMedida;
 
             // 3. ATUALIZAÇÃO IMEDIATA DOS MOSTRADORES HTML
             const elRMS = document.getElementById('valRMS');
@@ -567,7 +595,8 @@
             }
 
             if (elPico) {
-                elPico.textContent = distCalculada.toFixed(2) + " m";
+                // Exibe o valor interpolado acompanhado da unidade configurada
+                elPico.textContent = valorCalculado.toFixed(2) + " " + unidadeMedida;
             }
 
             // 4. DESENHO NO CANVAS E LÓGICA DO VIBRACALL
@@ -581,8 +610,8 @@
                 let f2 = modoCalibracao ? FREQ_LONGE : p2m.freq;
 
                 if (f1 && f2 && f1 !== f2) {
-                    const freqClamp = Math.min(Math.max(f1, f2), Math.max(Math.min(f1, f2), freqMedida));
-                    nivelProximidade = (freqClamp - f1) / (f2 - f1);
+                    // Mapeamento proporcional sem trava rígida na frequência de medição
+                    nivelProximidade = (freqMedida - f1) / (f2 - f1);
                     nivelProximidade = Math.max(0, Math.min(1, nivelProximidade));
                 }
 
@@ -608,11 +637,11 @@
 
             // LÓGICA DE CORES: Vermelho nas duas extremidades e Verde no centro
             if (nivel < limiteL1) {
-                ctx.fillStyle = '#FF0000'; // Vermelho (Extrema proximidade / Abaixo de L1)
+                ctx.fillStyle = '#FF0000'; // Vermelho (Abaixo de L1)
             } else if (nivel >= limiteL1 && nivel <= limiteL2) {
-                ctx.fillStyle = '#00FF00'; // Verde (Zona Segura / Centralizada entre L1 e L2)
+                ctx.fillStyle = '#00FF00'; // Verde (Zona Segura entre L1 e L2)
             } else {
-                ctx.fillStyle = '#FF0000'; // Vermelho (Extremo afastamento / Acima de L2)
+                ctx.fillStyle = '#FF0000'; // Vermelho (Acima de L2)
             }
 
             if (larguraPreenchimento > 0) {
@@ -639,17 +668,16 @@
 
             ctx.setLineDash([]);
 
-            // Rótulos de Extremidade (1.0 m à Esquerda | 2.5 m à Direita)
+            // Rótulos de Extremidade Dinâmicos com a Unidade Escolhida
             ctx.fillStyle = '#AAAAAA';
             ctx.font = '12px sans-serif';
 
             ctx.textAlign = 'left';
-            ctx.fillText('1.0 m', margemX, margemY + alturaBarra + 16);
+            ctx.fillText(valorPonto1.toFixed(1) + ' ' + unidadeMedida, margemX, margemY + alturaBarra + 16);
 
             ctx.textAlign = 'right';
-            ctx.fillText('2.5 m', margemX + larguraCalha, margemY + alturaBarra + 16);
+            ctx.fillText(valorPonto2.toFixed(1) + ' ' + unidadeMedida, margemX + larguraCalha, margemY + alturaBarra + 16);
         }
-
         // =========================================================================
         // 6. LÓGICA DO VIBRACALL E BLOQUEIO DE TELA
         // =========================================================================
@@ -757,6 +785,151 @@
                 }
             }
         }
+        // =========================================================================
+        // FUNÇÃO PARA CONFIGURAR A GRANDEZA FÍSICA E OS PONTOS DA RETA
+        // =========================================================================
+        function abrirConfiguracaoGrandeza() {
+            // 1. Pergunta o nome da unidade
+            const novaUnidade = prompt("Digite a unidade de medida (ex: V, PSI, °C, m, kg):", unidadeMedida);
+            if (novaUnidade === null || novaUnidade.trim() === "") return; // Cancelado pelo usuário
+
+            // 2. Pergunta o valor do Ponto 1
+            const entradaP1 = prompt(`Digite o valor numérico para o PONTO 1 (${novaUnidade.trim()}):`, valorPonto1);
+            if (entradaP1 === null) return;
+            const numP1 = parseFloat(entradaP1);
+
+            // 3. Pergunta o valor do Ponto 2
+            const entradaP2 = prompt(`Digite o valor numérico para o PONTO 2 (${novaUnidade.trim()}):`, valorPonto2);
+            if (entradaP2 === null) return;
+            const numP2 = parseFloat(entradaP2);
+
+            // Validação simples
+            if (isNaN(numP1) || isNaN(numP2)) {
+                alert("Por favor, digite valores numéricos válidos!");
+                return;
+            }
+
+            if (numP1 === numP2) {
+                alert("O Ponto 1 e o Ponto 2 não podem ter o mesmo valor!");
+                return;
+            }
+
+            // Atualiza as variáveis globais
+            unidadeMedida = novaUnidade.trim();
+            valorPonto1 = numP1;
+            valorPonto2 = numP2;
+
+            alert(`Configuração salva com sucesso!\nEscala: ${valorPonto1} ${unidadeMedida} até ${valorPonto2} ${unidadeMedida}`);
+        }
+        // =========================================================================
+        // ATUALIZAÇÃO DOS TEXTOS DOS BOTÕES
+        // =========================================================================
+        function atualizarRotulosBotoes() {
+            const btn1 = document.getElementById('btnCalib1');
+            const btn2 = document.getElementById('btnCalib2');
+
+            if (btn1) {
+                btn1.textContent = `Calibrar Ponto 1 (${valorPonto1} ${unidadeMedida})`;
+            }
+            if (btn2) {
+                btn2.textContent = `Calibrar Ponto 2 (${valorPonto2} ${unidadeMedida})`;
+            }
+        }
+
+        // =========================================================================
+        // ROTEADOR DE CALIBRAÇÃO (Conecta aos seus registros existentes)
+        // =========================================================================
+        function registrarPonto(numeroPonto) {
+            if (numeroPonto === 1) {
+                if (typeof registrarPonto1m === 'function') {
+                    registrarPonto1m();
+                }
+            } else if (numeroPonto === 2) {
+                if (typeof registrarPonto2m === 'function') {
+                    registrarPonto2m();
+                }
+            }
+        }
+// =========================================================================
+        // ATUALIZAÇÃO AUTOMÁTICA DOS RÓTULOS DOS BOTÕES NO HTML
+        // =========================================================================
+        function atualizarRotulosBotoes() {
+            const btn1 = document.getElementById('btnCalib1');
+            const btn2 = document.getElementById('btnCalib2');
+
+            if (btn1) {
+                btn1.textContent = `Calibrar Ponto 1 (${valorPonto1} ${unidadeMedida})`;
+            }
+            if (btn2) {
+                btn2.textContent = `Calibrar Ponto 2 (${valorPonto2} ${unidadeMedida})`;
+            }
+        }
+
+        // =========================================================================
+        // JANELA INTERATIVA DE CONFIGURAÇÃO DA GRANDEZA
+        // =========================================================================
+        function abrirConfiguracaoGrandeza() {
+            const novaUnidade = prompt("Digite a unidade de medida (ex: V, PSI, °C, m, kg):", unidadeMedida);
+            if (novaUnidade === null || novaUnidade.trim() === "") return;
+
+            const entradaP1 = prompt(`Digite o valor numérico para o PONTO 1 (${novaUnidade.trim()}):`, valorPonto1);
+            if (entradaP1 === null) return;
+            const numP1 = parseFloat(entradaP1);
+
+            const entradaP2 = prompt(`Digite o valor numérico para o PONTO 2 (${novaUnidade.trim()}):`, valorPonto2);
+            if (entradaP2 === null) return;
+            const numP2 = parseFloat(entradaP2);
+
+            if (isNaN(numP1) || isNaN(numP2) || numP1 === numP2) {
+                alert("Por favor, digite valores numéricos válidos e diferentes para os dois pontos!");
+                return;
+            }
+
+            // Atualiza as variáveis globais do sistema
+            unidadeMedida = novaUnidade.trim();
+            valorPonto1 = numP1;
+            valorPonto2 = numP2;
+
+            p1m.valor = valorPonto1;
+            p2m.valor = valorPonto2;
+
+            // Atualiza os textos dos botões no HTML
+            atualizarRotulosBotoes();
+
+            alert(`Grandeza alterada com sucesso!\nEscala configurada: ${valorPonto1} ${unidadeMedida} até ${valorPonto2} ${unidadeMedida}`);
+        }
+
+        // =========================================================================
+        // REGISTRO DOS PONTOS DE CALIBRAÇÃO COM POP-UP DINÂMICO
+        // =========================================================================
+function registrarPonto1m() {
+    if (!freqMedidaGlobal || freqMedidaGlobal <= 0) {
+        alert("Nenhuma frequência válida detectada para calibração! Verifique o sinal.");
+        return;
+    }
+
+    p1m.freq = freqMedidaGlobal;
+    p1m.valor = valorPonto1;
+    modoCalibracao = false;
+
+    alert(`Ponto 1 Calibrado com sucesso!\nValor: ${valorPonto1} ${unidadeMedida}\nFrequência: ${freqMedidaGlobal.toFixed(0)} Hz`);
+}
+
+function registrarPonto2m() {
+    if (!freqMedidaGlobal || freqMedidaGlobal <= 0) {
+        alert("Nenhuma frequência válida detectada para calibração! Verifique o sinal.");
+        return;
+    }
+
+    p2m.freq = freqMedidaGlobal;
+    p2m.valor = valorPonto2;
+    modoCalibracao = false;
+
+    alert(`Ponto 2 Calibrado com sucesso!\nValor: ${valorPonto2} ${unidadeMedida}\nFrequência: ${freqMedidaGlobal.toFixed(0)} Hz`);
+}
+
+        // Executa a atualização dos rótulos assim que o navegador carregar o HTML
+        window.addEventListener('DOMContentLoaded', atualizarRotulosBotoes);
     </script>
 </body>
 </html>
